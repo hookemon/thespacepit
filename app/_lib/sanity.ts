@@ -20,7 +20,10 @@ export const sanityClient = createClient({
 
 const builder = imageUrlBuilder(sanityClient);
 export function urlFor(source: SanityImageSource) {
-  return builder.image(source);
+  // builder.image expects the real SanityImageSource from a deep package path
+  // we can't reach from this build env (see type alias above). Cast to the
+  // builder's declared param shape — the runtime is identical.
+  return builder.image(source as Parameters<typeof builder.image>[0]);
 }
 
 const REVALIDATE_SECONDS = process.env.NODE_ENV === "production" ? 60 : 0;
