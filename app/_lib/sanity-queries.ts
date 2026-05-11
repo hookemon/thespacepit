@@ -547,13 +547,14 @@ export type VideoListItem = {
   thumbnail?: SanityImage;
   tags?: string[];
   featured?: boolean;
+  hidden?: boolean;
 };
 
 export async function getVideos(limit = 500): Promise<VideoListItem[]> {
   return sanityFetch<VideoListItem[]>(groq`
     *[_type == "video" && hidden != true]
       | order(featured desc, publishedAt desc) [0...$limit] {
-      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured, hidden
     }
   `, { limit });
 }

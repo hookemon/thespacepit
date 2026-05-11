@@ -10,6 +10,7 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { VideoListItem } from "../_lib/sanity-queries";
+import { loadYouTubeAPI, type YTPlayer } from "../_lib/yt-iframe";
 
 export type Channel = {
   id: string;
@@ -22,37 +23,8 @@ export type Channel = {
 
 type StockedChannel = Channel & { queue: VideoListItem[] };
 
-// ── YT IFrame API (same shape as RadioClient) ──
-type YTPlayer = { loadVideoById: (id: string) => void; destroy: () => void; playVideo?: () => void; pauseVideo?: () => void };
-type YTApi = {
-  Player: new (el: HTMLElement, opts: {
-    height?: string; width?: string; videoId?: string;
-    playerVars?: Record<string, string | number>;
-    events?: {
-      onReady?: (e: { target: YTPlayer }) => void;
-      onStateChange?: (e: { data: number }) => void;
-    };
-  }) => YTPlayer;
-};
-declare global {
-  interface Window {
-    YT?: YTApi;
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-let ytReadyPromise: Promise<YTApi> | null = null;
-function loadYouTubeAPI(): Promise<YTApi> {
-  if (typeof window === "undefined") return Promise.reject(new Error("server"));
-  if (window.YT?.Player) return Promise.resolve(window.YT);
-  if (ytReadyPromise) return ytReadyPromise;
-  ytReadyPromise = new Promise<YTApi>((resolve) => {
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-    window.onYouTubeIframeAPIReady = () => { if (window.YT?.Player) resolve(window.YT); };
-  });
-  return ytReadyPromise;
-}
+// YT IFrame types + loader live in _lib/yt-iframe so this file and RadioClient
+// share one global Window.YT declaration (avoids TS2717).
 
 // Shuffle a copy of an array — fresh order per channel hop.
 function shuffle<T>(arr: T[]): T[] {

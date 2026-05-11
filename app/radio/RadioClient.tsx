@@ -47,39 +47,7 @@ function sample<T>(arr: T[], n: number): T[] {
   return shuffle(arr).slice(0, n);
 }
 
-// ── YT IFrame API typing (same as before) ──
-type YTPlayer = { loadVideoById: (id: string) => void; destroy: () => void };
-type YTApi = {
-  Player: new (el: HTMLElement, opts: {
-    height?: string; width?: string; videoId?: string;
-    playerVars?: Record<string, string | number>;
-    events?: {
-      onReady?: (e: { target: YTPlayer }) => void;
-      onStateChange?: (e: { data: number }) => void;
-    };
-  }) => YTPlayer;
-};
-declare global {
-  interface Window {
-    YT?: YTApi;
-    onYouTubeIframeAPIReady?: () => void;
-  }
-}
-let ytReadyPromise: Promise<YTApi> | null = null;
-function loadYouTubeAPI(): Promise<YTApi> {
-  if (typeof window === "undefined") return Promise.reject(new Error("server"));
-  if (window.YT?.Player) return Promise.resolve(window.YT);
-  if (ytReadyPromise) return ytReadyPromise;
-  ytReadyPromise = new Promise<YTApi>((resolve) => {
-    const tag = document.createElement("script");
-    tag.src = "https://www.youtube.com/iframe_api";
-    document.head.appendChild(tag);
-    window.onYouTubeIframeAPIReady = () => {
-      if (window.YT?.Player) resolve(window.YT);
-    };
-  });
-  return ytReadyPromise;
-}
+import { loadYouTubeAPI, type YTPlayer } from "../_lib/yt-iframe";
 
 // ── Stream → Track converters ──
 function crateToTrack(r: DiscogsRelease): Track {
