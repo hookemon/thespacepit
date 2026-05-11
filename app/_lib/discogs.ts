@@ -114,7 +114,21 @@ export async function getCollection(): Promise<{ total: number; records: Discogs
     cover_image: r.basic_information.cover_image,
   }));
 
-  return { total: first.pagination.items, records };
+  // Drop spoken-word / interview / comedy / audiobook from the radio crate.
+  // Nick: "i don't want any talking no interviews."
+  const TALKING_GENRES = new Set(["Non-Music"]);
+  const TALKING_STYLES = new Set([
+    "Spoken Word", "Interview", "Comedy", "Audiobook",
+    "Story", "Public Speech", "Speech", "Education",
+    "Poetry", "Dialogue", "Monolog",
+  ]);
+  const musicOnly = records.filter((r) => {
+    if (r.genres.some((g) => TALKING_GENRES.has(g))) return false;
+    if (r.styles.some((s) => TALKING_STYLES.has(s))) return false;
+    return true;
+  });
+
+  return { total: musicOnly.length, records: musicOnly };
 }
 
 /** Discogs strips "(2)" suffixes from disambiguated artist names — pretty-print. */
