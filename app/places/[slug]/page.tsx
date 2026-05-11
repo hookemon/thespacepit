@@ -36,6 +36,9 @@ const KIND_COLORS: Record<PlaceKind, { fill: string; label: string }> = {
   "record-store":{ fill: "#0E4B3A", label: "record store" },
   vibe:          { fill: "#F4EFE6", label: "vibe" },
   moment:        { fill: "#F4EFE6", label: "moment" },
+  session:       { fill: "#F2B705", label: "session" },
+  party:         { fill: "#E83A1C", label: "party" },
+  workshop:      { fill: "#C9B9E8", label: "workshop" },
 };
 
 export default async function PlacePage({ params }: { params: Promise<{ slug: string }> }) {

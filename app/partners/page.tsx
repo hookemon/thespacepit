@@ -38,7 +38,7 @@ export default async function PartnersIndex() {
           <section className="px-8 py-12">
             <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
               {brands.map((b) => {
-                const logo = b.logo ? urlFor(b.logo).width(640).height(640).fit("contain").url() : null;
+                const logo = b.logo ? urlFor(b.logo).width(640).height(640).fit("max").url() : null;
                 const bg = b.backgroundImage ? urlFor(b.backgroundImage).width(1200).height(900).fit("crop").url() : null;
                 return (
                   <Link

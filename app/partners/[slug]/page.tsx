@@ -31,7 +31,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   const brand = await getBrandBySlug(slug);
   if (!brand) notFound();
 
-  const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("contain").url() : null;
+  const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("max").url() : null;
   const bg = brand.backgroundImage ? urlFor(brand.backgroundImage).width(2000).height(1100).fit("crop").url() : null;
 
   // Pull videos from the YouTube playlist if one is set, then combine with the

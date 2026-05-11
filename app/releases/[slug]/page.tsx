@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-const STREAM_LINK_LABELS: { key: keyof Pick<Awaited<ReturnType<typeof getReleaseBySlug>>, "spotifyUrl" | "appleMusicUrl" | "youtubeUrl" | "soundcloudUrl"> | "bandcampUrl"; label: string }[] = [
+const STREAM_LINK_LABELS: { key: keyof Pick<NonNullable<Awaited<ReturnType<typeof getReleaseBySlug>>>, "spotifyUrl" | "appleMusicUrl" | "youtubeUrl" | "soundcloudUrl"> | "bandcampUrl"; label: string }[] = [
   { key: "bandcampUrl", label: "bandcamp" },
   { key: "spotifyUrl", label: "spotify" },
   { key: "appleMusicUrl", label: "apple music" },

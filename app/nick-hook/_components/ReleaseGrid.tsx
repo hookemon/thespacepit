@@ -11,25 +11,29 @@ const ROLE_COLORS: Record<CatalogItem["roleSet"], string> = {
   djmix:      "#65C7F7",
 };
 
-// How many entries to show inline before linking to the full /catalog.
-const PREVIEW_CAP = 24;
+// Cleanup gate — drop any entry with an invalid/blank title before render.
+function isValidTitle(t: string | undefined): t is string {
+  if (!t) return false;
+  const cleaned = t.trim().replace(/[^A-Za-z0-9]/g, "");
+  return cleaned.length >= 2;
+}
 
 export async function NHReleaseGrid() {
   const all = await getCatalogForArtist("nick-hook");
 
-  // Sort chronologically newest-first (catalog already does this but be explicit).
-  const sorted = [...all].sort((a, b) => {
-    const ad = a.releaseDate ?? "";
-    const bd = b.releaseDate ?? "";
-    const ya = a.year ?? 0;
-    const yb = b.year ?? 0;
-    if (yb !== ya) return yb - ya;
-    if (ad && bd) return bd.localeCompare(ad);
-    return (b.catalogNumber ?? "").localeCompare(a.catalogNumber ?? "");
-  });
+  // Sort newest first; drop garbage titles entirely.
+  const sorted = all
+    .filter((r) => isValidTitle(r.title))
+    .sort((a, b) => {
+      const ad = a.releaseDate ?? "";
+      const bd = b.releaseDate ?? "";
+      const ya = a.year ?? 0;
+      const yb = b.year ?? 0;
+      if (yb !== ya) return yb - ya;
+      if (ad && bd) return bd.localeCompare(ad);
+      return (b.catalogNumber ?? "").localeCompare(a.catalogNumber ?? "");
+    });
 
-  const preview = sorted.slice(0, PREVIEW_CAP);
-  const overflow = sorted.length - PREVIEW_CAP;
   const labelCount = sorted.filter((r) => r.roleSet === "label").length;
 
   if (sorted.length === 0) {
@@ -82,7 +86,7 @@ export async function NHReleaseGrid() {
       </div>
 
       <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(190px, 1fr))" }}>
-        {preview.map((r) => {
+        {sorted.map((r) => {
           const cover = r.cover ? urlFor(r.cover).width(420).height(420).fit("crop").url() : null;
           const artistText = r.artists.map((a) => a.name).join(" · ");
           const color = ROLE_COLORS[r.roleSet];
@@ -123,16 +127,14 @@ export async function NHReleaseGrid() {
         })}
       </div>
 
-      {overflow > 0 && (
-        <div className="mt-7 flex justify-end">
-          <Link
-            href="/catalog"
-            className="font-display font-semibold text-[15px] tracking-[.04em] uppercase px-5 py-3 border border-paper bg-transparent text-paper hover:bg-paper hover:text-ink transition-colors no-underline"
-          >
-            +{overflow} more · open the full catalog →
-          </Link>
-        </div>
-      )}
+      <div className="mt-7 flex justify-end">
+        <Link
+          href="/catalog"
+          className="font-display font-semibold text-[15px] tracking-[.04em] uppercase px-5 py-3 border border-paper bg-transparent text-paper hover:bg-paper hover:text-ink transition-colors no-underline"
+        >
+          filter / sort in the full catalog →
+        </Link>
+      </div>
     </section>
   );
 }

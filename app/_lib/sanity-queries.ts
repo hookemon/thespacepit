@@ -826,22 +826,25 @@ export type CatalogItem = ReleaseListItem & {
  * Sorted newest first by year, then catalog number.
  */
 export async function getCatalogForArtist(slug: string): Promise<CatalogItem[]> {
-  // Releases where they're a primary artist
+  // Skip any release with a blank/garbage title (single chars, only symbols, etc).
+  const titleGuard = "&& defined(title) && length(title) >= 2";
+
   const primary = await sanityFetch<ReleaseListItem[]>(groq`
     *[
       _type == "release"
       && (withdrawn != true)
+      ${titleGuard}
       && $slug in artists[]->slug.current
     ] | order(year desc, releaseDate desc, catalogNumber desc) {
       ${releaseListProjection}
     }
   `, { slug });
 
-  // Releases where they appear in credits (and aren't a primary artist)
   const credited = await sanityFetch<(ReleaseListItem & { creditRoles: string[] })[]>(groq`
     *[
       _type == "release"
       && (withdrawn != true)
+      ${titleGuard}
       && !($slug in artists[]->slug.current)
       && count(credits[person->slug.current == $slug]) > 0
     ] | order(year desc, releaseDate desc, catalogNumber desc) {
