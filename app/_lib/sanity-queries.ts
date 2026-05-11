@@ -819,6 +819,31 @@ export async function getGearSlugs(): Promise<{ slug: string }[]> {
   `);
 }
 
+/**
+ * Pull every gear doc whose manufacturer matches the brand name. Used on
+ * the partner page to auto-populate "the full rack from {brand}" without
+ * requiring Nick to manually re-list every piece in productsUsed[].
+ *
+ * Fuzzy match: we accept exact equality on lowercased manufacturer, plus
+ * a name-fragment match (so "TE" / "Teenage Engineering" both surface the
+ * same items). Case-insensitive everywhere.
+ */
+export async function getGearForBrand(brandName: string): Promise<GearItem[]> {
+  // GROQ is case-sensitive, so normalize both sides to lower in the query.
+  // Match either: exact lowercased equality, OR brand-name-tokens substring
+  // (handles "Teenage Engineering" matching "TE" notes too).
+  return sanityFetch<GearItem[]>(groq`
+    *[_type == "gear" && defined(manufacturer) && (
+      lower(manufacturer) == lower($name) ||
+      lower(manufacturer) match (lower($name) + "*") ||
+      lower($name) match (lower(manufacturer) + "*")
+    )]
+      | order(pinned desc, status asc, name asc) {
+      _id, name, "slug": slug.current, category, status, manufacturer, note, yearAcquired, photo, pinned
+    }
+  `, { name: brandName });
+}
+
 export type PackKind =
   | "sample-pack" | "preset-pack" | "template" | "tutorial" | "loop-pack" | "drum-kit";
 

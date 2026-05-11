@@ -4,7 +4,7 @@ import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
-import { getBrandBySlug, getBrandSlugs, getVideosForBrand } from "../../_lib/sanity-queries";
+import { getBrandBySlug, getBrandSlugs, getVideosForBrand, getGearForBrand } from "../../_lib/sanity-queries";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
@@ -33,6 +33,11 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   const brand = await getBrandBySlug(slug);
   if (!brand) notFound();
   const brandVideos = await getVideosForBrand(slug);
+  // Pull every gear doc whose manufacturer matches this brand's name so
+  // we can auto-surface Nick's full rack from this brand. Skips manual
+  // re-listing in productsUsed[] — for brands like Teenage Engineering with
+  // 14+ pieces this is way better than hand-curating.
+  const fullRack = await getGearForBrand(brand.name);
 
   const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("max").url() : null;
   // Hero background: prefer explicit backgroundImage, fall back to the
@@ -241,6 +246,69 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                           )}
                         </div>
                       </Wrapper>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* === THE FULL RACK FROM {BRAND} === auto-populated from gear
+                docs whose manufacturer matches this brand. For brands like TE
+                or Roland where Nick has many pieces, this saves him from
+                re-listing each one in productsUsed. Clicks through to each
+                gear's detail page. */}
+            {fullRack.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
+                  THE FULL RACK · EVERYTHING {brand.name.toUpperCase()} IN MY ROOM
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+                >
+                  the shelf · {brand.name.toLowerCase()}
+                </h2>
+                <div
+                  className="grid gap-3"
+                  style={{ gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))" }}
+                >
+                  {fullRack.map((g) => {
+                    const photo = g.photo ? urlFor(g.photo).width(480).height(360).fit("crop").url() : null;
+                    return (
+                      <Link
+                        key={g._id}
+                        href={`/gear/${g.slug}`}
+                        className="group block border border-paper bg-ink-2 transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#F2B705] no-underline text-paper overflow-hidden"
+                      >
+                        <div className="aspect-[4/3] border-b border-paper bg-ink-2 overflow-hidden relative flex items-center justify-center">
+                          {photo ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={photo} alt={g.name} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                          ) : (
+                            <div className="font-display font-bold uppercase text-center px-3 text-paper-2/80 leading-tight" style={{ fontSize: 16, letterSpacing: "-0.01em" }}>
+                              {g.name.replace(new RegExp(`^${brand.name}\\s*`, "i"), "")}
+                            </div>
+                          )}
+                          {g.pinned && (
+                            <div
+                              className="absolute top-1.5 right-1.5 font-mono text-[7px] tracking-[.16em] uppercase px-1 py-0.5 rounded-full bg-lamp text-ink"
+                            >
+                              patched
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3">
+                          <div className="font-display font-semibold text-[14px] uppercase tracking-[-0.005em] leading-tight line-clamp-2">
+                            {g.name.replace(new RegExp(`^${brand.name}\\s*`, "i"), "")}
+                          </div>
+                          <div className="font-mono text-[8px] tracking-[.14em] uppercase text-paper-2 mt-1.5 flex items-center gap-1.5">
+                            <span>{g.category.replace("-", " ")}</span>
+                            {g.status === "active" && <span className="text-lamp">·  active</span>}
+                            {g.status === "shelf" && <span>· shelf</span>}
+                            {g.status === "travel" && <span>· travel</span>}
+                          </div>
+                        </div>
+                      </Link>
                     );
                   })}
                 </div>

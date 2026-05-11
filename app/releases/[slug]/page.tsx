@@ -412,6 +412,34 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             )}
 
             <RelatedVideos videos={releaseVideos} eyebrow={`FROM THE CHANNEL · ${releaseVideos.length}`} title="videos" theme="light" />
+
+            {/* "LISTEN ON" footer — repeats the stream-out links at the bottom
+                of the article so visitors who scrolled past the meta header
+                can still reach Spotify / Apple / etc. without scrolling back. */}
+            {(release.bandcampUrl || release.spotifyUrl || release.appleMusicUrl || release.youtubeUrl || release.soundcloudUrl) && (
+              <section className="mt-16 pt-8 border-t-2 border-ink">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
+                  LISTEN ON · ALL THE PLATFORMS
+                </div>
+                <div className="flex flex-wrap gap-2.5">
+                  {STREAM_LINK_LABELS.map((link) => {
+                    const url = release[link.key];
+                    if (!url) return null;
+                    return (
+                      <a
+                        key={`bot-${link.key}`}
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-display font-semibold text-[14px] tracking-[.04em] uppercase px-5 py-3 border border-ink bg-paper text-ink hover:bg-ink hover:text-paper transition-colors no-underline"
+                      >
+                        {link.label} →
+                      </a>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </div>
         </article>
       </main>
