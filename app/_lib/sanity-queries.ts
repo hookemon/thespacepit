@@ -80,6 +80,9 @@ export type ArtistListItem = {
   city?: string;
   tagline?: string;
   portrait?: SanityImage;
+  /** When true, the artist page (and rosters) render initials instead of the
+   *  portrait — e.g. "NH" as a big monogram. Design-block over photo. */
+  displayInitials?: boolean;
   onLabel?: boolean;
 };
 
@@ -420,6 +423,7 @@ const artistListProjection = `
   city,
   tagline,
   portrait,
+  displayInitials,
   onLabel
 `;
 

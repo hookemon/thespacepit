@@ -22,6 +22,13 @@ export const artist = defineType({
     }),
     defineField({ name: "portrait", title: "Portrait image", type: "image", options: { hotspot: true } }),
     defineField({
+      name: "displayInitials",
+      title: "Show initials instead of portrait",
+      type: "boolean",
+      description: 'When ON, the artist page renders a big monogram (e.g. "NH") instead of the portrait. For when the design-block look hits harder than any photo would.',
+      initialValue: false,
+    }),
+    defineField({
       name: "gallery",
       title: "Photo gallery",
       type: "array",

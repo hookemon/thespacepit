@@ -36,7 +36,14 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
   const artist = await getArtistBySlug(slug);
   if (!artist) notFound();
 
+  const useInitials = artist.displayInitials || !artist.portrait;
   const portraitUrl = artist.portrait ? urlFor(artist.portrait).width(800).height(800).fit("crop").url() : null;
+  const initials = (() => {
+    const parts = artist.name.replace(/[\(\[\{].*?[\)\]\}]/g, "").split(/\s+/).filter(Boolean);
+    if (parts.length === 0) return "·";
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  })();
 
   return (
     <>
@@ -52,11 +59,29 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
             </Link>
 
             <div className="grid gap-10 mt-6 md:grid-cols-[minmax(240px,360px)_1fr] items-start">
-              <div className="aspect-square border border-ink overflow-hidden bg-paper-2 flex items-center justify-center">
-                {portraitUrl ? (
+              <div
+                className="aspect-square border border-ink overflow-hidden flex items-center justify-center relative"
+                style={{ background: useInitials ? "#F2B705" : undefined }}
+              >
+                {useInitials ? (
+                  <>
+                    {/* Big lamp-amber block with the initials punched out — design-system
+                        anchor (lamp #F2B705) + ink. Hard-offset shadow per the brand. */}
+                    <span
+                      className="font-display font-black uppercase text-ink select-none leading-none"
+                      style={{
+                        fontSize: "clamp(120px, 22vw, 280px)",
+                        letterSpacing: "-0.04em",
+                      }}
+                      aria-label={artist.name}
+                    >
+                      {initials}
+                    </span>
+                  </>
+                ) : portraitUrl ? (
                   <img src={portraitUrl} alt={artist.name} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="font-display font-bold uppercase text-[40px] text-ink-3 p-6 text-center" style={{ letterSpacing: "-0.02em" }}>
+                  <div className="font-display font-bold uppercase text-[40px] text-ink-3 p-6 text-center bg-paper-2 w-full h-full flex items-center justify-center" style={{ letterSpacing: "-0.02em" }}>
                     {artist.name}
                   </div>
                 )}
