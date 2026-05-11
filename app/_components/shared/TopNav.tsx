@@ -23,9 +23,10 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
   ],
   spacepit: [
     { href: "/watch", label: "watch" },
+    { href: "/tv", label: "tv" },
+    { href: "/radio", label: "radio" },
     { href: "/mixes", label: "mixes" },
     { href: "/listening", label: "listening" },
-    { href: "/radio", label: "radio" },
     { href: "/packs", label: "packs" },
     { href: "/map", label: "map" },
     { href: "/studios", label: "studios" },

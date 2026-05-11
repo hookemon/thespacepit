@@ -177,7 +177,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                   <p className="font-serif italic text-[20px] mt-4 max-w-[560px]">{release.tagline}</p>
                 )}
 
-                {(release.bandcampAlbumId || release.bandcampTrackId || release.bandcampUrl) && (
+                {(release.bandcampAlbumId || release.bandcampTrackId || release.bandcampUrl) ? (
                   <div className="mt-7">
                     <BandcampEmbed
                       albumId={release.bandcampAlbumId}
@@ -187,7 +187,14 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                       size="large"
                     />
                   </div>
-                )}
+                ) : release.youtubeUrl ? (
+                  // No Bandcamp → fall back to a YouTube embed so EVERY release
+                  // is listenable inline, not just click-out. Stream buttons
+                  // still render below for save-to-library.
+                  <div className="mt-7">
+                    <MediaEmbed url={release.youtubeUrl} title={`${release.title} — ${artistNames}`} />
+                  </div>
+                ) : null}
 
                 <div className="flex flex-wrap gap-2 mt-6">
                   {STREAM_LINK_LABELS.map((link) => {
