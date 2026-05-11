@@ -152,12 +152,12 @@ export default async function JamPage() {
               </Link>
             </div>
 
-            {featured.stems.length > 0 && (
+            {(featured.stems?.length ?? 0) > 0 && (
               <div className="mb-12">
-                <StemPlayer stems={featured.stems} trackTitle={featured.stemsTrackTitle ?? featured.title} />
+                <StemPlayer stems={featured.stems!} trackTitle={featured.stemsTrackTitle ?? featured.title} />
               </div>
             )}
-            {featured.oneshots.length > 0 && <PadGrid pads={featured.oneshots} />}
+            {(featured.oneshots?.length ?? 0) > 0 && <PadGrid pads={featured.oneshots!} />}
           </section>
         )}
 
