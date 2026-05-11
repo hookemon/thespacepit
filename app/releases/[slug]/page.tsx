@@ -177,7 +177,16 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                   <p className="font-serif italic text-[20px] mt-4 max-w-[560px]">{release.tagline}</p>
                 )}
 
-                {(release.bandcampAlbumId || release.bandcampTrackId || release.bandcampUrl) ? (
+                {/* Embed priority: YOUTUBE first if present (auto-plays full
+                    album, no click required) — otherwise Bandcamp embed.
+                    Bandcamp keeps a button in the LISTEN ON footer for
+                    save-to-library. Was Bandcamp-first; flipped because
+                    bandcamp embeds are 30s-preview only on auto-load. */}
+                {release.youtubeUrl ? (
+                  <div className="mt-7">
+                    <MediaEmbed url={release.youtubeUrl} title={`${release.title} — ${artistNames}`} />
+                  </div>
+                ) : (release.bandcampAlbumId || release.bandcampTrackId || release.bandcampUrl) ? (
                   <div className="mt-7">
                     <BandcampEmbed
                       albumId={release.bandcampAlbumId}
@@ -186,13 +195,6 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                       title={`${release.title} — ${artistNames}`}
                       size="large"
                     />
-                  </div>
-                ) : release.youtubeUrl ? (
-                  // No Bandcamp → fall back to a YouTube embed so EVERY release
-                  // is listenable inline, not just click-out. Stream buttons
-                  // still render below for save-to-library.
-                  <div className="mt-7">
-                    <MediaEmbed url={release.youtubeUrl} title={`${release.title} — ${artistNames}`} />
                   </div>
                 ) : null}
 

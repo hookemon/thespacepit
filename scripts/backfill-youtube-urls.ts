@@ -52,8 +52,11 @@ type Release = {
 
 function searchQuery(r: Release): string {
   const artist = (r.artists ?? []).map((a) => a.name).join(" ").trim();
-  if (/^various/i.test(artist) || !artist) return r.title;
-  return `${artist} ${r.title}`;
+  // Bias toward distributor "- Topic" channels (auto-uploads of every track
+  // by official distributors — these are the canonical YouTube versions of
+  // every release vs. random fan reuploads).
+  if (/^various/i.test(artist) || !artist) return `${r.title} topic`;
+  return `${artist} ${r.title} topic`;
 }
 
 async function searchYouTube(q: string): Promise<{ videoId: string; title: string; channel: string } | null> {
@@ -82,12 +85,12 @@ async function searchYouTube(q: string): Promise<{ videoId: string; title: strin
 }
 
 (async () => {
+  // Now also includes bandcamp-having releases that don't have a YouTube
+  // fallback yet — bandcamp can't auto-play full albums, YouTube can, so
+  // adding both gives every release a real inline-play option.
   const orphans: Release[] = await sanity.fetch(`
     *[_type == "release" && (withdrawn != true)
-      && !defined(bandcampUrl) && !defined(bandcampAlbumId) && !defined(bandcampTrackId)
-      && !defined(spotifyUrl) && !defined(appleMusicUrl)
       && !defined(youtubeUrl) && !defined(youtubePlaylistId)
-      && !defined(soundcloudUrl)
     ] | order(year desc, releaseDate desc) {
       _id, title, "artists": artists[]->{name}
     }
