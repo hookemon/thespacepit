@@ -110,6 +110,19 @@ export type PressQuoteItem = {
   source: string;
   url?: string;
   year?: number;
+  // === new fields (all optional for backwards compat with legacy quote-only docs) ===
+  kind?: "review" | "interview" | "feature" | "profile" | "mention" | "list-inclusion" | "premiere";
+  headline?: string;
+  excerpt?: string;
+  outlet?: string;
+  author?: string;
+  date?: string;  // YYYY-MM-DD
+  image?: SanityImage;
+  featured?: boolean;
+  /** Resolved era reference for press attached to MWC, CZ, etc. */
+  era?: { name: string; slug: string };
+  /** Resolved release if this piece reviews a specific record. */
+  release?: { _id: string; title: string; slug: string };
 };
 
 export type LiveDateItem = {
@@ -452,12 +465,54 @@ export async function getArtistSlugs(): Promise<{ slug: string }[]> {
   `);
 }
 
+// Projection used by every press query — pulls legacy + new fields plus
+// resolved era / release refs in one shot so the page doesn't need a 2nd
+// round-trip.
+const pressProjection = `
+  _id, quote, source, url, year,
+  kind, headline, excerpt, outlet, author, date, image, featured,
+  "era": relatedEra->{ name, "slug": slug.current },
+  "release": relatedRelease->{ _id, title, "slug": slug.current }
+`;
+
 export async function getPressQuotes(limit = 8): Promise<PressQuoteItem[]> {
+  // Press wall on /nick-hook#press — featured only, top hits.
   return sanityFetch<PressQuoteItem[]>(groq`
-    *[_type == "pressQuote" && featured == true] | order(year desc) [0...$limit] {
-      _id, quote, source, url, year
+    *[_type == "pressQuote" && featured == true] | order(coalesce(date, "0000") desc, year desc) [0...$limit] {
+      ${pressProjection}
     }
   `, { limit });
+}
+
+/**
+ * The master /press list — every piece, newest first, with full metadata
+ * so the page can filter by kind / era / outlet.
+ */
+export async function getAllPress(): Promise<PressQuoteItem[]> {
+  return sanityFetch<PressQuoteItem[]>(groq`
+    *[_type == "pressQuote"]
+      | order(coalesce(date, year + "-01-01", "0000") desc) {
+      ${pressProjection}
+    }
+  `);
+}
+
+export async function getPressForRelease(releaseSlug: string): Promise<PressQuoteItem[]> {
+  return sanityFetch<PressQuoteItem[]>(groq`
+    *[_type == "pressQuote" && relatedRelease->slug.current == $slug]
+      | order(coalesce(date, "0000") desc) {
+      ${pressProjection}
+    }
+  `, { slug: releaseSlug });
+}
+
+export async function getPressForEra(eraSlug: string): Promise<PressQuoteItem[]> {
+  return sanityFetch<PressQuoteItem[]>(groq`
+    *[_type == "pressQuote" && relatedEra->slug.current == $slug]
+      | order(coalesce(date, "0000") desc) {
+      ${pressProjection}
+    }
+  `, { slug: eraSlug });
 }
 
 export async function getUpcomingLiveDates(limit = 12): Promise<LiveDateItem[]> {

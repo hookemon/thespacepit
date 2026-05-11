@@ -21,6 +21,7 @@ export const STUDIO_CLIENTS: string[] = [
   "B.I.C.",
   "Big Boi",
   "Black Noise",
+  "Blaqstarr",
   "Byron The Aquarius",
   "Cadence Weapon",
   "Chino Amobi",
