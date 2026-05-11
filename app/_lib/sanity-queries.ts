@@ -195,11 +195,43 @@ export type BrandListItem = {
   featured?: boolean;
 };
 
+// One block of a brand's embedded article. The article body is stored as an
+// ordered array of these on the brand doc so the partner page can render it
+// as an inline reader instead of just linking out.
+export type ArticleBodyBlock = {
+  _key?: string;
+  kind: "h2" | "h3" | "p" | "video" | "soundcloud";
+  text?: string;
+  url?: string;
+  caption?: string;
+};
+
 export type BrandDetail = BrandListItem & {
   story?: unknown[];
   youtubePlaylistId?: string;
   videos?: { title?: string; youtubeUrl: string }[];
   gear?: string[];
+  articleUrl?: string;
+  articleTitle?: string;
+  articleImage?: SanityImage;
+  articleQuote?: string;
+  articleBody?: ArticleBodyBlock[];
+  productsUsed?: {
+    name: string;
+    url?: string;
+    image?: SanityImage;
+    note?: string;
+  }[];
+  workshops?: {
+    date?: string;
+    yearOnly?: boolean;
+    city?: string;
+    country?: string;
+    venue?: string;
+    kind?: string;
+    note?: string;
+    url?: string;
+  }[];
 };
 
 export type StudioListItem = {
@@ -447,6 +479,48 @@ const mixListProjection = `
   featured
 `;
 
+// ── Videos (synced from YouTube into Sanity, taggable + linkable) ──
+
+export type VideoListItem = {
+  _id: string;
+  youtubeId: string;
+  title: string;
+  publishedAt?: string;
+  duration?: string;
+  viewCount?: number;
+  thumbnailUrl?: string;
+  thumbnail?: SanityImage;
+  tags?: string[];
+  featured?: boolean;
+};
+
+export async function getVideos(limit = 500): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true]
+      | order(featured desc, publishedAt desc) [0...$limit] {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { limit });
+}
+
+export async function getVideosForRelease(releaseSlug: string): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true && relatedRelease->slug.current == $slug]
+      | order(publishedAt desc) {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { slug: releaseSlug });
+}
+
+export async function getVideosForEra(projectSlug: string): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true && relatedEra->slug.current == $slug]
+      | order(publishedAt desc) {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { slug: projectSlug });
+}
+
 export async function getMixes(limit = 60): Promise<MixListItem[]> {
   return sanityFetch<MixListItem[]>(groq`
     *[_type == "mix"] | order(featured desc, date desc) [0...$limit] {
@@ -549,7 +623,14 @@ export async function getBrandBySlug(slug: string): Promise<BrandDetail | null> 
       story,
       youtubePlaylistId,
       videos,
-      gear
+      gear,
+      articleUrl,
+      articleTitle,
+      articleImage,
+      articleQuote,
+      articleBody,
+      productsUsed,
+      workshops
     }
   `, { slug });
 }

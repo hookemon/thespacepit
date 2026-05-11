@@ -8,6 +8,7 @@ import { getBrandBySlug, getBrandSlugs } from "../../_lib/sanity-queries";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
+import { ArticleReader } from "./ArticleReader";
 
 export const revalidate = 60;
 
@@ -32,7 +33,14 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   if (!brand) notFound();
 
   const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("max").url() : null;
-  const bg = brand.backgroundImage ? urlFor(brand.backgroundImage).width(2000).height(1100).fit("crop").url() : null;
+  // Hero background: prefer explicit backgroundImage, fall back to the
+  // featured article's hero image, so brands like Ableton can populate one
+  // upload and have it work everywhere.
+  const heroSrc = brand.backgroundImage ?? brand.articleImage;
+  const bg = heroSrc ? urlFor(heroSrc).width(2000).height(1100).fit("crop").url() : null;
+  const articleImg = brand.articleImage
+    ? urlFor(brand.articleImage).width(1600).height(900).fit("crop").url()
+    : null;
 
   // Pull videos from the YouTube playlist if one is set, then combine with the
   // manual videos[] list. Dedupe so a clip showing up in both places only
@@ -153,6 +161,89 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
               </section>
             )}
 
+            {/* === THE ARTICLE — INLINE READER === if this brand has an
+                article body scraped onto its doc, render it big as the lead
+                long-form section. Recreates the article on Nick's site so
+                it's part of the partnership page, not a portal out. */}
+            {brand.articleBody && brand.articleBody.length > 0 && (
+              <ArticleReader
+                brandName={brand.name}
+                articleTitle={brand.articleTitle}
+                articleUrl={brand.articleUrl}
+                body={brand.articleBody}
+                heroImg={articleImg}
+              />
+            )}
+
+            {/* === PRODUCTS USED === the brand's actual products Nick uses */}
+            {brand.productsUsed && brand.productsUsed.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                  IN THE RIG
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+                >
+                  products i actually use
+                </h2>
+                <div
+                  className="grid gap-4"
+                  style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}
+                >
+                  {brand.productsUsed.map((p, i) => {
+                    const img = p.image ? urlFor(p.image).width(720).height(720).fit("crop").url() : null;
+                    const Wrapper = (props: { children: React.ReactNode }) =>
+                      p.url ? (
+                        <a
+                          href={p.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="group block border border-paper bg-ink-2 transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#F2B705] no-underline text-paper overflow-hidden"
+                        >
+                          {props.children}
+                        </a>
+                      ) : (
+                        <div className="block border border-paper bg-ink-2 overflow-hidden">{props.children}</div>
+                      );
+                    return (
+                      <Wrapper key={i}>
+                        <div className="aspect-square border-b border-paper bg-ink-2 overflow-hidden relative flex items-center justify-center">
+                          {img ? (
+                            <img
+                              src={img}
+                              alt={p.name}
+                              loading="lazy"
+                              className="absolute inset-0 w-full h-full object-cover"
+                            />
+                          ) : (
+                            <div className="font-display font-bold uppercase text-center px-4 text-paper-2" style={{ fontSize: 22, letterSpacing: "-0.015em" }}>
+                              {p.name}
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3.5">
+                          <div className="font-display font-semibold text-[18px] uppercase tracking-[-0.005em] leading-tight line-clamp-2">
+                            {p.name}
+                          </div>
+                          {p.note && (
+                            <div className="font-mono text-[10px] tracking-[.06em] text-on-dark mt-1.5 leading-snug line-clamp-3">
+                              {p.note}
+                            </div>
+                          )}
+                          {p.url && (
+                            <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 mt-2 group-hover:text-lamp transition-colors">
+                              learn more ↗
+                            </div>
+                          )}
+                        </div>
+                      </Wrapper>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
             {hasClips && (
               <section className={brand.story && Array.isArray(brand.story) && brand.story.length > 0 ? "mt-16" : ""}>
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
@@ -179,6 +270,102 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                     </div>
                   ))}
                 </div>
+              </section>
+            )}
+
+            {/* === WORKSHOPS / MASTERCLASSES / TALKS === sortable list of
+                every event with this brand. Empty entries hidden. */}
+            {brand.workshops && brand.workshops.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                  ON THE ROAD WITH {brand.name.toUpperCase()}
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+                >
+                  workshops + talks
+                </h2>
+                <ol className="list-none p-0 m-0 border-t border-paper/30 max-w-[920px]">
+                  {[...brand.workshops]
+                    .sort((a, b) => {
+                      // Latest first — fall back to year prefix if no full date
+                      const ad = a.date ?? "";
+                      const bd = b.date ?? "";
+                      return bd.localeCompare(ad);
+                    })
+                    .map((w, i) => {
+                      const place = [w.venue, w.city, w.country].filter(Boolean).join(" · ");
+                      const Inner = (
+                        <>
+                          <div className="font-mono text-[11px] tracking-[.12em] uppercase text-paper-2 shrink-0 w-[120px] tabular-nums">
+                            {w.date
+                              ? w.yearOnly
+                                ? w.date.slice(0, 4)
+                                : w.date
+                              : "—"}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-display font-semibold text-[18px] uppercase tracking-[-0.005em] leading-tight">
+                              {place || w.kind || "workshop"}
+                            </div>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              {w.kind && (
+                                <span className="font-mono text-[9px] tracking-[.14em] uppercase text-redline">
+                                  {w.kind}
+                                </span>
+                              )}
+                              {w.note && (
+                                <span className="font-serif italic text-[14px] text-paper-2">
+                                  {w.note}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          {w.url && (
+                            <span className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 group-hover:text-redline transition-colors shrink-0">
+                              recap ↗
+                            </span>
+                          )}
+                        </>
+                      );
+                      return (
+                        <li key={i} className="border-b border-paper/30 py-3">
+                          {w.url ? (
+                            <a
+                              href={w.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="group flex items-baseline gap-4 no-underline text-paper hover:opacity-90"
+                            >
+                              {Inner}
+                            </a>
+                          ) : (
+                            <div className="flex items-baseline gap-4">{Inner}</div>
+                          )}
+                        </li>
+                      );
+                    })}
+                </ol>
+              </section>
+            )}
+
+            {/* === PRESS FALLBACK === If we have an articleUrl but no
+                articleBody scraped yet, show a small link card so the page
+                isn't completely missing the press piece. */}
+            {brand.articleUrl && (!brand.articleBody || brand.articleBody.length === 0) && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                  PRESS · {brand.name.toUpperCase()} WROTE ABOUT ME
+                </div>
+                <a
+                  href={brand.articleUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 font-mono text-[11px] tracking-[.14em] uppercase px-4 py-2 border border-paper rounded-full hover:bg-paper hover:text-ink transition-colors no-underline text-paper"
+                >
+                  {brand.articleTitle ?? "read the article"} ↗
+                </a>
               </section>
             )}
 

@@ -12,7 +12,42 @@ export type Embed = {
   aspectRatio: number;
   thumbnail?: string;
   rawUrl: string;
+  /** For YouTube: deep-link timestamp in seconds (e.g. ?t=183). */
+  startSeconds?: number;
 };
+
+/**
+ * Parse a YouTube timestamp from any of the forms YouTube accepts:
+ *   ?t=183   ?t=3m3s   &start=183
+ * Returns seconds (integer). Returns 0 if not present.
+ */
+function parseYouTubeTimestamp(url: string): number {
+  const m = url.match(/[?&](?:t|start)=([0-9hms]+)/i);
+  if (!m) return 0;
+  const v = m[1];
+  if (/^\d+$/.test(v)) return parseInt(v, 10);
+  // "3m3s" / "1h2m3s" form
+  let total = 0;
+  const re = /(\d+)([hms])/g;
+  let part: RegExpExecArray | null;
+  while ((part = re.exec(v)) !== null) {
+    const n = parseInt(part[1], 10);
+    if (part[2] === "h") total += n * 3600;
+    else if (part[2] === "m") total += n * 60;
+    else total += n;
+  }
+  return total;
+}
+
+/** Format seconds as M:SS or H:MM:SS for display. */
+export function formatTimestamp(s: number): string {
+  if (s < 60) return `0:${String(s).padStart(2, "0")}`;
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+  return `${m}:${String(sec).padStart(2, "0")}`;
+}
 
 const YT_RE = /(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/|v\/|live\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
 const IG_RE = /instagram\.com\/(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/;
@@ -24,12 +59,18 @@ export function parseEmbed(url: string): Embed {
   const ytMatch = url.match(YT_RE);
   if (ytMatch) {
     const id = ytMatch[1];
+    // Pull a `?t=` / `?start=` timestamp so a deep-link like
+    // youtu.be/abc?t=183 jumps the embed to that second.
+    const ts = parseYouTubeTimestamp(url);
+    const params = ["rel=0"];
+    if (ts > 0) params.push(`start=${ts}`);
     return {
       kind: "youtube",
-      src: `https://www.youtube-nocookie.com/embed/${id}?rel=0`,
+      src: `https://www.youtube-nocookie.com/embed/${id}?${params.join("&")}`,
       aspectRatio: 16 / 9,
       thumbnail: `https://i.ytimg.com/vi/${id}/hqdefault.jpg`,
       rawUrl: url,
+      startSeconds: ts > 0 ? ts : undefined,
     };
   }
 

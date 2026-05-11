@@ -19,20 +19,29 @@ export function TracklistAndCover({ tracklist }: { tracklist: Track[] }) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize a single Audio element on mount.
+  // NOTE: do NOT set crossOrigin — Bandcamp's t4.bcbits.com CDN doesn't send
+  // CORS headers, so requesting "anonymous" silently fails. Plain <audio>
+  // playback doesn't need CORS unless you're routing through Web Audio.
   useEffect(() => {
     const audio = new Audio();
     audio.preload = "none";
-    audio.crossOrigin = "anonymous";
     audioRef.current = audio;
     const onEnd = () => { setPlayingIdx(null); setProgress(0); };
+    const onErr = (e: Event) => {
+      // Help future-me debug expired tokens / network blocks
+      console.warn("[tracklist] audio error", (e.target as HTMLAudioElement)?.error);
+      setPlayingIdx(null);
+    };
     const onTime = () => {
       if (audio.duration) setProgress(audio.currentTime / audio.duration);
     };
     audio.addEventListener("ended", onEnd);
+    audio.addEventListener("error", onErr);
     audio.addEventListener("timeupdate", onTime);
     return () => {
       audio.pause();
       audio.removeEventListener("ended", onEnd);
+      audio.removeEventListener("error", onErr);
       audio.removeEventListener("timeupdate", onTime);
       audioRef.current = null;
     };

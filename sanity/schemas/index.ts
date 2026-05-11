@@ -11,5 +11,6 @@ import { studio } from "./studio";
 import { place } from "./place";
 import { gear } from "./gear";
 import { pack } from "./pack";
+import { video } from "./video";
 
-export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack];
+export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack, video];

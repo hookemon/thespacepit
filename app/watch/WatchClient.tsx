@@ -1,88 +1,105 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { YouTubeVideo } from "../_lib/youtube";
+import type { VideoListItem } from "../_lib/sanity-queries";
 
-type PlaylistBucket = {
-  slug: string;
-  title: string;
-  description: string;
-  videos: YouTubeVideo[];
-};
+type TagChip = { value: string; label: string; count: number };
 
-export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
+export function WatchClient({ videos, tags }: { videos: VideoListItem[]; tags: TagChip[] }) {
   const [filter, setFilter] = useState<string>("all");
   const [open, setOpen] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return buckets.flatMap((b) => {
-      if (filter !== "all" && b.slug !== filter) return [];
-      return b.videos.map((v) => ({ ...v, _bucket: b }));
-    }).filter((v) => !q || v.title.toLowerCase().includes(q));
-  }, [buckets, filter, search]);
+    return videos.filter((v) => {
+      if (filter !== "all" && !(v.tags ?? []).includes(filter)) return false;
+      if (q && !v.title.toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [videos, filter, search]);
 
-  const totalCount = buckets.reduce((sum, b) => sum + b.videos.length, 0);
+  const totalCount = videos.length;
 
   return (
     <>
-      <div className="px-5 sm:px-8 py-6 border-b border-ink/30 sticky top-0 z-[5] bg-paper/90 backdrop-blur-md">
-        <div className="flex flex-wrap items-center gap-3">
+      {/* STICKY TAG NAV + SEARCH */}
+      <div className="px-5 sm:px-8 py-5 border-b border-ink/30 sticky top-[60px] z-[5] bg-paper/92 backdrop-blur-md">
+        <div className="flex flex-wrap items-center gap-2.5">
           <input
             type="search"
             placeholder="search title…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="bg-transparent border border-ink text-ink px-3 py-2 font-mono text-[12px] tracking-[.05em] placeholder:text-mute focus:outline-none focus:border-lamp-deep min-w-[220px]"
+            className="bg-transparent border border-ink text-ink px-3 py-1.5 font-mono text-[12px] tracking-[.05em] placeholder:text-mute focus:outline-none focus:border-lamp-deep min-w-[200px]"
           />
           <button
             onClick={() => setFilter("all")}
-            className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors ${filter === "all" ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
+            className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === "all" ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
           >
             all · {totalCount}
           </button>
-          {buckets.map((b) => (
+          {tags.map((t) => (
             <button
-              key={b.slug}
-              onClick={() => setFilter(b.slug)}
-              className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors ${filter === b.slug ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
+              key={t.value}
+              onClick={() => setFilter(t.value)}
+              className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === t.value ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
             >
-              {b.title.toLowerCase()}
+              {t.label} · {t.count}
             </button>
           ))}
         </div>
+        {filter !== "all" && (
+          <div className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 mt-2.5">
+            showing {visible.length} of {totalCount}
+          </div>
+        )}
       </div>
 
-      <section className="px-5 sm:px-8 py-8">
+      {/* VIDEO GRID */}
+      <section className="px-5 sm:px-8 py-10">
         {visible.length === 0 ? (
-          <p className="font-mono text-[12px] tracking-[.08em] uppercase text-mute">no videos match.</p>
+          <p className="font-mono text-[12px] tracking-[.08em] uppercase text-mute text-center py-20">
+            no videos match{search ? ` "${search}"` : ""}{filter !== "all" ? ` in ${filter}` : ""}.
+          </p>
         ) : (
           <div className="grid gap-[18px]" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
             {visible.map((v) => (
               <button
-                key={`${v._bucket.slug}-${v.id}`}
-                onClick={() => setOpen(v.id)}
+                key={v._id}
+                onClick={() => setOpen(v.youtubeId)}
                 className="group text-left border border-ink bg-paper flex flex-col cursor-pointer transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#0B0B0B]"
               >
-                <div className="relative border-b border-ink overflow-hidden" style={{ aspectRatio: "16 / 9" }}>
-                  <img
-                    src={v.thumbnail}
-                    alt={v.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    loading="lazy"
-                  />
+                <div className="relative border-b border-ink overflow-hidden bg-ink" style={{ aspectRatio: "16 / 9" }}>
+                  {v.thumbnailUrl && (
+                    <img
+                      src={v.thumbnailUrl}
+                      alt={v.title}
+                      className="absolute inset-0 w-full h-full object-cover"
+                      loading="lazy"
+                    />
+                  )}
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 border border-paper rounded-full bg-ink/60 text-paper flex items-center justify-center text-[22px] group-hover:bg-ink transition-colors">▶</div>
+                    <div className="w-14 h-14 border border-paper rounded-full bg-ink/60 text-paper flex items-center justify-center text-[22px] group-hover:bg-redline transition-colors">▶</div>
                   </div>
                   {v.duration && (
                     <div className="absolute bottom-2 right-2 bg-ink text-paper font-mono text-[11px] px-1.5 py-0.5 tracking-[.05em]">{v.duration}</div>
                   )}
-                  <div className="absolute top-2 left-2 bg-paper/90 text-ink font-mono text-[9px] px-1.5 py-0.5 tracking-[.12em] uppercase">{v._bucket.title}</div>
+                  {v.tags && v.tags.length > 0 && (
+                    <div className="absolute top-2 left-2 bg-paper/90 text-ink font-mono text-[9px] px-1.5 py-0.5 tracking-[.12em] uppercase">{v.tags[0]}</div>
+                  )}
                 </div>
                 <div className="p-3.5">
-                  <div className="font-display font-semibold text-[20px] uppercase leading-tight tracking-[-0.005em] line-clamp-2">{v.title}</div>
-                  <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{v.viewCount} views · {v.ago} ago</div>
+                  <div className="font-display font-semibold text-[18px] uppercase leading-tight tracking-[-0.005em] line-clamp-2">{v.title}</div>
+                  <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2 flex flex-wrap items-center gap-x-2">
+                    {v.viewCount !== undefined && v.viewCount > 0 && <span>{formatViews(v.viewCount)}</span>}
+                    {v.publishedAt && (
+                      <>
+                        {v.viewCount ? <span>·</span> : null}
+                        <span>{new Date(v.publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "short" }).toLowerCase()}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </button>
             ))}
@@ -90,6 +107,7 @@ export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
         )}
       </section>
 
+      {/* INLINE PLAYER MODAL */}
       {open && (
         <div
           onClick={() => setOpen(null)}
@@ -118,4 +136,11 @@ export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
       )}
     </>
   );
+}
+
+function formatViews(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}m views`;
+  if (n >= 10_000) return `${Math.round(n / 1000)}k views`;
+  if (n >= 1_000) return `${(n / 1000).toFixed(1)}k views`;
+  return `${n} views`;
 }

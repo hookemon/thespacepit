@@ -68,6 +68,105 @@ export const brand = defineType({
       type: "array",
       of: [{ type: "string" }],
     }),
+    // === Featured article — interview / profile written about Nick ===
+    defineField({
+      name: "articleUrl",
+      title: "Featured article URL",
+      type: "url",
+      description: 'A press piece written about Nick by this brand (e.g. Ableton "Collaborator in Chief").',
+    }),
+    defineField({ name: "articleTitle", title: "Article title", type: "string" }),
+    defineField({
+      name: "articleImage",
+      title: "Article hero image",
+      type: "image",
+      options: { hotspot: true },
+      description: "Pull the hero image off the article page and upload it here. Used as the brand-page hero background.",
+    }),
+    defineField({
+      name: "articleQuote",
+      title: "Pull quote from the article",
+      type: "text",
+      rows: 3,
+    }),
+    defineField({
+      name: "articleBody",
+      title: "Article body (inline reader)",
+      description:
+        "The full article content, rendered big on the brand page like an embedded version of the original. Each block is a paragraph, heading, video, or soundcloud embed — in document order. Auto-populated by `scripts/seed-ableton-brand.ts` (and similar).",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          name: "block",
+          fields: [
+            {
+              name: "kind",
+              type: "string",
+              options: { list: ["h2", "h3", "p", "video", "soundcloud"] },
+              validation: (r) => r.required(),
+            },
+            { name: "text", type: "text", rows: 3, description: "For h2/h3/p" },
+            { name: "url", type: "url", description: "For video / soundcloud" },
+            { name: "caption", type: "string", description: "For video (the line that precedes the embed)" },
+          ],
+          preview: {
+            select: { kind: "kind", text: "text", url: "url" },
+            prepare({ kind, text, url }) {
+              return { title: `[${kind}] ${(text ?? url ?? "").slice(0, 80)}` };
+            },
+          },
+        },
+      ],
+    }),
+    // === Products used — the specific products from this brand that Nick uses ===
+    defineField({
+      name: "productsUsed",
+      title: "Products used",
+      type: "array",
+      description: "The brand's products Nick actually uses on records / live.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "name", type: "string", validation: (r) => r.required() },
+            { name: "url", type: "url", title: "Product page URL" },
+            { name: "image", type: "image", options: { hotspot: true } },
+            { name: "note", type: "string", description: "One-line: how Nick uses it." },
+          ],
+          preview: { select: { title: "name", subtitle: "note", media: "image" } },
+        },
+      ],
+    }),
+    // === Workshops / talks / residencies Nick has done with the brand ===
+    defineField({
+      name: "workshops",
+      title: "Workshops / talks / residencies",
+      type: "array",
+      description: "Each entry is one event. India, NYC Music Hall, Medellín, college visits, etc.",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "date", type: "date", title: "Date (or just year)" },
+            { name: "yearOnly", type: "boolean", title: "Year-only?", description: "Tick if you don't know the exact day." },
+            { name: "city", type: "string" },
+            { name: "country", type: "string" },
+            { name: "venue", type: "string", description: 'e.g. "Music Hall of Williamsburg" or "NYU".' },
+            { name: "kind", type: "string", options: { list: ["workshop", "masterclass", "panel", "residency", "college visit", "interview"] }, initialValue: "workshop" },
+            { name: "note", type: "text", rows: 2, title: "Note (optional)" },
+            { name: "url", type: "url", title: "Link (recap / clip / IG post)" },
+          ],
+          preview: {
+            select: { date: "date", city: "city", venue: "venue", kind: "kind" },
+            prepare({ date, city, venue, kind }) {
+              const left = [venue, city].filter(Boolean).join(" · ");
+              return { title: left || kind || "workshop", subtitle: date ?? "" };
+            },
+          },
+        },
+      ],
+    }),
     defineField({ name: "featured", title: "Pin to top", type: "boolean", initialValue: false }),
   ],
   preview: {

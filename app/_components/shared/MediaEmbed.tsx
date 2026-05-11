@@ -1,4 +1,4 @@
-import { embedLabel, parseEmbed } from "../../_lib/embed";
+import { embedLabel, formatTimestamp, parseEmbed } from "../../_lib/embed";
 
 // Generic media embed — drop-in for YouTubeEmbed. Handles YT, Instagram reels,
 // Vimeo, TikTok. Falls back to a tile + outbound link for unknown URLs.
@@ -48,16 +48,13 @@ export function MediaEmbed({ url, title, aspectRatio }: Props) {
           className="absolute inset-0 w-full h-full"
         />
       </div>
-      {embed.kind === "instagram" && (
-        <div className="font-mono text-[9px] tracking-[.14em] uppercase opacity-60 mt-1.5">
-          instagram reel
-        </div>
-      )}
-      {embed.kind === "tiktok" && (
-        <div className="font-mono text-[9px] tracking-[.14em] uppercase opacity-60 mt-1.5">
-          tiktok
-        </div>
-      )}
+      <div className="flex items-center gap-2 mt-1.5 font-mono text-[9px] tracking-[.14em] uppercase opacity-60">
+        {embed.kind === "instagram" && <span>instagram reel</span>}
+        {embed.kind === "tiktok" && <span>tiktok</span>}
+        {embed.startSeconds && embed.startSeconds > 0 && (
+          <span className="text-lamp opacity-100">▶ jumps to {formatTimestamp(embed.startSeconds)}</span>
+        )}
+      </div>
     </div>
   );
 }
