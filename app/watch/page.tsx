@@ -15,7 +15,8 @@ export const metadata = {
 // Order matters: chips render in this sequence.
 const TAG_ORDER: { value: string; label: string }[] = [
   { value: "gear-demo",            label: "gear" },
-  { value: "live-set",             label: "live" },
+  { value: "live-set",             label: "live set" },
+  { value: "livestream",           label: "livestream" },
   { value: "studio-session",       label: "studio" },
   { value: "jam",                  label: "jam" },
   { value: "tutorial",             label: "tutorial" },

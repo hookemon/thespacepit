@@ -44,16 +44,19 @@ function arg(name: string): string | undefined {
 }
 
 const PLAYLIST_ID = arg("playlist");
+const VIDEO_ID    = arg("video");      // sync a single video instead of a playlist
 const BRAND_SLUG  = arg("brand");
 const GEAR_SLUG   = arg("gear");
+const RELEASE_SLUG= arg("release");
+const ARTIST_SLUG = arg("artist");
 const FORCE_TAG   = arg("tag");
 
-if (!PLAYLIST_ID) {
-  console.error("❌ --playlist is required");
+if (!PLAYLIST_ID && !VIDEO_ID) {
+  console.error("❌ either --playlist or --video is required");
   process.exit(1);
 }
-if (!BRAND_SLUG && !GEAR_SLUG) {
-  console.error("❌ at least one of --brand / --gear is required");
+if (!BRAND_SLUG && !GEAR_SLUG && !RELEASE_SLUG && !ARTIST_SLUG) {
+  console.error("❌ at least one of --brand / --gear / --release / --artist is required");
   process.exit(1);
 }
 
@@ -122,7 +125,8 @@ function pickThumb(thumbs?: Record<string, { url: string }>): string | undefined
   return thumbs?.maxres?.url ?? thumbs?.standard?.url ?? thumbs?.high?.url ?? thumbs?.medium?.url ?? thumbs?.default?.url;
 }
 
-async function lookupRef(type: "brand" | "gear", slug: string): Promise<string | null> {
+type RefType = "brand" | "gear" | "release" | "artist";
+async function lookupRef(type: RefType, slug: string): Promise<string | null> {
   return sanity.fetch<string | null>(
     `*[_type == $type && slug.current == $slug][0]._id`,
     { type, slug }
@@ -130,22 +134,40 @@ async function lookupRef(type: "brand" | "gear", slug: string): Promise<string |
 }
 
 async function main() {
-  console.log(`\n📺 syncing playlist ${PLAYLIST_ID}\n`);
+  console.log(`\n📺 syncing ${VIDEO_ID ? `single video ${VIDEO_ID}` : `playlist ${PLAYLIST_ID}`}\n`);
 
-  const brandId = BRAND_SLUG ? await lookupRef("brand", BRAND_SLUG) : null;
-  const gearId  = GEAR_SLUG  ? await lookupRef("gear",  GEAR_SLUG)  : null;
-  if (BRAND_SLUG && !brandId) { console.error(`❌ brand "${BRAND_SLUG}" not found`); process.exit(1); }
-  if (GEAR_SLUG  && !gearId)  { console.error(`❌ gear "${GEAR_SLUG}" not found`); process.exit(1); }
-  console.log(`   → brand: ${BRAND_SLUG ?? "—"} ${brandId ?? ""}`);
-  console.log(`   → gear:  ${GEAR_SLUG  ?? "—"} ${gearId  ?? ""}`);
-  console.log(`   → tag:   ${FORCE_TAG  ?? "—"}\n`);
+  const brandId   = BRAND_SLUG   ? await lookupRef("brand",   BRAND_SLUG)   : null;
+  const gearId    = GEAR_SLUG    ? await lookupRef("gear",    GEAR_SLUG)    : null;
+  const releaseId = RELEASE_SLUG ? await lookupRef("release", RELEASE_SLUG) : null;
+  const artistId  = ARTIST_SLUG  ? await lookupRef("artist",  ARTIST_SLUG)  : null;
+  if (BRAND_SLUG   && !brandId)   { console.error(`❌ brand "${BRAND_SLUG}" not found`); process.exit(1); }
+  if (GEAR_SLUG    && !gearId)    { console.error(`❌ gear "${GEAR_SLUG}" not found`); process.exit(1); }
+  if (RELEASE_SLUG && !releaseId) { console.error(`❌ release "${RELEASE_SLUG}" not found`); process.exit(1); }
+  if (ARTIST_SLUG  && !artistId)  { console.error(`❌ artist "${ARTIST_SLUG}" not found`); process.exit(1); }
+  console.log(`   → brand:   ${BRAND_SLUG   ?? "—"} ${brandId   ?? ""}`);
+  console.log(`   → gear:    ${GEAR_SLUG    ?? "—"} ${gearId    ?? ""}`);
+  console.log(`   → release: ${RELEASE_SLUG ?? "—"} ${releaseId ?? ""}`);
+  console.log(`   → artist:  ${ARTIST_SLUG  ?? "—"} ${artistId  ?? ""}`);
+  console.log(`   → tag:     ${FORCE_TAG    ?? "—"}\n`);
 
-  const items = await fetchAllPlaylistItems();
-  console.log(`   ${items.length} videos in playlist\n`);
-  const details = await fetchVideoDetails(items.map((i) => i.contentDetails.videoId));
+  let videoIds: string[];
+  if (VIDEO_ID) {
+    videoIds = [VIDEO_ID];
+  } else {
+    const items = await fetchAllPlaylistItems();
+    console.log(`   ${items.length} videos in playlist\n`);
+    videoIds = items.map((i) => i.contentDetails.videoId);
+  }
+  const details = await fetchVideoDetails(videoIds);
 
-  const existing = await sanity.fetch<{ _id: string; youtubeId: string; tags?: string[]; relatedBrand?: { _ref: string }; relatedGear?: { _ref: string } }[]>(
-    `*[_type == "video" && youtubeId in $ids]{_id, youtubeId, tags, relatedBrand, relatedGear}`,
+  const existing = await sanity.fetch<{
+    _id: string; youtubeId: string; tags?: string[];
+    relatedBrand?: { _ref: string };
+    relatedGear?: { _ref: string };
+    relatedRelease?: { _ref: string };
+    relatedArtist?: { _ref: string };
+  }[]>(
+    `*[_type == "video" && youtubeId in $ids]{_id, youtubeId, tags, relatedBrand, relatedGear, relatedRelease, relatedArtist}`,
     { ids: details.map((d) => d.id) }
   );
   const existingByYid = new Map(existing.map((d) => [d.youtubeId, d]));
@@ -170,18 +192,20 @@ async function main() {
       fields.tags = [...merged];
     }
 
-    // Only set relatedBrand/Gear if they're not already set — manual /studio
-    // edits win over the sync.
-    if (brandId && !ex?.relatedBrand) {
-      fields.relatedBrand = { _type: "reference", _ref: brandId };
-    }
-    if (gearId && !ex?.relatedGear) {
-      fields.relatedGear = { _type: "reference", _ref: gearId };
-    }
+    // Only set relations if not already set — manual /studio edits win.
+    if (brandId   && !ex?.relatedBrand)   { fields.relatedBrand   = { _type: "reference", _ref: brandId };   }
+    if (gearId    && !ex?.relatedGear)    { fields.relatedGear    = { _type: "reference", _ref: gearId };    }
+    if (releaseId && !ex?.relatedRelease) { fields.relatedRelease = { _type: "reference", _ref: releaseId }; }
+    if (artistId  && !ex?.relatedArtist)  { fields.relatedArtist  = { _type: "reference", _ref: artistId };  }
 
     if (ex) {
       await sanity.patch(docId).set(fields).commit();
-      if ((brandId && !ex.relatedBrand) || (gearId && !ex.relatedGear)) linked += 1;
+      const gotNewLink =
+        (brandId   && !ex.relatedBrand)   ||
+        (gearId    && !ex.relatedGear)    ||
+        (releaseId && !ex.relatedRelease) ||
+        (artistId  && !ex.relatedArtist);
+      if (gotNewLink) linked += 1;
       updated += 1;
     } else {
       await sanity.createOrReplace({
@@ -195,8 +219,10 @@ async function main() {
     }
   }
 
-  console.log(`✅ ${created} created · ${updated} updated · ${linked} got brand/gear links\n`);
-  if (BRAND_SLUG) console.log(`→ open http://localhost:3000/partners/${BRAND_SLUG}`);
-  if (GEAR_SLUG)  console.log(`→ open http://localhost:3000/gear/${GEAR_SLUG}`);
+  console.log(`✅ ${created} created · ${updated} updated · ${linked} got new relations\n`);
+  if (BRAND_SLUG)   console.log(`→ open http://localhost:3000/partners/${BRAND_SLUG}`);
+  if (GEAR_SLUG)    console.log(`→ open http://localhost:3000/gear/${GEAR_SLUG}`);
+  if (RELEASE_SLUG) console.log(`→ open http://localhost:3000/releases/${RELEASE_SLUG}`);
+  if (ARTIST_SLUG)  console.log(`→ open http://localhost:3000/artists/${ARTIST_SLUG}`);
 }
 main().catch((err) => { console.error(err); process.exit(1); });

@@ -47,6 +47,8 @@ const TAG_RULES: Array<{ tag: string; pattern: RegExp }> = [
   { tag: "behind-the-scenes",    pattern: /\b(bts|behind the scenes|making of|in the studio with)\b/i },
   { tag: "interview",            pattern: /\b(interview|talks to|in conversation|sat down|q\s?&\s?a|talking)\b/i },
   { tag: "live-set",             pattern: /\b(live (?:at|in|from)?|dj set|set at|festival|sónar|sonar|movement|boiler room|nts|the lot)\b/i },
+  // NOTE: split-livestreams.ts re-classifies long-form (>=30min) "live-set"
+  // entries as `livestream` after sync. Keep that script in your loop.
   { tag: "studio-session",       pattern: /\b(studio session|jam session|in session|live in studio)\b/i },
   { tag: "jam",                  pattern: /\b(modular|patch|improv|jam|noodle|loop)\b/i },
   { tag: "gear-demo",            pattern: /\b(demo|review|first look|unboxing|new gear|sidekick|move|op-?1|op1|808|prophet|octatrack|moog|ableton|teenage engineering|mpc|sp-?\d|tr-?\d|808|909|drum machine|sampler|synth)\b/i },

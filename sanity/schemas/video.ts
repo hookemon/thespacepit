@@ -65,7 +65,8 @@ export const video = defineType({
           options: {
             list: [
               { value: "gear-demo",         title: "Gear demo" },
-              { value: "live-set",          title: "Live set / DJ" },
+              { value: "live-set",          title: "Live set / DJ (short performance)" },
+              { value: "livestream",        title: "Livestream (long-form, unedited)" },
               { value: "studio-session",    title: "Studio session / jam" },
               { value: "music-video",       title: "Music video" },
               { value: "behind-the-scenes", title: "Behind the scenes" },
