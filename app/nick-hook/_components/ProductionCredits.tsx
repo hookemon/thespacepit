@@ -21,7 +21,7 @@ export async function NHProductionCredits() {
   return (
     <section id="credits" className="px-8 py-16 bg-ink text-paper border-y border-paper/20">
       <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline mb-2">
-        OUTSIDE CREDITS · NOT ON CALM + COLLECT · {credits.length} RELEASES
+        OUTSIDE CREDITS · NOT ON CALM + COLLECT
       </div>
       <h2
         className="font-display font-bold uppercase m-0 mb-2"

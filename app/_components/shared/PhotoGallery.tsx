@@ -100,7 +100,7 @@ export function PhotoGallery({ photos }: { photos: GalleryPhoto[] }) {
             ✕ close · esc
           </button>
           <div className="absolute top-4 left-4 sm:top-6 sm:left-6 font-mono text-[11px] tracking-[.14em] uppercase text-paper-2">
-            {activeIdx + 1} / {photos.length}
+            the gallery
           </div>
           {photos.length > 1 && (
             <>

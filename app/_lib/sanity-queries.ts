@@ -668,8 +668,9 @@ export async function getPlaceBySlug(slug: string): Promise<PlaceDetail | null> 
  * Sanity artist doc and the slugs we can link to. Case-insensitive name match.
  */
 export type GearCategoryRef =
-  | "drum-machine" | "synth" | "sampler" | "modular" | "outboard"
-  | "mic" | "controller" | "monitor" | "dj" | "software";
+  | "drum-machine" | "synth" | "sampler" | "modular" | "sequencer"
+  | "outboard" | "pedal" | "mic" | "controller" | "interface"
+  | "monitor" | "guitar" | "amp" | "piano" | "dj" | "software";
 
 export type GearStatusRef =
   | "active" | "shelf" | "travel" | "wishlist" | "retired";

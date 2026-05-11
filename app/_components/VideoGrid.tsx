@@ -38,7 +38,7 @@ export async function VideoGrid() {
           className="group block text-right no-underline text-ink hover:text-lamp-deep transition-colors"
         >
           <div className="font-mono text-[10px] tracking-[.14em] uppercase text-mute group-hover:text-lamp-deep transition-colors">
-            {fullCount} videos curated · {PLAYLISTS.length} playlist{PLAYLISTS.length === 1 ? "" : "s"}
+            videos curated · playlists
           </div>
           <div
             className="font-display font-bold uppercase mt-1 leading-none flex items-center justify-end gap-2"

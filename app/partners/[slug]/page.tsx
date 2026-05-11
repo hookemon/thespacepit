@@ -156,7 +156,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
             {hasClips && (
               <section className={brand.story && Array.isArray(brand.story) && brand.story.length > 0 ? "mt-16" : ""}>
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
-                  THE WORK WE DID · {allClips.length} CLIP{allClips.length === 1 ? "" : "S"}
+                  THE WORK WE DID
                 </div>
                 <h2
                   className="font-display font-bold uppercase m-0 mb-6"

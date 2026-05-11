@@ -125,7 +125,7 @@ export default async function GearDetailPage({ params }: { params: Promise<{ slu
             {g.packs.length > 0 ? (
               <section>
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
-                  PACKS · {g.packs.length}
+                  PACKS
                 </div>
                 <h2
                   className="font-display font-bold uppercase m-0 mb-6"

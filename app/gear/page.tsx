@@ -19,7 +19,7 @@ export default async function GearPage() {
       <main className="flex-1">
         <header className="px-8 pt-16 pb-10 border-b border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
-            THE SHELF · {items.length} UNITS · LIVE INVENTORY
+            THE SHELF · LIVE INVENTORY
           </div>
           <h1
             className="font-display font-bold uppercase m-0"

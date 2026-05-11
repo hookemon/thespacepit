@@ -233,7 +233,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             {allClips.length > 0 && (
               <Room
                 number={leadVideoUrl ? "01" : "02"}
-                title={`the watch · ${allClips.length} ${allClips.length === 1 ? "clip" : "clips"}`}
+                title="the watch"
                 kicker="every video"
               >
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))" }}>
@@ -256,9 +256,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               const hasPacks = releasePacks.length > 0;
               if (!hasStems && !hasPads && !hasPacks) return null;
               const sub: string[] = [];
-              if (hasStems) sub.push(`${release.stems!.length} stems`);
-              if (hasPads)  sub.push(`${release.oneshots!.length} pads`);
-              if (hasPacks) sub.push(`${releasePacks.length} pack${releasePacks.length === 1 ? "" : "s"}`);
+              if (hasStems) sub.push("stems");
+              if (hasPads)  sub.push("pads");
+              if (hasPacks) sub.push("packs");
               return (
                 <Room number="02" title={`the jam · ${sub.join(" · ")}`} kicker="play with it" accent="lamp">
                   <p className="font-serif italic text-[16px] text-ink-3 max-w-[640px] mb-5">
@@ -331,7 +331,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             {release.tracklist && release.tracklist.length > 0 && (
               <Room
                 number="03"
-                title={`the tracks · ${release.tracklist.length} track${release.tracklist.length === 1 ? "" : "s"}${leadVideoTrack ? " · ▶ has video" : ""}`}
+                title={`the tracks${leadVideoTrack ? " · ▶ has video" : ""}`}
                 kicker="tracklist"
               >
                 <div className="max-w-[760px]">
@@ -344,7 +344,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             {release.credits && release.credits.length > 0 && (
               <Room
                 number="05"
-                title={`the credits · ${release.credits.length}`}
+                title="the credits"
                 kicker="who played what"
               >
                 <ul className="grid gap-1.5 max-w-[760px]">
@@ -386,7 +386,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               return (
                 <Room
                   number="06"
-                  title={`the gallery · ${photos.length} photo${photos.length === 1 ? "" : "s"}`}
+                  title="the gallery"
                   kicker={sessionGallery.length > 0 && releaseGallery.length === 0 ? "from the session" : "out the lens"}
                 >
                   <PhotoGallery photos={photos} />

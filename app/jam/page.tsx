@@ -164,7 +164,7 @@ export default async function JamPage() {
         {/* OTHER JAMS */}
         {others.length > 0 && (
           <section className="px-8 py-12 border-t border-paper/30">
-            <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">OTHER JAMS · {others.length}</div>
+            <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">OTHER JAMS</div>
             <h3
               className="font-display font-bold uppercase m-0 mb-7"
               style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.01em" }}

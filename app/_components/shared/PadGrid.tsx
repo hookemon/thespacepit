@@ -128,7 +128,7 @@ export function PadGrid({ pads }: { pads: Pad[] }) {
     <div className="border border-paper bg-ink-2">
       <div className="px-5 py-3 border-b border-paper flex items-center justify-between gap-3">
         <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2">
-          {ready ? `${pads.length} pads · click or use the keys` : `loading pads · ${Math.round(loadProgress * 100)}%`}
+          {ready ? "pads · click or use the keys" : "loading pads…"}
         </div>
         <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2">
           {!ready && (

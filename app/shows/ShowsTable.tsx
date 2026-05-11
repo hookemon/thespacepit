@@ -43,20 +43,17 @@ export function ShowsTable() {
             onClick={() => setFilterEra("all")}
             className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-paper rounded-full transition-colors ${filterEra === "all" ? "bg-paper text-ink" : "hover:bg-paper hover:text-ink"}`}
           >
-            all · {SHOWS.length}
+            all
           </button>
-          {ERAS.map((era) => {
-            const count = SHOWS.filter((s) => s.era === era).length;
-            return (
-              <button
-                key={era}
-                onClick={() => setFilterEra(era)}
-                className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-paper rounded-full transition-colors ${filterEra === era ? "bg-paper text-ink" : "hover:bg-paper hover:text-ink"}`}
-              >
-                {era.toLowerCase()} · {count}
-              </button>
-            );
-          })}
+          {ERAS.map((era) => (
+            <button
+              key={era}
+              onClick={() => setFilterEra(era)}
+              className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-paper rounded-full transition-colors ${filterEra === era ? "bg-paper text-ink" : "hover:bg-paper hover:text-ink"}`}
+            >
+              {era.toLowerCase()}
+            </button>
+          ))}
         </div>
       </div>
 

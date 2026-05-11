@@ -4,12 +4,15 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { urlFor } from "../_lib/sanity";
 import type { GearItem } from "../_lib/sanity-queries";
-import type { GearCategory } from "../_lib/gear-data";
+import type { GearCategory, CategoryMeta } from "../_lib/gear-data";
 import { CATEGORIES } from "../_lib/gear-data";
 
 type Filter = GearCategory | "all";
 
 const CATEGORY_KEYS = new Set<string>(CATEGORIES.map((c) => c.key));
+const CAT_BY_KEY: Record<string, CategoryMeta> = Object.fromEntries(
+  CATEGORIES.map((c) => [c.key, c])
+);
 
 function readCatFromUrl(): Filter {
   if (typeof window === "undefined") return "all";
@@ -39,15 +42,21 @@ export function GearClient({ items }: { items: GearItem[] }) {
     [filter, items]
   );
 
-  const counts = useMemo(() => {
-    const map = new Map<Filter, number>();
-    map.set("all", items.length);
-    for (const cat of CATEGORIES) {
-      map.set(cat.key, items.filter((g) => g.category === cat.key).length);
-    }
-    return map;
+  // Track which categories have anything so we hide empty chips.
+  const populated = useMemo(() => {
+    const has = new Set<GearCategory>();
+    for (const g of items) has.add(g.category as GearCategory);
+    return has;
   }, [items]);
 
+  // Pinned items — shown FIRST in a featured row, always (regardless of filter).
+  // These are the ones Nick wants front-and-center: the rack right now.
+  const pinned = useMemo(
+    () => items.filter((g) => g.pinned),
+    [items]
+  );
+
+  // Group visible items by category, in CATEGORIES display order.
   const grouped = useMemo(() => {
     const order: GearCategory[] = CATEGORIES.map((c) => c.key);
     const buckets = new Map<GearCategory, GearItem[]>();
@@ -64,92 +73,77 @@ export function GearClient({ items }: { items: GearItem[] }) {
 
   return (
     <>
+      {/* Sticky filter strip */}
       <div className="px-8 py-6 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2">
-          <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all" count={counts.get("all") ?? 0} />
+          <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all" />
           {CATEGORIES.map((c) => {
-            const n = counts.get(c.key) ?? 0;
-            if (n === 0) return null;
+            if (!populated.has(c.key)) return null;
             return (
               <Chip
                 key={c.key}
                 active={filter === c.key}
                 onClick={() => setFilter(c.key)}
                 label={c.label}
-                count={n}
+                accent={c.accent}
               />
             );
           })}
         </div>
       </div>
 
+      {/* PINNED — "patched in right now" featured row. Always visible at the
+          top, even when a category filter is active, so the desk is the
+          anchor. */}
+      {filter === "all" && pinned.length > 0 && (
+        <section className="px-8 pt-12 pb-2">
+          <div className="font-mono text-[11px] tracking-[.18em] uppercase text-lamp mb-2 flex items-center gap-2">
+            <span className="inline-block w-2 h-2 rounded-full bg-lamp animate-pulse" />
+            patched in · on the desk right now
+          </div>
+          <h2
+            className="font-display font-bold uppercase m-0 mb-6"
+            style={{ fontSize: "clamp(36px, 5vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+          >
+            the desk
+          </h2>
+          <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
+            {pinned.map((g) => (
+              <GearCard key={g._id} g={g} featured />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* MAIN GRID — grouped by category */}
       <div className="px-8 py-12">
         {grouped.length === 0 && (
           <p className="font-serif italic text-[20px] text-paper-2">nothing in this rack yet.</p>
         )}
         {grouped.map(({ cat, items: catItems }) => {
-          const meta = CATEGORIES.find((c) => c.key === cat);
+          const meta = CAT_BY_KEY[cat];
           return (
-            <section key={cat} className="mb-14">
-              <div className="flex items-end justify-between border-b border-paper pb-2.5 mb-5">
+            <section key={cat} className="mb-16">
+              {/* Category header — accent dot + label + blurb */}
+              <div className="flex items-end justify-between border-b-2 pb-2.5 mb-6 flex-wrap gap-3" style={{ borderColor: meta?.accent ?? "#F4EFE6" }}>
                 <div>
-                  <div className="font-mono text-[10px] tracking-[.14em] uppercase text-lamp">
-                    {catItems.length} unit{catItems.length === 1 ? "" : "s"}
+                  <div className="font-mono text-[10px] tracking-[.18em] uppercase mb-1 flex items-center gap-2" style={{ color: meta?.accent }}>
+                    <span className="inline-block w-2 h-2 rounded-full" style={{ background: meta?.accent }} />
+                    on the shelf
                   </div>
                   <h2
                     className="font-display font-bold uppercase m-0"
-                    style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}
+                    style={{ fontSize: "clamp(32px, 4.5vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}
                   >
                     {meta?.label ?? cat}
                   </h2>
                 </div>
                 {meta?.blurb && (
-                  <div className="font-serif italic text-[15px] text-paper-2 hidden sm:block">{meta.blurb}</div>
+                  <div className="font-serif italic text-[16px] text-paper-2 sm:text-right">{meta.blurb}</div>
                 )}
               </div>
-              <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
-                {catItems.map((g) => {
-                  const photo = g.photo ? urlFor(g.photo).width(720).height(540).fit("crop").url() : null;
-                  return (
-                    <Link
-                      key={g._id}
-                      href={`/gear/${g.slug}`}
-                      className="group block border border-paper bg-ink-2 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#F2B705] transition-transform duration-150 overflow-hidden no-underline text-paper"
-                    >
-                      {photo && (
-                        <div className="aspect-[4/3] overflow-hidden border-b border-paper bg-ink-2">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={photo} alt={g.name} loading="lazy" className="w-full h-full object-cover" />
-                        </div>
-                      )}
-                      <div className="p-4">
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <div className="min-w-0">
-                            {g.manufacturer && (
-                              <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 line-clamp-1">
-                                {g.manufacturer}
-                              </div>
-                            )}
-                            <div className="font-display text-[20px] uppercase font-semibold tracking-[-0.005em] leading-tight">
-                              {g.name}
-                            </div>
-                          </div>
-                          <StatusDot status={g.status} />
-                        </div>
-                        {g.note && (
-                          <p className="font-mono text-[11px] tracking-[.02em] text-on-dark leading-snug mt-2 line-clamp-3">
-                            {g.note}
-                          </p>
-                        )}
-                        <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 mt-3 flex items-center gap-2">
-                          <span>{g.status}</span>
-                          {g.yearAcquired && <span>· since {g.yearAcquired}</span>}
-                          <span className="ml-auto opacity-0 group-hover:opacity-100 text-lamp transition-opacity">enter →</span>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+              <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                {catItems.map((g) => <GearCard key={g._id} g={g} />)}
               </div>
             </section>
           );
@@ -159,28 +153,153 @@ export function GearClient({ items }: { items: GearItem[] }) {
   );
 }
 
+/* ============================================================================
+ * Gear card — handles photo case AND photoless case. Empty cards get a
+ * category-tinted panel with the manufacturer + name typeset large so they
+ * still look intentional, not unfinished. Status dot, year, and accent
+ * top-stripe communicate identity at a glance.
+ * ========================================================================*/
+function GearCard({ g, featured = false }: { g: GearItem; featured?: boolean }) {
+  const meta = CAT_BY_KEY[g.category];
+  const accent = meta?.accent ?? "#F4EFE6";
+  const tint = meta?.tint ?? "rgba(244,239,230,0.08)";
+  const photo = g.photo ? urlFor(g.photo).width(featured ? 960 : 720).height(featured ? 720 : 540).fit("crop").url() : null;
+  const isRetired = g.status === "retired";
+
+  return (
+    <Link
+      href={`/gear/${g.slug}`}
+      className={`group block border border-paper bg-ink-2 transition-all duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] overflow-hidden no-underline text-paper relative ${isRetired ? "opacity-60" : ""}`}
+      style={{
+        // Hover shadow uses the category accent — wired via inline style so
+        // each card pops in its own color.
+        boxShadow: "none",
+      }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `4px 4px 0 ${accent}`; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
+    >
+      {/* Accent stripe — top edge, category color */}
+      <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background: accent }} aria-hidden />
+
+      {/* Image / placeholder area */}
+      <div
+        className={`relative ${featured ? "aspect-[5/4]" : "aspect-[4/3]"} overflow-hidden border-b border-paper`}
+        style={{ background: photo ? "#0B0B0B" : tint }}
+      >
+        {photo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={photo} alt={g.name} loading="lazy" className="w-full h-full object-cover" />
+        ) : (
+          // No photo yet — big stamped placeholder w/ category accent
+          <div className="absolute inset-0 flex flex-col items-center justify-center px-5 text-center">
+            <div
+              className="font-mono text-[9px] tracking-[.24em] uppercase mb-2"
+              style={{ color: accent, opacity: 0.85 }}
+            >
+              {meta?.label ?? g.category}
+            </div>
+            <div
+              className="font-display font-bold uppercase leading-[0.92] tracking-[-0.015em]"
+              style={{
+                fontSize: `clamp(${featured ? 28 : 22}px, ${featured ? 3.5 : 2.8}vw, ${featured ? 44 : 32}px)`,
+                color: "#F4EFE6",
+              }}
+            >
+              {g.name}
+            </div>
+            {g.manufacturer && (
+              <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2/60 mt-3">
+                {g.manufacturer}
+              </div>
+            )}
+            <div className="font-mono text-[8px] tracking-[.2em] uppercase text-paper-2/40 mt-6">
+              awaiting photo
+            </div>
+          </div>
+        )}
+
+        {/* Pinned badge — top-right */}
+        {g.pinned && (
+          <div
+            className="absolute top-2 right-2 font-mono text-[8px] tracking-[.18em] uppercase px-1.5 py-0.5 rounded-full"
+            style={{ background: accent, color: "#0B0B0B" }}
+          >
+            patched in
+          </div>
+        )}
+      </div>
+
+      {/* Card body */}
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <div className="min-w-0 flex-1">
+            {g.manufacturer && (
+              <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 line-clamp-1">
+                {g.manufacturer}
+              </div>
+            )}
+            <div className="font-display text-[20px] uppercase font-semibold tracking-[-0.005em] leading-tight line-clamp-2">
+              {g.name}
+            </div>
+          </div>
+          <StatusDot status={g.status} />
+        </div>
+        {g.note && (
+          <p className="font-mono text-[11px] tracking-[.02em] text-on-dark leading-snug mt-2 line-clamp-3">
+            {g.note}
+          </p>
+        )}
+        <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 mt-3 flex items-center gap-2">
+          <span>{statusLabel(g.status)}</span>
+          {g.yearAcquired && <span>· since {g.yearAcquired}</span>}
+          <span
+            className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ color: accent }}
+          >
+            enter →
+          </span>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
+function statusLabel(s: GearItem["status"]) {
+  switch (s) {
+    case "active":   return "patched";
+    case "shelf":    return "shelf";
+    case "travel":   return "travel";
+    case "wishlist": return "wishlist";
+    case "retired":  return "retired";
+    default:         return s;
+  }
+}
+
 function Chip({
   active,
   onClick,
   label,
-  count,
+  accent,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  count: number;
+  accent?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`font-mono text-[11px] tracking-[.12em] uppercase px-3 py-1.5 border rounded-full transition-colors ${
+      className={`font-mono text-[11px] tracking-[.12em] uppercase px-3 py-1.5 border rounded-full transition-colors flex items-center gap-1.5 ${
         active
           ? "border-lamp bg-lamp text-ink"
           : "border-paper text-paper hover:bg-paper hover:text-ink"
       }`}
     >
-      {label} <span className={`tabular-nums ml-1 ${active ? "text-ink/60" : "text-paper-2"}`}>{count}</span>
+      {accent && (
+        <span className="inline-block w-2 h-2 rounded-full" style={{ background: accent }} />
+      )}
+      {label}
     </button>
   );
 }

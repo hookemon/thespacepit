@@ -56,7 +56,6 @@ export default async function MapPage() {
     };
   });
 
-  const totalShows = tourPins.reduce((sum, p) => sum + p.showCount, 0);
   const countries = worldCountries();
 
   return (
@@ -65,7 +64,7 @@ export default async function MapPage() {
       <main className="flex-1">
         <header className="px-8 pt-16 pb-10 border-b border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
-            THE GLOBE · {sanityPins.length} CURATED · {tourPins.length} TOUR CITIES · {totalShows} SHOWS
+            THE GLOBE · CURATED PINS · TOUR CITIES · SHOWS
           </div>
           <h1
             className="font-display font-bold uppercase m-0"
@@ -74,7 +73,7 @@ export default async function MapPage() {
             the globe
           </h1>
           <p className="font-serif italic text-[20px] mt-4 max-w-[760px] text-paper-2">
-            every tour stop, every studio, every spot. {totalShows.toLocaleString()} shows across {tourPins.length} cities. spinning · drag to look around · click a pin for the story.
+            every tour stop, every studio, every spot. shows across cities. spinning · drag to look around · click a pin for the story.
           </p>
         </header>
 

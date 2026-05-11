@@ -109,7 +109,7 @@ export default async function StudioPage({ params }: { params: Promise<{ slug: s
           {allClips.length > 0 && (
             <section className="mt-16">
               <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp-deep mb-2">
-                INSIDE THE ROOM · {allClips.length} CLIP{allClips.length === 1 ? "" : "S"}
+                INSIDE THE ROOM
               </div>
               <h2
                 className="font-display font-bold uppercase m-0 mb-6"

@@ -30,7 +30,7 @@ export default async function StudiosIndex() {
           <p className="font-serif italic text-[20px] mt-4 max-w-[680px]">
             {studios.length === 0
               ? "no studios filled in yet — add the spacepit + la burbuja via /studio."
-              : `${studios.length} rooms. recording, mixing, residencies. brooklyn → medellín.`}
+              : "the rooms. recording, mixing, residencies. brooklyn → medellín."}
           </p>
         </header>
 

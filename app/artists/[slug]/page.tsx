@@ -142,7 +142,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
             {artist.bands && artist.bands.length > 0 && (
               <section className="mt-16">
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
-                  BANDS · {artist.bands.length}
+                  BANDS
                 </div>
                 <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
                   {artist.bands.map((b) => {
@@ -174,7 +174,7 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
             {artist.appearsOn && artist.appearsOn.length > 0 && (
               <section className="mt-16">
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
-                  APPEARS ON · {artist.appearsOn.length}
+                  APPEARS ON
                 </div>
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
                   {artist.appearsOn.map((a) => {

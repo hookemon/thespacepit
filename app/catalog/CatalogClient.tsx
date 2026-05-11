@@ -96,7 +96,6 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
                   active={filter === f.key}
                   onClick={() => setFilter(f.key)}
                   label={f.label}
-                  count={n}
                   color={color}
                 />
               );
@@ -142,16 +141,13 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
                   >
                     {year > 0 ? year : "—"}
                   </h2>
-                  <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3">
-                    {label.length + other.length} entr{(label.length + other.length) === 1 ? "y" : "ies"}
-                  </span>
                 </div>
                 <div className="grid gap-x-6 md:grid-cols-2">
                   {label.length > 0 && (
-                    <Lane items={label} accentColor={ROLE_COLORS.label} onRoleClick={(rs) => setFilter(ROLE_TO_FILTER[rs])} />
+                    <Lane items={label} laneLabel="my label" accentColor={ROLE_COLORS.label} onRoleClick={(rs) => setFilter(ROLE_TO_FILTER[rs])} />
                   )}
                   {other.length > 0 && (
-                    <Lane items={other} accentColor={ROLE_COLORS.production} onRoleClick={(rs) => setFilter(ROLE_TO_FILTER[rs])} />
+                    <Lane items={other} laneLabel="other work" accentColor={ROLE_COLORS.production} onRoleClick={(rs) => setFilter(ROLE_TO_FILTER[rs])} />
                   )}
                 </div>
               </section>
@@ -168,9 +164,6 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
                 >
                   {year > 0 ? year : "—"}
                 </h2>
-                <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3">
-                  {all.length} entr{all.length === 1 ? "y" : "ies"}
-                </span>
               </div>
               <div className="grid gap-3" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(170px, 1fr))" }}>
                 {all.map((r) => <ReleaseCard key={r._id} r={r} onRoleClick={(rs) => setFilter(ROLE_TO_FILTER[rs])} />)}
@@ -185,10 +178,12 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
 
 function Lane({
   items,
+  laneLabel,
   accentColor,
   onRoleClick,
 }: {
   items: CatalogItem[];
+  laneLabel: string;
   accentColor: string;
   onRoleClick: (rs: CatalogItem["roleSet"]) => void;
 }) {
@@ -199,7 +194,7 @@ function Lane({
         style={{ color: accentColor }}
       >
         <span className="inline-block w-2 h-2 rounded-full" style={{ background: accentColor }} />
-        {items.length}
+        {laneLabel}
       </div>
       <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))" }}>
         {items.map((r) => <ReleaseCard key={r._id} r={r} compact onRoleClick={onRoleClick} />)}
@@ -280,13 +275,11 @@ function Chip({
   active,
   onClick,
   label,
-  count,
   color,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  count: number;
   color?: string;
 }) {
   return (
@@ -304,7 +297,6 @@ function Chip({
         />
       )}
       {label}
-      <span className={`tabular-nums ${active ? "text-paper-2" : "text-ink-3"}`}>{count}</span>
     </button>
   );
 }

@@ -25,7 +25,7 @@ export default async function CatalogPage() {
       <main className="flex-1 bg-paper text-ink">
         <header className="px-8 pt-16 pb-10 border-b-2 border-ink">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
-            EVERYTHING NICK&apos;S BEEN ON · {items.length} ENTRIES
+            EVERYTHING NICK&apos;S BEEN ON
           </div>
           <h1
             className="font-display font-bold uppercase m-0"

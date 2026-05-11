@@ -1,8 +1,3 @@
-import { SHOWS } from "../../_lib/shows";
-import { getCatalogForArtist } from "../../_lib/sanity-queries";
-
-const NICK_FOUNDED = 2004;
-
 // Hero photo pool — rotates per page load. Each entry has its own crop hint
 // because the subject sits in a different spot in every frame.
 type HeroPhoto = { src: string; alt: string; objectPosition: string };
@@ -19,26 +14,8 @@ const HERO_PHOTOS: HeroPhoto[] = [
 export const dynamic = "force-dynamic";
 
 export async function NHHero() {
-  const catalog = await getCatalogForArtist("nick-hook");
-  const yearsActive = new Date().getFullYear() - NICK_FOUNDED;
-
-  const cities = new Set<string>();
-  for (const s of SHOWS) {
-    if (!s.city) continue;
-    const c = s.city.trim();
-    if (!c || c === "TBC" || c === "Various" || c.startsWith("(")) continue;
-    cities.add(c);
-  }
-
   // Random hero photo — picks a fresh one each request.
   const photo = HERO_PHOTOS[Math.floor(Math.random() * HERO_PHOTOS.length)];
-
-  const stats = [
-    { num: `${catalog.length}`,        lbl: "catalogue entries" },
-    { num: `${SHOWS.length}+`,         lbl: "shows on record" },
-    { num: `${cities.size}`,           lbl: "cities played" },
-    { num: `${yearsActive}yr`,         lbl: "on the road" },
-  ];
 
   return (
     <section className="relative overflow-hidden bg-ink text-paper border-b border-paper">
@@ -94,17 +71,6 @@ export async function NHHero() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 border-t border-paper">
-        {stats.map((s, i) => (
-          <div
-            key={s.lbl}
-            className={`px-4 py-4 ${i < stats.length - 1 ? "md:border-r border-paper" : ""} ${i % 2 === 0 ? "border-r md:border-r" : ""}`}
-          >
-            <div className="font-display font-bold text-[40px] leading-none tracking-tight">{s.num}</div>
-            <div className="font-mono text-[10px] tracking-[.12em] uppercase text-on-dark mt-1.5">{s.lbl}</div>
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

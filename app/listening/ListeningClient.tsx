@@ -107,16 +107,16 @@ export function ListeningClient({ records, total }: { records: DiscogsRelease[];
           {(["all", "Vinyl", "Cassette", "CD", "File", "Other"] as FormatFilter[]).map((f) => {
             const n = formatCounts.get(f) ?? 0;
             if (n === 0 && f !== "all") return null;
-            return <Chip key={f} active={format === f} onClick={() => onFormat(f)} label={f.toLowerCase()} count={n} />;
+            return <Chip key={f} active={format === f} onClick={() => onFormat(f)} label={f.toLowerCase()} />;
           })}
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 self-center mr-2">decade ·</span>
-          <Chip active={decade === "all"} onClick={() => onDecade("all")} label="all" count={records.length} />
+          <Chip active={decade === "all"} onClick={() => onDecade("all")} label="all" />
           {DECADES.map((d) => {
             const n = decadeCounts.get(d.key) ?? 0;
             if (n === 0) return null;
-            return <Chip key={d.key} active={decade === d.key} onClick={() => onDecade(d.key)} label={d.key} count={n} />;
+            return <Chip key={d.key} active={decade === d.key} onClick={() => onDecade(d.key)} label={d.key} />;
           })}
         </div>
       </div>
@@ -124,8 +124,8 @@ export function ListeningClient({ records, total }: { records: DiscogsRelease[];
       <div className="px-8 py-10">
         <div className="font-mono text-[11px] tracking-[.14em] uppercase text-paper-2 mb-6">
           {q || format !== "all" || decade !== "all"
-            ? `${filtered.length} of ${total} matching`
-            : `${total} records · sorted newest-added`}
+            ? "matching"
+            : "sorted newest-added"}
         </div>
 
         {filtered.length === 0 ? (
@@ -213,12 +213,10 @@ function Chip({
   active,
   onClick,
   label,
-  count,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  count: number;
 }) {
   return (
     <button
@@ -228,7 +226,7 @@ function Chip({
         active ? "border-lamp bg-lamp text-ink" : "border-paper text-paper hover:bg-paper hover:text-ink"
       }`}
     >
-      {label} <span className={`tabular-nums ml-1 ${active ? "text-ink/60" : "text-paper-2"}`}>{count}</span>
+      {label}
     </button>
   );
 }

@@ -111,9 +111,6 @@ export default async function ErasIndex() {
                   </h2>
                   <p className="font-serif italic text-[16px] text-paper-2 mt-2 max-w-[520px]">{g.copy}</p>
                 </div>
-                <div className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">
-                  {list.length} {list.length === 1 ? "era" : "eras"}
-                </div>
               </div>
 
               <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>

@@ -48,7 +48,7 @@ export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
               onClick={() => setFilter(b.slug)}
               className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors ${filter === b.slug ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
             >
-              {b.title.toLowerCase()} · {b.videos.length}
+              {b.title.toLowerCase()}
             </button>
           ))}
         </div>

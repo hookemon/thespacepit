@@ -45,7 +45,7 @@ export default async function WatchPage() {
           <p className="font-serif italic text-[20px] mt-4 max-w-[760px]">
             {totalCount === 0
               ? "no videos yet — add a YouTube playlist in app/_lib/youtube-playlists.ts."
-              : `${totalCount} videos across ${buckets.length} curated playlist${buckets.length === 1 ? "" : "s"}. studio sessions, live, radio, tutorials, behind-the-scenes.`}
+              : "videos across curated playlists. studio sessions, live, radio, tutorials, behind-the-scenes."}
           </p>
         </header>
 

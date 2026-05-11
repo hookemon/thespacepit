@@ -180,10 +180,10 @@ export function RadioClient({ records }: { records: DiscogsRelease[] }) {
     <div className="px-6 sm:px-8 py-8">
       {/* Filter strip */}
       <div className="flex flex-wrap gap-2 mb-6">
-        <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all formats" count={records.length} />
-        <Chip active={filter === "Vinyl"} onClick={() => setFilter("Vinyl")} label="vinyl only" count={records.filter((r) => primaryFormat(r.formats) === "Vinyl").length} />
-        <Chip active={filter === "Cassette"} onClick={() => setFilter("Cassette")} label="cassette only" count={records.filter((r) => primaryFormat(r.formats) === "Cassette").length} />
-        <Chip active={filter === "CD"} onClick={() => setFilter("CD")} label="cd only" count={records.filter((r) => primaryFormat(r.formats) === "CD").length} />
+        <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all formats" />
+        <Chip active={filter === "Vinyl"} onClick={() => setFilter("Vinyl")} label="vinyl only" />
+        <Chip active={filter === "Cassette"} onClick={() => setFilter("Cassette")} label="cassette only" />
+        <Chip active={filter === "CD"} onClick={() => setFilter("CD")} label="cd only" />
       </div>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(280px,420px)_1fr]">
@@ -298,12 +298,10 @@ function Chip({
   active,
   onClick,
   label,
-  count,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
-  count: number;
 }) {
   return (
     <button
@@ -313,7 +311,7 @@ function Chip({
         active ? "border-lamp bg-lamp text-ink" : "border-paper text-paper hover:bg-paper hover:text-ink"
       }`}
     >
-      {label} <span className={`tabular-nums ml-1 ${active ? "text-ink/60" : "text-paper-2"}`}>{count}</span>
+      {label}
     </button>
   );
 }

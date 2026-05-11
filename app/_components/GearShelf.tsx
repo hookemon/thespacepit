@@ -17,7 +17,7 @@ export async function GearShelf() {
       <div className="flex items-end justify-between mb-7 border-b-2 border-paper pb-2.5 flex-wrap gap-3">
         <div>
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp">
-            THE SHELF · {items.length} UNITS
+            THE SHELF
           </div>
           <h2
             className="font-display font-bold uppercase m-0"
@@ -31,7 +31,7 @@ export async function GearShelf() {
           className="group block text-right no-underline text-paper hover:text-lamp transition-colors"
         >
           <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 group-hover:text-lamp transition-colors">
-            {populated.length} categor{populated.length === 1 ? "y" : "ies"} · pick one to drill in
+            pick a category to drill in
           </div>
           <div
             className="font-display font-bold uppercase mt-1 leading-none flex items-center justify-end gap-2"

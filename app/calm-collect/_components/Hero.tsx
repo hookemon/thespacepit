@@ -38,11 +38,11 @@ export async function CCHero() {
             cultivating records where the sound is shared. nick hook &amp; gareth jones. hip-hop, experimental, and ambient — released with care, one after the other.
           </p>
           <div className="mt-8 flex gap-5 flex-wrap font-mono text-[11px] tracking-[.1em] uppercase text-ink-3">
-            <span>{allReleases.length} releases</span>
+            <span>releases</span>
             <span>·</span>
-            <span>{rosterArtists.length} artists</span>
+            <span>artists</span>
             <span>·</span>
-            <span>1 sub-label · calllm</span>
+            <span>sub-label · calllm</span>
           </div>
         </div>
 

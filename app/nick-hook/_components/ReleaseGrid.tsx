@@ -34,8 +34,6 @@ export async function NHReleaseGrid() {
       return (b.catalogNumber ?? "").localeCompare(a.catalogNumber ?? "");
     });
 
-  const labelCount = sorted.filter((r) => r.roleSet === "label").length;
-
   if (sorted.length === 0) {
     return (
       <section id="music" className="px-8 py-16 bg-ink text-paper">
@@ -51,7 +49,7 @@ export async function NHReleaseGrid() {
       <div className="flex justify-between items-end mb-8 border-b-2 border-paper pb-3 flex-wrap gap-6">
         <div>
           <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline">
-            THE CATALOG · CHRONOLOGICAL · {sorted.length} ENTRIES
+            THE CATALOG · CHRONOLOGICAL
           </div>
           <h2
             className="font-display font-bold uppercase m-0"
@@ -66,7 +64,7 @@ export async function NHReleaseGrid() {
             className="group block text-right no-underline text-paper hover:text-redline transition-colors"
           >
             <div className="font-mono text-[10px] tracking-[.16em] uppercase text-on-dark group-hover:text-redline transition-colors">
-              {labelCount} on calm + collect · {sorted.length - labelCount} other roles
+              calm + collect · other roles
             </div>
             <div
               className="font-display font-bold uppercase mt-1 leading-none flex items-center justify-end gap-2"

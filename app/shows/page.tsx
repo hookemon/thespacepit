@@ -40,8 +40,6 @@ export default async function ShowsPage() {
     alt: "",
   }));
 
-  const totalDated = SHOWS.filter((s) => s.year).length;
-
   // EPK photo strip — anchor live shots up top.
   const epkStrip: { src: string; alt: string; caption: string }[] = [
     { src: "/epk/nick-7-2.png", alt: "Sónar 2017 main stage",     caption: "sónar · 2017" },
@@ -65,7 +63,7 @@ export default async function ShowsPage() {
             shows
           </h1>
           <p className="font-serif italic text-[20px] mt-4 max-w-[760px] text-paper-2">
-            {SHOWS.length} performances on record. {totalDated} with confirmed dates. men women + children to run the jewels to medellín. filterable.
+            performances on record. men women + children to run the jewels to medellín. filterable.
           </p>
         </header>
 
@@ -94,7 +92,7 @@ export default async function ShowsPage() {
         {galleryPhotos.length > 0 && (
           <section className="px-8 py-10 border-b border-paper/30">
             <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
-              IN THE ROOMS · {galleryPhotos.length} PHOTOS
+              IN THE ROOMS
             </div>
             <h2
               className="font-display font-bold uppercase m-0 mb-6"

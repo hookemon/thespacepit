@@ -45,7 +45,7 @@ export default async function ReleasesIndex() {
             releases
           </h1>
           <p className="font-serif italic text-[20px] mt-4 max-w-[640px]">
-            {all.length} releases across {[...groups.values()].filter((g) => g.length > 0).length} imprints. click any cover to enter the world.
+            releases across the imprints. click any cover to enter the world.
           </p>
         </header>
 

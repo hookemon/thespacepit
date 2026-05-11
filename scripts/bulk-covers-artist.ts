@@ -110,6 +110,95 @@ const GROUPS: Group[] = [
       { id: "release-discogs-1092696", title: "Untitled" },
     ],
   },
+  // Second batch — rest of the iTunes-likely ones
+  {
+    artist: "Bodega Bamz",
+    targets: [
+      { id: "release-ext-diddy-bop", title: "Diddy Bop" },
+      { id: "release-ext-sidewalk-exec", title: "Sidewalk Exec" },
+    ],
+  },
+  {
+    artist: "Novelist",
+    targets: [
+      { id: "release-ext-street-politican", title: "Street Politician", titleOverride: "Street Politician" },
+    ],
+  },
+  {
+    artist: "Villa",
+    targets: [
+      { id: "release-ext-mint-single", title: "Mint", titleOverride: "Mint" },
+    ],
+  },
+  {
+    artist: "Men Women & Children",
+    targets: [
+      { id: "release-ext-dance-in-my-blood-us-dmd-maxi", title: "Dance in My Blood", titleOverride: "Dance in My Blood" },
+    ],
+  },
+  {
+    artist: "Plaitum",
+    targets: [
+      { id: "release-ext-kitsune-maison-compilation-14", title: "Kitsune Maison Compilation 14", titleOverride: "Kitsune Maison Compilation 14" },
+    ],
+  },
+  {
+    artist: "Nick Hook",
+    targets: [
+      { id: "release-ext-follow-that-money", title: "Follow That Money" },
+    ],
+  },
+  {
+    artist: "Cubic Zirconia",
+    targets: [
+      { id: "release-ext-fuck-work", title: "Fuck Work" },
+    ],
+  },
+  // Third batch — long tail
+  {
+    artist: "Kid Kreep",
+    targets: [
+      { id: "release-ext-go-crazy", title: "Go Crazy" },
+    ],
+  },
+  {
+    artist: "Yoga Fire",
+    targets: [
+      { id: "release-ext-lazaro", title: "Lazaro" },
+    ],
+  },
+  {
+    artist: "Sinden",
+    targets: [
+      { id: "release-ext-got-me-moving-feat-syf", title: "Got Me Moving" },
+    ],
+  },
+  {
+    artist: "Nehuen",
+    targets: [
+      { id: "release-ext-hidden-traxx-ep", title: "Hidden Traxx", titleOverride: "Hidden Traxx" },
+      { id: "release-ext-split-01-2012", title: "Split 01" },
+    ],
+  },
+  {
+    artist: "Cardopusher",
+    targets: [
+      // Same release listed under Cardopusher
+      { id: "release-ext-split-01-2012", title: "Split 01" },
+    ],
+  },
+  {
+    artist: "Downliners Sekt",
+    targets: [
+      { id: "release-discogs-5954131", title: "RA.417", titleOverride: "RA.417" },
+    ],
+  },
+  {
+    artist: "Lucki",
+    targets: [
+      { id: "release-ext-weightin-on", title: "Weightin On", titleOverride: "Weightin On" },
+    ],
+  },
 ];
 
 const norm = (s: string) =>
