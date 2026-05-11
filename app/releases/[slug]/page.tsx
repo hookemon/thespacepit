@@ -346,7 +346,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 kicker="tracklist"
               >
                 <div className="max-w-[760px]">
-                  <TracklistAndCover tracklist={release.tracklist} />
+                  <TracklistAndCover
+                    tracklist={release.tracklist}
+                    releaseArtistText={artistNames}
+                    releaseTitle={release.title}
+                    fallbackYouTubeUrl={release.youtubeUrl}
+                  />
                 </div>
               </Room>
             )}

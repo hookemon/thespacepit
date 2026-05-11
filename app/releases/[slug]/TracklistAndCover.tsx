@@ -5,16 +5,29 @@ import type { Track } from "../../_lib/sanity-queries";
 import { VideoModal } from "../../_components/shared/VideoModal";
 
 /**
- * Tracklist with playable Bandcamp 30s previews and clickable music videos.
+ * Tracklist where EVERY track is clickable, with a smart play fallback chain:
+ *   1. If track has audioPreviewUrl → play 30s Bandcamp preview
+ *   2. Else if track has videoUrl → open music video modal
+ *   3. Else → search YouTube on-demand for "$artist $title", open in modal
  *
- * - ▶ play next to a track → plays its preview audio (single shared <audio>)
- * - clicking another row stops the first, starts the second
- * - ▶ video pill → opens the song's music video modal
+ * If you don't click any track, the release-page top embed (or the
+ * fallbackYouTubeUrl modal trigger) carries the album.
  */
-export function TracklistAndCover({ tracklist }: { tracklist: Track[] }) {
+export function TracklistAndCover({
+  tracklist,
+  releaseArtistText,
+  releaseTitle,
+  fallbackYouTubeUrl,
+}: {
+  tracklist: Track[];
+  releaseArtistText?: string;
+  releaseTitle?: string;
+  fallbackYouTubeUrl?: string;
+}) {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoTitle, setVideoTitle] = useState("");
   const [playingIdx, setPlayingIdx] = useState<number | null>(null);
+  const [searchingIdx, setSearchingIdx] = useState<number | null>(null);
   const [progress, setProgress] = useState(0); // 0..1 of current track
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -68,6 +81,31 @@ export function TracklistAndCover({ tracklist }: { tracklist: Track[] }) {
     setVideoTitle(title);
   };
 
+  // Smart play: try preview audio → try song's videoUrl → fall back to a
+  // YouTube search for "$artist $title" → open in modal.
+  const smartPlay = useCallback(async (idx: number, t: Track) => {
+    if (t.audioPreviewUrl) { playTrack(idx, t.audioPreviewUrl); return; }
+    if (t.videoUrl) { openVideo(t.videoUrl, `${t.title} — music video`); return; }
+    setSearchingIdx(idx);
+    try {
+      const q = encodeURIComponent(
+        releaseArtistText
+          ? `${releaseArtistText} ${t.title}`
+          : t.title
+      );
+      const res = await fetch(`/api/radio-search?q=${q}`, { cache: "force-cache" });
+      const data = (await res.json().catch(() => ({}))) as { videoId?: string | null };
+      if (data?.videoId) {
+        openVideo(`https://www.youtube.com/watch?v=${data.videoId}`, `${t.title}${releaseArtistText ? ` — ${releaseArtistText}` : ""}`);
+      } else if (fallbackYouTubeUrl) {
+        // Couldn't find the specific track — fall back to the release-level URL.
+        openVideo(fallbackYouTubeUrl, `${releaseTitle ?? t.title} — full album`);
+      }
+    } finally {
+      setSearchingIdx(null);
+    }
+  }, [playTrack, releaseArtistText, releaseTitle, fallbackYouTubeUrl]);
+
   return (
     <>
       <ol className="list-none p-0 m-0 border-t border-ink">
@@ -89,26 +127,36 @@ export function TracklistAndCover({ tracklist }: { tracklist: Track[] }) {
                 />
               )}
 
-              {/* Track # or play button */}
-              {hasPreview ? (
-                <button
-                  type="button"
-                  onClick={() => playTrack(i, t.audioPreviewUrl!)}
-                  className={`w-8 h-8 shrink-0 rounded-full border border-ink flex items-center justify-center text-[12px] tabular-nums font-mono transition-colors ${
-                    isPlaying
-                      ? "bg-collect text-paper"
-                      : "bg-paper hover:bg-ink hover:text-paper"
-                  }`}
-                  aria-label={isPlaying ? `Pause ${t.title}` : `Play 30s preview of ${t.title}`}
-                  title={isPlaying ? "Pause" : "30s preview"}
-                >
-                  <span aria-hidden>{isPlaying ? "❚❚" : "▶"}</span>
-                </button>
-              ) : (
-                <span className="font-mono text-[11px] tracking-[.1em] text-ink-3 w-8 tabular-nums shrink-0 text-center">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-              )}
+              {/* EVERY track is now clickable. Track number doubles as the
+                  play button — hover and it morphs into ▶. Click triggers the
+                  smartPlay chain: preview → video → YouTube search. */}
+              {(() => {
+                const isSearching = searchingIdx === i;
+                const label = isSearching ? "…" : isPlaying ? "❚❚" : "▶";
+                const num = String(i + 1).padStart(2, "0");
+                const title = hasPreview
+                  ? (isPlaying ? "Pause" : "30s preview")
+                  : hasVideo
+                  ? "Play music video"
+                  : "Find on YouTube";
+                return (
+                  <button
+                    type="button"
+                    onClick={() => smartPlay(i, t)}
+                    disabled={isSearching}
+                    className={`group/play w-8 h-8 shrink-0 rounded-full border border-ink flex items-center justify-center text-[12px] tabular-nums font-mono transition-colors ${
+                      isPlaying
+                        ? "bg-collect text-paper"
+                        : "bg-paper hover:bg-ink hover:text-paper"
+                    } ${isSearching ? "opacity-60 cursor-wait" : "cursor-pointer"}`}
+                    aria-label={`${title}: ${t.title}`}
+                    title={title}
+                  >
+                    <span className="group-hover/play:hidden" aria-hidden>{isPlaying || isSearching ? label : num}</span>
+                    <span className="hidden group-hover/play:inline" aria-hidden>{label}</span>
+                  </button>
+                );
+              })()}
 
               <div className="flex-1 min-w-0">
                 <div className="font-display font-semibold text-[18px] sm:text-[22px] uppercase tracking-[-0.005em] leading-tight">
