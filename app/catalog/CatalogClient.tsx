@@ -44,9 +44,18 @@ function formatDate(d?: string, fallbackYear?: number): string {
   return fallbackYear ? "" : "";
 }
 
+// GTA-related release detector — flags entries that are part of Nick's
+// Grand Theft Auto chapter (mission scores, Dam-Funk reworks).
+const GTA_PATTERN = /\b(grand theft auto|gta|casino heist|diamond casino|los santos)\b/i;
+function isGta(item: CatalogItem): boolean {
+  const t = item.title || "";
+  const a = item.artists.map((x) => x.name).join(" ");
+  return GTA_PATTERN.test(t) || /dam[\s-]?funk.*\b(gta|grand theft)\b/i.test(`${a} ${t}`);
+}
+
 export function CatalogClient({ items }: { items: CatalogItem[] }) {
   const [filter, setFilter] = useState<Filter>("all");
-  const [view, setView] = useState<View>("side-by-side");
+  const [view, setView] = useState<View>("single");
 
   const visible = useMemo(
     () => (filter === "all" ? items : items.filter((r) => r.roleSet === filter)),
@@ -85,6 +94,28 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
     <>
       <div className="px-5 sm:px-8 py-5 border-b border-ink sticky top-[60px] z-[5] bg-paper/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2 items-center">
+          {/* VIEW TOGGLE — first, so spatial-memory clicks land where Nick expects */}
+          <div className="flex items-center gap-1 font-mono text-[9px] tracking-[.14em] uppercase text-ink-3">
+            <button
+              type="button"
+              onClick={() => setView("single")}
+              className={`px-2 py-1 border rounded-full transition-colors ${
+                view === "single" ? "border-ink bg-ink text-paper" : "border-ink hover:bg-ink hover:text-paper"
+              }`}
+            >
+              single column
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("side-by-side")}
+              className={`px-2 py-1 border rounded-full transition-colors ${
+                view === "side-by-side" ? "border-ink bg-ink text-paper" : "border-ink hover:bg-ink hover:text-paper"
+              }`}
+            >
+              side × side
+            </button>
+          </div>
+          <span className="w-px self-stretch bg-ink/30 mx-2" aria-hidden />
           <div className="flex flex-wrap gap-2">
             {FILTER_LABELS.map((f) => {
               const n = counts.get(f.key) ?? 0;
@@ -100,28 +131,6 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
                 />
               );
             })}
-          </div>
-          <span className="w-px self-stretch bg-ink/30 mx-2" aria-hidden />
-          <div className="flex items-center gap-1 font-mono text-[9px] tracking-[.14em] uppercase text-ink-3">
-            <span>view ·</span>
-            <button
-              type="button"
-              onClick={() => setView("side-by-side")}
-              className={`px-2 py-1 border rounded-full transition-colors ${
-                view === "side-by-side" ? "border-ink bg-ink text-paper" : "border-ink hover:bg-ink hover:text-paper"
-              }`}
-            >
-              side × side
-            </button>
-            <button
-              type="button"
-              onClick={() => setView("single")}
-              className={`px-2 py-1 border rounded-full transition-colors ${
-                view === "single" ? "border-ink bg-ink text-paper" : "border-ink hover:bg-ink hover:text-paper"
-              }`}
-            >
-              single column
-            </button>
           </div>
         </div>
       </div>
@@ -216,11 +225,16 @@ function ReleaseCard({
   const color = ROLE_COLORS[r.roleSet];
   const artists = r.artists.map((a) => a.name).join(" · ");
   const dateLabel = formatDate(r.releaseDate, r.year);
+  const gta = isGta(r);
   return (
     <div className="group">
       <Link
         href={`/releases/${r.slug}`}
-        className="block border border-ink p-2 transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#E83A1C] no-underline text-ink"
+        className={`block border p-2 transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] no-underline text-ink ${
+          gta
+            ? "border-[#7A4FB7] hover:shadow-[3px_3px_0_#7A4FB7]"
+            : "border-ink hover:shadow-[3px_3px_0_#E83A1C]"
+        }`}
       >
         <div
           className="aspect-square border border-ink mb-1.5 flex items-center justify-center relative overflow-hidden"
@@ -235,6 +249,14 @@ function ReleaseCard({
             >
               {r.title}
             </span>
+          )}
+          {gta && (
+            <div
+              className="absolute top-1.5 left-1.5 font-mono text-[9px] tracking-[.14em] uppercase px-1.5 py-0.5 bg-[#7A4FB7] text-paper border border-paper rounded-full leading-none"
+              title="Part of the GTA chapter"
+            >
+              🎮 IN THE GAME
+            </div>
           )}
         </div>
         <div className={`font-display font-semibold uppercase tracking-[-0.005em] leading-tight line-clamp-2 ${compact ? "text-[13px]" : "text-[15px]"}`}>

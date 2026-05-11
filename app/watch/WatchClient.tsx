@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { VideoListItem } from "../_lib/sanity-queries";
 
 type TagChip = { value: string; label: string; count: number };
@@ -9,6 +9,30 @@ export function WatchClient({ videos, tags }: { videos: VideoListItem[]; tags: T
   const [filter, setFilter] = useState<string>("all");
   const [open, setOpen] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+
+  // /watch is the unified video page across all 3 worlds (nick · spacepit ·
+  // calm + collect). The TopNav for nick + cc deep-links here with
+  // ?filter=music-video so visitors land on world-relevant content. Pick that
+  // up on mount and apply if it matches a known tag. Also keep the URL in
+  // sync when the user clicks a different chip so shared links work.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const fromQuery = new URLSearchParams(window.location.search).get("filter");
+    if (fromQuery && (fromQuery === "all" || tags.some((t) => t.value === fromQuery))) {
+      setFilter(fromQuery);
+    }
+    // We only check the URL on initial mount. Tag clicks update both state
+    // and URL via the chip handlers below.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const url = new URL(window.location.href);
+    if (filter === "all") url.searchParams.delete("filter");
+    else url.searchParams.set("filter", filter);
+    window.history.replaceState(null, "", url.toString());
+  }, [filter]);
 
   const visible = useMemo(() => {
     const q = search.trim().toLowerCase();

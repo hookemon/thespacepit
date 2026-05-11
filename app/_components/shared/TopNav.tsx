@@ -11,6 +11,10 @@ const ROUTES: Record<Site, string> = {
 const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
   nick: [
     { href: "/catalog", label: "catalog" },
+    // /watch is unified across all 3 worlds — deep-link with ?filter=music-video
+    // so visitors landing from nick-hook see his performances first, then can
+    // clear the chip to see everything else.
+    { href: "/watch?filter=music-video", label: "watch" },
     { href: "/mixes", label: "mixes" },
     { href: "/shows", label: "shows" },
     { href: "/partners", label: "partners" },
@@ -32,6 +36,10 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
   ],
   label: [
     { href: "/releases", label: "releases" },
+    // CC nav: same /watch, pre-filtered to label-adjacent video sets. We don't
+    // have a single "c+c" tag, so we land on the broadest CC-flavored chip
+    // ("music-video") — the user can swap chips from there.
+    { href: "/watch?filter=music-video", label: "watch" },
     { href: "/calm-collect#artists", label: "artists" },
     { href: "/calm-collect#calllm", label: "calllm" },
     { href: "/contact", label: "contact" },

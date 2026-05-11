@@ -55,9 +55,34 @@ if (!PLAYLIST_ID && !VIDEO_ID) {
   console.error("❌ either --playlist or --video is required");
   process.exit(1);
 }
-if (!BRAND_SLUG && !GEAR_SLUG && !RELEASE_SLUG && !ARTIST_SLUG) {
-  console.error("❌ at least one of --brand / --gear / --release / --artist is required");
+if (!BRAND_SLUG && !GEAR_SLUG && !RELEASE_SLUG && !ARTIST_SLUG && !FORCE_TAG) {
+  console.error("❌ at least one of --brand / --gear / --release / --artist / --tag is required");
   process.exit(1);
+}
+
+// Auto-tag rules — same list as scripts/sync-youtube.ts. When ingesting a
+// 3rd-party playlist (where videos are uploaded by other channels and not
+// in our channel-sync), we still want them properly tagged.
+const TAG_RULES: Array<{ tag: string; pattern: RegExp }> = [
+  { tag: "spiritual-friendship", pattern: /\b(spiritual friendship|gareth jones)\b/i },
+  { tag: "rtj",                  pattern: /\b(run the jewels|rtj|killer mike|el-?p)\b/i },
+  { tag: "mwc",                  pattern: /\b(men,? women|mwc|men women)\b/i },
+  { tag: "cubic-zirconia",       pattern: /\b(cubic zirconia|tiombe|fuck work|josephine|black ?& ?blue|hoes come|follow your heart|take me high|darko|night or day)\b/i },
+  { tag: "tutorial",             pattern: /\b(tutorial|how to|walkthrough|breakdown|guide)\b/i },
+  { tag: "music-video",          pattern: /\b(official video|music video|\(official\)|\[official\]|\bvideo for\b)\b/i },
+  { tag: "behind-the-scenes",    pattern: /\b(bts|behind the scenes|making of)\b/i },
+  { tag: "interview",            pattern: /\b(interview|talks to|in conversation|q\s?&\s?a)\b/i },
+  { tag: "live-set",             pattern: /\b(live (?:at|in|from)|dj set|set at|boiler room|nts|the lot)\b/i },
+  { tag: "studio-session",       pattern: /\b(studio session|jam session|in session|live in studio)\b/i },
+  { tag: "gear-demo",            pattern: /\b(demo|review|first look|unboxing)\b/i },
+  { tag: "remix",                pattern: /\b(remix)\b/i },
+];
+
+function autoTags(title: string, description = ""): string[] {
+  const text = `${title}\n${description}`;
+  const tags = new Set<string>();
+  for (const { tag, pattern } of TAG_RULES) if (pattern.test(text)) tags.add(tag);
+  return [...tags];
 }
 
 type PlaylistItem = {
@@ -185,12 +210,13 @@ async function main() {
       viewCount: parseInt(v.statistics.viewCount ?? "0", 10),
     };
 
-    // Add FORCE_TAG to the tags array if it isn't already there
-    if (FORCE_TAG) {
-      const merged = new Set(ex?.tags ?? []);
-      merged.add(FORCE_TAG);
-      fields.tags = [...merged];
-    }
+    // Build the tag set: keep any tags already on the doc (manual /studio
+    // edits win), add FORCE_TAG, and add any auto-tags whose patterns hit.
+    const auto = autoTags(v.snippet.title, v.snippet.description ?? "");
+    const merged = new Set<string>(ex?.tags ?? []);
+    if (FORCE_TAG) merged.add(FORCE_TAG);
+    for (const t of auto) merged.add(t);
+    if (merged.size > 0) fields.tags = [...merged];
 
     // Only set relations if not already set — manual /studio edits win.
     if (brandId   && !ex?.relatedBrand)   { fields.relatedBrand   = { _type: "reference", _ref: brandId };   }
