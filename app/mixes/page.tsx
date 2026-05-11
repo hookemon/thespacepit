@@ -19,7 +19,7 @@ export default async function MixesIndex() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="nick" />
       <main className="flex-1">
-        <header className="relative overflow-hidden px-8 pt-16 pb-8 border-b-2 border-paper">
+        <header className="relative overflow-hidden px-5 sm:px-8 pt-16 pb-8 border-b-2 border-paper">
           {/* atmospheric photo behind the title — same pattern as the spacepit Hero. */}
           <img
             src="/epk/spacepit-3-0.jpg"
@@ -47,7 +47,7 @@ export default async function MixesIndex() {
         </header>
 
         {mixes.length > 0 && (
-          <section className="px-8 py-12">
+          <section className="px-5 sm:px-8 py-12">
             <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))" }}>
               {mixes.map((m) => {
                 const cover = m.cover ? urlFor(m.cover).width(560).height(560).fit("crop").url() : null;

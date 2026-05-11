@@ -36,7 +36,7 @@ export default async function ReleasesIndex() {
     <>
       <TopNav current="label" />
       <main className="flex-1 bg-paper text-ink">
-        <header className="px-8 pt-16 pb-8 border-b-2 border-ink">
+        <header className="px-5 sm:px-8 pt-16 pb-8 border-b-2 border-ink">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-2">THE FULL CATALOGUE</div>
           <h1
             className="font-display font-bold uppercase m-0"
@@ -52,7 +52,7 @@ export default async function ReleasesIndex() {
         {[...groups.entries()].map(([imprint, releases]) => {
           if (releases.length === 0) return null;
           return (
-            <section key={imprint} className="px-8 py-12 border-b border-ink/30">
+            <section key={imprint} className="px-5 sm:px-8 py-12 border-b border-ink/30">
               <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-1">IMPRINT</div>
               <h2
                 className="font-display font-bold uppercase m-0 mb-6"

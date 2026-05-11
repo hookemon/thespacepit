@@ -23,7 +23,7 @@ export async function NHLiveCatalogue() {
   const isEmpty = fromSanity.length === 0;
 
   return (
-    <section id="live" className="px-8 py-16 bg-redline text-paper">
+    <section id="live" className="px-5 sm:px-8 py-16 bg-redline text-paper">
       <div className="font-mono text-[11px] tracking-[.14em] uppercase mb-3 flex items-baseline gap-3 flex-wrap">
         <span>🔊 A/V SHOW · 2026</span>
         {isEmpty && <span className="text-paper-2 text-[10px]">· placeholder · edit in /studio</span>}

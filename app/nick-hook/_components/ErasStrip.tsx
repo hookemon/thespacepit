@@ -17,7 +17,7 @@ export async function NHErasStrip() {
   }
 
   return (
-    <section id="eras" className="px-8 py-16 bg-ink-2 text-paper border-y border-paper/20">
+    <section id="eras" className="px-5 sm:px-8 py-16 bg-ink-2 text-paper border-y border-paper/20">
       <div className="flex items-end justify-between mb-7 flex-wrap gap-4">
         <div>
           <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline">CAREER</div>
@@ -37,7 +37,7 @@ export async function NHErasStrip() {
         </Link>
       </div>
 
-      <div className="flex gap-4 overflow-x-auto pb-2 -mx-8 px-8 snap-x snap-mandatory">
+      <div className="flex gap-4 overflow-x-auto pb-2 -mx-8 px-5 sm:px-8 snap-x snap-mandatory">
         {projects.map((p) => {
           const cover = p.cover ? urlFor(p.cover).width(560).height(560).fit("crop").url() : null;
           return (

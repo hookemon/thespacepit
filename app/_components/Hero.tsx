@@ -51,7 +51,7 @@ export async function Hero() {
 
   return (
     <section
-      className={`relative overflow-hidden px-8 pt-20 pb-16 border-b border-ink ${hasBg ? "text-paper" : "bg-paper text-ink"}`}
+      className={`relative overflow-hidden px-5 sm:px-8 pt-20 pb-16 border-b border-ink ${hasBg ? "text-paper" : "bg-paper text-ink"}`}
     >
       {hasBg && (
         <>

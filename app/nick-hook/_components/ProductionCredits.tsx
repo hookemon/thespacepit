@@ -19,7 +19,7 @@ export async function NHProductionCredits() {
   }
 
   return (
-    <section id="credits" className="px-8 py-16 bg-ink text-paper border-y border-paper/20">
+    <section id="credits" className="px-5 sm:px-8 py-16 bg-ink text-paper border-y border-paper/20">
       <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline mb-2">
         OUTSIDE CREDITS · NOT ON CALM + COLLECT
       </div>

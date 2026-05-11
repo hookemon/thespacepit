@@ -167,7 +167,7 @@ export function RadioClient({ records }: { records: DiscogsRelease[] }) {
 
   if (!currentRecord) {
     return (
-      <div className="px-8 py-12">
+      <div className="px-5 sm:px-8 py-12">
         <p className="font-serif italic text-[20px] text-paper-2">no records match that filter.</p>
       </div>
     );

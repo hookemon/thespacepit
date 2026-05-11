@@ -70,7 +70,7 @@ export default async function JamPage() {
       <TopNav current="spacepit" />
       <main className="flex-1 bg-ink text-paper">
         {/* HERO STRIP */}
-        <header className="relative overflow-hidden px-8 pt-16 pb-10 border-b-2 border-paper">
+        <header className="relative overflow-hidden px-5 sm:px-8 pt-16 pb-10 border-b-2 border-paper">
           <img
             src="/epk/spacepit-3-0.jpg"
             alt=""
@@ -101,7 +101,7 @@ export default async function JamPage() {
 
         {/* FEATURED JAM (or empty state) */}
         {isEmpty ? (
-          <section className="px-8 py-20">
+          <section className="px-5 sm:px-8 py-20">
             <div className="max-w-[760px] border border-paper/40 p-10 bg-ink-2">
               <div className="font-mono text-[11px] tracking-[.16em] uppercase text-on-dark mb-3">EMPTY ROOM · 0 STEM PACKS LOADED</div>
               <div
@@ -130,7 +130,7 @@ export default async function JamPage() {
             </div>
           </section>
         ) : (
-          <section className="px-8 py-12">
+          <section className="px-5 sm:px-8 py-12">
             <div className="flex justify-between items-end mb-6 border-b-2 border-paper pb-3 flex-wrap gap-4">
               <div>
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline">FEATURED JAM</div>
@@ -163,7 +163,7 @@ export default async function JamPage() {
 
         {/* OTHER JAMS */}
         {others.length > 0 && (
-          <section className="px-8 py-12 border-t border-paper/30">
+          <section className="px-5 sm:px-8 py-12 border-t border-paper/30">
             <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">OTHER JAMS</div>
             <h3
               className="font-display font-bold uppercase m-0 mb-7"

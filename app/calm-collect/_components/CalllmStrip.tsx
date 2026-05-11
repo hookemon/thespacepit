@@ -34,7 +34,7 @@ export async function CCCalllmStrip() {
   return (
     <section
       id="calllm"
-      className="relative overflow-hidden px-8 py-20 text-paper border-t-2 border-b-2 border-ink"
+      className="relative overflow-hidden px-5 sm:px-8 py-20 text-paper border-t-2 border-b-2 border-ink"
       style={{ background: CHAKRA_GRADIENT }}
     >
       <div className="absolute inset-0 bg-ink/50" style={{ backdropFilter: "blur(2px)" }} />

@@ -23,7 +23,7 @@ export default async function CatalogPage() {
     <>
       <TopNav current="nick" />
       <main className="flex-1 bg-paper text-ink">
-        <header className="px-8 pt-16 pb-10 border-b-2 border-ink">
+        <header className="px-5 sm:px-8 pt-16 pb-10 border-b-2 border-ink">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
             EVERYTHING NICK&apos;S BEEN ON
           </div>

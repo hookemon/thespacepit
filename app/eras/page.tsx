@@ -63,7 +63,7 @@ export default async function ErasIndex() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="nick" />
       <main className="flex-1">
-        <header className="px-8 pt-16 pb-10 border-b-2 border-paper">
+        <header className="px-5 sm:px-8 pt-16 pb-10 border-b-2 border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">CAREER · ERAS · PROJECTS</div>
           <h1
             className="font-display font-bold uppercase m-0"
@@ -98,7 +98,7 @@ export default async function ErasIndex() {
             <section
               key={g.id}
               id={g.id}
-              className="px-8 py-12 border-b border-paper/30"
+              className="px-5 sm:px-8 py-12 border-b border-paper/30"
             >
               <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
                 <div>

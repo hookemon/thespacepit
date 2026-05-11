@@ -20,7 +20,7 @@ export async function VideoGrid() {
   const playlistTitle = meta?.title ?? "in the pit";
 
   return (
-    <section id="videos" className="px-8 py-16 bg-paper text-ink">
+    <section id="videos" className="px-5 sm:px-8 py-16 bg-paper text-ink">
       <div className="flex items-end justify-between mb-7 border-b-2 border-ink pb-2.5 flex-wrap gap-3">
         <div>
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp-deep">

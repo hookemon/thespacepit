@@ -27,7 +27,7 @@ export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
 
   return (
     <>
-      <div className="px-8 py-6 border-b border-ink/30 sticky top-0 z-[5] bg-paper/90 backdrop-blur-md">
+      <div className="px-5 sm:px-8 py-6 border-b border-ink/30 sticky top-0 z-[5] bg-paper/90 backdrop-blur-md">
         <div className="flex flex-wrap items-center gap-3">
           <input
             type="search"
@@ -54,7 +54,7 @@ export function WatchClient({ buckets }: { buckets: PlaylistBucket[] }) {
         </div>
       </div>
 
-      <section className="px-8 py-8">
+      <section className="px-5 sm:px-8 py-8">
         {visible.length === 0 ? (
           <p className="font-mono text-[12px] tracking-[.08em] uppercase text-mute">no videos match.</p>
         ) : (

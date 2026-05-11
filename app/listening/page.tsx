@@ -21,7 +21,7 @@ export default async function ListeningPage() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="spacepit" />
       <main className="flex-1">
-        <header className="px-8 pt-16 pb-10 border-b border-paper">
+        <header className="px-5 sm:px-8 pt-16 pb-10 border-b border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
             THE LISTENING ROOM · LIVE FROM DISCOGS
           </div>
@@ -41,7 +41,7 @@ export default async function ListeningPage() {
         {total > 0 ? (
           <ListeningClient records={records} total={total} />
         ) : (
-          <div className="px-8 py-16">
+          <div className="px-5 sm:px-8 py-16">
             <p className="font-serif italic text-[20px] text-paper-2">
               Discogs API didn&apos;t return any records. Check that the collection at{" "}
               <a

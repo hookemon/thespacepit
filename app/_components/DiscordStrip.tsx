@@ -21,7 +21,7 @@ export async function DiscordStrip() {
   const inviteUrl = widget?.inviteUrl ?? FALLBACK_INVITE;
 
   return (
-    <section id="discord" className="px-8 py-20 bg-lamp text-ink border-t border-b border-ink">
+    <section id="discord" className="px-5 sm:px-8 py-20 bg-lamp text-ink border-t border-b border-ink">
       <div className="grid md:grid-cols-[1.3fr_1fr] gap-12 items-center">
         <div>
           <div className="font-mono text-[11px] tracking-[.14em] uppercase mb-2.5">THE DISCORD</div>

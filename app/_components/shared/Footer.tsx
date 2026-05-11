@@ -19,8 +19,8 @@ const HEPTAGON_SRC: Record<HeptagonVariant, string> = {
 
 export function Footer({ theme, signoff, meta, links, id, heptagon }: Props) {
   const wrap = theme === "dark"
-    ? "px-8 py-12 bg-ink text-paper border-t border-paper flex flex-wrap items-center justify-between gap-6"
-    : "px-8 py-12 bg-paper text-ink border-t border-ink flex flex-wrap items-center justify-between gap-6";
+    ? "px-5 sm:px-8 py-12 bg-ink text-paper border-t border-paper flex flex-wrap items-center justify-between gap-6"
+    : "px-5 sm:px-8 py-12 bg-paper text-ink border-t border-ink flex flex-wrap items-center justify-between gap-6";
   const metaColor = theme === "dark" ? "text-on-dark" : "text-ink-3";
   const heptagonSrc = HEPTAGON_SRC[heptagon ?? (theme === "dark" ? "paper" : "transparent")];
 

@@ -53,3 +53,7 @@
 .heptagon-spin { animation: heptagon-rotate 8s linear infinite; }
 .sp-pulse { animation: sp-pulse 1.4s ease-in-out infinite; }
 
+/* Hide horizontal scrollbar (used by mobile TopNav nav strip + similar). */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+

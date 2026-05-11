@@ -30,7 +30,7 @@ const EXPERIENCES = [
 
 export function NHHighlights() {
   return (
-    <section id="highlights" className="px-8 py-16 bg-ink text-paper border-y border-paper/20">
+    <section id="highlights" className="px-5 sm:px-8 py-16 bg-ink text-paper border-y border-paper/20">
       <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline mb-2">CAREER · HIGHLIGHTS</div>
       <h2
         className="font-display font-bold uppercase m-0 mb-10"

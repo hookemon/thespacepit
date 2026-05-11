@@ -95,7 +95,7 @@ export default function ContactPage() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="nick" />
       <main className="flex-1">
-        <header className="relative overflow-hidden px-8 pt-16 pb-12 border-b-2 border-paper">
+        <header className="relative overflow-hidden px-5 sm:px-8 pt-16 pb-12 border-b-2 border-paper">
           {/* atmospheric photo behind the heading — picks up the studio energy */}
           <img
             src="/epk/spacepit-3-5.jpg"
@@ -135,7 +135,7 @@ export default function ContactPage() {
           <section
             key={s.id}
             id={s.id}
-            className={`px-8 py-16 ${i % 2 === 0 ? "bg-ink" : "bg-ink-2"} border-b border-ink-3`}
+            className={`px-5 sm:px-8 py-16 ${i % 2 === 0 ? "bg-ink" : "bg-ink-2"} border-b border-ink-3`}
           >
             <div className="max-w-[1180px] mx-auto grid gap-10 md:grid-cols-[minmax(280px,1fr)_1.2fr] items-start">
               <div>
@@ -194,7 +194,7 @@ export default function ContactPage() {
           </section>
         ))}
 
-        <section className="px-8 py-16">
+        <section className="px-5 sm:px-8 py-16">
           <div className="max-w-[1180px] mx-auto">
             <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">FROM THE ROOM</div>
             <h2

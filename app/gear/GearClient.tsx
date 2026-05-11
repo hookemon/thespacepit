@@ -74,7 +74,7 @@ export function GearClient({ items }: { items: GearItem[] }) {
   return (
     <>
       {/* Sticky filter strip */}
-      <div className="px-8 py-6 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
+      <div className="px-5 sm:px-8 py-6 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2">
           <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all" />
           {CATEGORIES.map((c) => {
@@ -96,7 +96,7 @@ export function GearClient({ items }: { items: GearItem[] }) {
           top, even when a category filter is active, so the desk is the
           anchor. */}
       {filter === "all" && pinned.length > 0 && (
-        <section className="px-8 pt-12 pb-2">
+        <section className="px-5 sm:px-8 pt-12 pb-2">
           <div className="font-mono text-[11px] tracking-[.18em] uppercase text-lamp mb-2 flex items-center gap-2">
             <span className="inline-block w-2 h-2 rounded-full bg-lamp animate-pulse" />
             patched in · on the desk right now
@@ -116,7 +116,7 @@ export function GearClient({ items }: { items: GearItem[] }) {
       )}
 
       {/* MAIN GRID — grouped by category */}
-      <div className="px-8 py-12">
+      <div className="px-5 sm:px-8 py-12">
         {grouped.length === 0 && (
           <p className="font-serif italic text-[20px] text-paper-2">nothing in this rack yet.</p>
         )}

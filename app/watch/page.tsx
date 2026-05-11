@@ -34,7 +34,7 @@ export default async function WatchPage() {
     <>
       <TopNav current="spacepit" />
       <main className="flex-1 bg-paper text-ink">
-        <header className="px-8 pt-16 pb-8 border-b-2 border-ink">
+        <header className="px-5 sm:px-8 pt-16 pb-8 border-b-2 border-ink">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp-deep mb-2">YOUTUBE · @THESPACEPIT</div>
           <h1
             className="font-display font-bold uppercase m-0"

@@ -9,7 +9,7 @@ export async function StudioClients() {
   const linkedCount = links.size;
 
   return (
-    <section id="clients" className="px-8 py-16 bg-paper text-ink border-y border-ink">
+    <section id="clients" className="px-5 sm:px-8 py-16 bg-paper text-ink border-y border-ink">
       <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp-deep mb-2">
         RECORDED HERE · BROOKLYN + MEDELLÍN · 2011 → TODAY
       </div>

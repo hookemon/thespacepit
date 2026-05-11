@@ -83,7 +83,7 @@ export function CatalogClient({ items }: { items: CatalogItem[] }) {
 
   return (
     <>
-      <div className="px-8 py-5 border-b border-ink sticky top-[60px] z-[5] bg-paper/95 backdrop-blur-md">
+      <div className="px-5 sm:px-8 py-5 border-b border-ink sticky top-[60px] z-[5] bg-paper/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2 items-center">
           <div className="flex flex-wrap gap-2">
             {FILTER_LABELS.map((f) => {

@@ -201,7 +201,7 @@ export function MapClient({ pins, tourPins, countries }: Props) {
 
   return (
     <>
-      <div className="px-8 py-5 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
+      <div className="px-5 sm:px-8 py-5 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2 items-center">
           <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all" count={counts.get("all") ?? 0} />
           <Chip active={filter === "tour"} onClick={() => setFilter("tour")} label="tour" count={counts.get("tour") ?? 0} color={TOUR_COLOR} />

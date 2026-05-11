@@ -23,7 +23,7 @@ export async function NHHero() {
           Stacks on mobile with photo on top. */}
       <div className="grid md:grid-cols-[1fr_1.25fr] min-h-[640px]">
         {/* LEFT — content. Logo is the dominant graphic. */}
-        <div className="relative px-8 pt-24 pb-12 md:py-20 flex flex-col justify-center">
+        <div className="relative px-5 sm:px-8 pt-24 pb-12 md:py-20 flex flex-col justify-center">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-5 flex flex-wrap gap-2.5">
             <span>PRODUCER</span><span>·</span><span>COMPOSER</span><span>·</span><span>DJ</span><span>·</span><span>SYNTHESIZER</span><span>·</span><span>ENGINEER</span><span>·</span><span>COLLABORATOR</span>
           </div>

@@ -16,7 +16,7 @@ export async function CCArtistRoster() {
   const list = artists.length > 0 ? artists : FALLBACK;
 
   return (
-    <section id="artists" className="px-8 py-16 bg-collect text-paper">
+    <section id="artists" className="px-5 sm:px-8 py-16 bg-collect text-paper">
       <div className="font-mono text-[11px] tracking-[.14em] uppercase text-calllm mb-2">THE FAM</div>
       <h2
         className="font-display font-bold uppercase m-0 mb-9"

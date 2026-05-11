@@ -52,7 +52,7 @@ export default async function ShowsPage() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="nick" />
       <main className="flex-1">
-        <header className="px-8 pt-16 pb-8 border-b-2 border-paper">
+        <header className="px-5 sm:px-8 pt-16 pb-8 border-b-2 border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
             EVERY KNOWN SHOW · 2004 → 2023
           </div>
@@ -70,7 +70,7 @@ export default async function ShowsPage() {
         {/* EPK photo strip — live anchors */}
         <section
           aria-label="tour images from the EPK"
-          className="px-8 py-6 border-b border-paper/30 grid gap-3"
+          className="px-5 sm:px-8 py-6 border-b border-paper/30 grid gap-3"
           style={{ gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))" }}
         >
           {epkStrip.map((p) => (
@@ -90,7 +90,7 @@ export default async function ShowsPage() {
 
         {/* Studio gallery — pulled live from Sanity (NI shoot + spacepit candids) */}
         {galleryPhotos.length > 0 && (
-          <section className="px-8 py-10 border-b border-paper/30">
+          <section className="px-5 sm:px-8 py-10 border-b border-paper/30">
             <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
               IN THE ROOMS
             </div>

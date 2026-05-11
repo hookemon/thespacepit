@@ -15,7 +15,7 @@ export async function CCHero() {
   const featuredArtists = featured?.artists.map((a) => a.name).join(" · ") ?? "";
 
   return (
-    <section className="relative overflow-hidden px-8 pt-16 pb-12 bg-paper text-ink border-b-2 border-ink">
+    <section className="relative overflow-hidden px-5 sm:px-8 pt-16 pb-12 bg-paper text-ink border-b-2 border-ink">
       <div className="grid gap-10 lg:grid-cols-[1fr_minmax(280px,420px)] items-center">
         {/* LEFT — heptagon over text, flush to the edge */}
         <div>

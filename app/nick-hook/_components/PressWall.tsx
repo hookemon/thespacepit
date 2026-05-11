@@ -13,7 +13,7 @@ export async function NHPressWall() {
   const isEmpty = fromSanity.length === 0;
 
   return (
-    <section id="press" className="px-8 py-16 bg-ink text-paper">
+    <section id="press" className="px-5 sm:px-8 py-16 bg-ink text-paper">
       <div className="font-mono text-[11px] tracking-[.14em] uppercase mb-2 flex items-baseline gap-3 flex-wrap">
         <span>THEY SAID</span>
         {isEmpty && <span className="text-mute text-[10px]">· placeholder · edit in /studio</span>}

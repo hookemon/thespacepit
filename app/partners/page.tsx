@@ -19,7 +19,7 @@ export default async function PartnersIndex() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="nick" />
       <main className="flex-1">
-        <header className="px-8 pt-16 pb-8 border-b-2 border-paper">
+        <header className="px-5 sm:px-8 pt-16 pb-8 border-b-2 border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">PARTNERS · GEAR · FAMILY</div>
           <h1
             className="font-display font-bold uppercase m-0"
@@ -35,7 +35,7 @@ export default async function PartnersIndex() {
         </header>
 
         {brands.length > 0 && (
-          <section className="px-8 py-12">
+          <section className="px-5 sm:px-8 py-12">
             <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))" }}>
               {brands.map((b) => {
                 const logo = b.logo ? urlFor(b.logo).width(640).height(640).fit("max").url() : null;

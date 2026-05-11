@@ -137,6 +137,16 @@ function brandKey(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]/g, "");
 }
 
+// Strip the manufacturer name from the front of the model (Sanity stores
+// names like "Akai MPC60" with the brand baked in; xlsx column B has just
+// the model "MPC60II Integrated...").
+function stripBrand(name: string, brand: string): string {
+  if (!brand) return name;
+  const b = brand.trim();
+  const re = new RegExp(`^${b.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s+`, "i");
+  return name.replace(re, "").trim();
+}
+
 // Two-axis score: brand similarity must clear a floor before we even look at
 // the model. Stops false matches like Roland Space Echo RE-201 ↔ Boss RE-20.
 function scorePair(sanityName: string, sanityBrand: string, xlsx: XlsxRow): { brand: number; model: number; total: number } {
@@ -153,8 +163,10 @@ function scorePair(sanityName: string, sanityBrand: string, xlsx: XlsxRow): { br
   //   (a) dice on token sets (handles "tx-6" vs "tx6 line module")
   //   (b) substring containment on the collapsed key (handles "MPC60" ⊂
   //       "mpc60ii integrated...", "Octatrack mk2" ⊂ "octatrack mkii dynamic 8-track...")
-  const sm = brandKey(sanityName);   // "mpc60" / "octatrackmk2" / "tx6"
-  const xm = brandKey(xlsx.model);   // "mpc60ii..." / "octatrackmkiidynamic..." / "tx6"
+  // Strip the brand prefix from the sanity name first.
+  const sanityModelOnly = stripBrand(sanityName, sanityBrand);
+  const sm = brandKey(sanityModelOnly);   // "mpc60" / "octatrackmk2" / "tx6"
+  const xm = brandKey(xlsx.model);         // "mpc60ii..." / "octatrackmkiidynamic..." / "tx6"
   let modelByContain = 0;
   if (sm.length >= 3 && xm.includes(sm)) modelByContain = 1;
   else if (xm.length >= 3 && sm.includes(xm)) modelByContain = 1;
@@ -165,7 +177,7 @@ function scorePair(sanityName: string, sanityBrand: string, xlsx: XlsxRow): { br
     if (sm2.length >= 3 && xm2.includes(sm2)) modelByContain = 0.9;
     else if (xm2.length >= 3 && sm2.includes(xm2)) modelByContain = 0.9;
   }
-  const modelByDice = dice(toks(sanityName, 2), toks(xlsx.model, 2));
+  const modelByDice = dice(toks(sanityModelOnly, 2), toks(xlsx.model, 2));
   const model = Math.max(modelByContain, modelByDice);
   return { brand, model, total: brand * 0.4 + model * 0.6 };
 }

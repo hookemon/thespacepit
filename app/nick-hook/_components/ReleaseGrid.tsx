@@ -36,7 +36,7 @@ export async function NHReleaseGrid() {
 
   if (sorted.length === 0) {
     return (
-      <section id="music" className="px-8 py-16 bg-ink text-paper">
+      <section id="music" className="px-5 sm:px-8 py-16 bg-ink text-paper">
         <div className="font-mono text-[11px] tracking-[.12em] uppercase text-on-dark">
           PLACEHOLDER · POPULATE IN /STUDIO →
         </div>
@@ -45,7 +45,7 @@ export async function NHReleaseGrid() {
   }
 
   return (
-    <section id="music" className="px-8 py-16 bg-ink text-paper">
+    <section id="music" className="px-5 sm:px-8 py-16 bg-ink text-paper">
       <div className="flex justify-between items-end mb-8 border-b-2 border-paper pb-3 flex-wrap gap-6">
         <div>
           <div className="font-mono text-[11px] tracking-[.12em] uppercase text-redline">

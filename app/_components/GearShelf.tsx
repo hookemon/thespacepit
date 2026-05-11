@@ -13,7 +13,7 @@ export async function GearShelf() {
   const populated = CATEGORIES.filter((c) => (counts.get(c.key) ?? 0) > 0);
 
   return (
-    <section id="gear" className="px-8 py-16 bg-ink text-paper">
+    <section id="gear" className="px-5 sm:px-8 py-16 bg-ink text-paper">
       <div className="flex items-end justify-between mb-7 border-b-2 border-paper pb-2.5 flex-wrap gap-3">
         <div>
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp">

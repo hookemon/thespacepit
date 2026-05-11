@@ -94,7 +94,7 @@ export function ListeningClient({ records, total }: { records: DiscogsRelease[];
   return (
     <>
       {/* Sticky filter strip */}
-      <div className="px-8 py-5 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
+      <div className="px-5 sm:px-8 py-5 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
         <input
           type="search"
           placeholder="search artist or title…"
@@ -121,7 +121,7 @@ export function ListeningClient({ records, total }: { records: DiscogsRelease[];
         </div>
       </div>
 
-      <div className="px-8 py-10">
+      <div className="px-5 sm:px-8 py-10">
         <div className="font-mono text-[11px] tracking-[.14em] uppercase text-paper-2 mb-6">
           {q || format !== "all" || decade !== "all"
             ? "matching"

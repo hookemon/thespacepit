@@ -17,7 +17,7 @@ export async function CCCatalogGrid() {
   const isEmpty = releases.length === 0;
 
   return (
-    <section id="releases" className="px-8 py-16 bg-paper text-ink">
+    <section id="releases" className="px-5 sm:px-8 py-16 bg-paper text-ink">
       <div className="flex justify-between items-end mb-7 border-b-2 border-ink pb-2.5 flex-wrap gap-3">
         <div>
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect">THE CATALOGUE</div>

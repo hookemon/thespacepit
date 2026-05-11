@@ -62,7 +62,7 @@ export default async function MapPage() {
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <TopNav current="spacepit" />
       <main className="flex-1">
-        <header className="px-8 pt-16 pb-10 border-b border-paper">
+        <header className="px-5 sm:px-8 pt-16 pb-10 border-b border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
             THE GLOBE · CURATED PINS · TOUR CITIES · SHOWS
           </div>
