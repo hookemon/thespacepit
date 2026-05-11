@@ -30,6 +30,7 @@ export const STUDIO_CLIENTS: string[] = [
   "Conductor Williams",
   "Conway The Machine",
   "D Double E",
+  "Damian Hagglund",
   "Daniel Aged",
   "Danny Brown",
   "Dave 1",

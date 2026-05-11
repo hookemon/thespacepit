@@ -57,6 +57,70 @@ export const gear = defineType({
     defineField({ name: "yearAcquired", title: "Year acquired", type: "number" }),
     defineField({ name: "photo", type: "image", options: { hotspot: true } }),
     defineField({ name: "pinned", title: "Pin to homepage teaser", type: "boolean", initialValue: false }),
+
+    // ── External media — articles, videos, movies, related links ──
+    defineField({
+      name: "links",
+      title: "Links (article / video / movie / interview)",
+      type: "array",
+      description: "External media this gear shows up in. e.g. a Reverb article, a YouTube demo, a movie scene.",
+      of: [
+        {
+          type: "object",
+          name: "gearLink",
+          fields: [
+            {
+              name: "kind",
+              type: "string",
+              validation: (r) => r.required(),
+              options: {
+                list: [
+                  { title: "Article", value: "article" },
+                  { title: "Video", value: "video" },
+                  { title: "Movie / film scene", value: "movie" },
+                  { title: "Interview", value: "interview" },
+                  { title: "Podcast", value: "podcast" },
+                  { title: "Other", value: "other" },
+                ],
+              },
+            },
+            { name: "title", type: "string", validation: (r) => r.required() },
+            { name: "url", type: "url", validation: (r) => r.required() },
+            { name: "source", type: "string", description: 'e.g. "Reverb", "YouTube", "Pitchfork".' },
+            { name: "note", type: "text", rows: 2, description: "What it is, why it matters." },
+          ],
+          preview: {
+            select: { title: "title", subtitle: "kind", source: "source" },
+            prepare({ title, subtitle, source }) {
+              return { title, subtitle: source ? `${subtitle} · ${source}` : subtitle };
+            },
+          },
+        },
+      ],
+    }),
+
+    defineField({
+      name: "gallery",
+      title: "Gallery (extra photos)",
+      type: "array",
+      description: "Additional photos — gear in context, with collaborators, in the rack, on the road. Each can have a caption.",
+      of: [
+        {
+          type: "object",
+          name: "galleryPhoto",
+          fields: [
+            { name: "image", type: "image", options: { hotspot: true }, validation: (r) => r.required() },
+            { name: "caption", type: "string", description: 'e.g. "Large Pro holding the SP-1200, NYC 2018".' },
+          ],
+          preview: {
+            select: { media: "image", title: "caption" },
+            prepare({ media, title }) {
+              return { media, title: title || "(no caption)" };
+            },
+          },
+        },
+      ],
+    }),
   ],
   preview: {
     select: { title: "name", category: "category", status: "status", media: "photo" },

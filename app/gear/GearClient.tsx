@@ -227,6 +227,18 @@ function GearCard({ g, featured = false }: { g: GearItem; featured?: boolean }) 
             patched in
           </div>
         )}
+        {/* Video-count badge — top-left. Highlights gear that has linked
+            demos / livestreams so visitors spot "click here for videos"
+            at a glance on the rack grid. */}
+        {g.videoCount && g.videoCount > 0 && (
+          <div
+            className="absolute top-2 left-2 font-mono text-[8px] tracking-[.18em] uppercase px-1.5 py-0.5 rounded-full flex items-center gap-1 bg-ink/85 backdrop-blur-sm"
+            style={{ color: accent, border: `1px solid ${accent}` }}
+          >
+            <span>▶</span>
+            <span>{g.videoCount}</span>
+          </div>
+        )}
       </div>
 
       {/* Card body */}

@@ -296,6 +296,12 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                               patched
                             </div>
                           )}
+                          {/* Video count badge — flags gear with demos */}
+                          {g.videoCount && g.videoCount > 0 && (
+                            <div className="absolute top-1.5 left-1.5 font-mono text-[7px] tracking-[.16em] uppercase px-1 py-0.5 rounded-full bg-ink/85 text-lamp border border-lamp flex items-center gap-0.5">
+                              <span>▶</span><span>{g.videoCount}</span>
+                            </div>
+                          )}
                         </div>
                         <div className="p-3">
                           <div className="font-display font-semibold text-[14px] uppercase tracking-[-0.005em] leading-tight line-clamp-2">
@@ -306,6 +312,9 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                             {g.status === "active" && <span className="text-lamp">·  active</span>}
                             {g.status === "shelf" && <span>· shelf</span>}
                             {g.status === "travel" && <span>· travel</span>}
+                            {g.videoCount && g.videoCount > 0 && (
+                              <span className="text-lamp ml-auto">· {g.videoCount} ▶</span>
+                            )}
                           </div>
                         </div>
                       </Link>

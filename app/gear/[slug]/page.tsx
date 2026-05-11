@@ -200,6 +200,78 @@ export default async function GearDetailPage({ params }: { params: Promise<{ slu
             )}
 
             <RelatedVideos videos={gearVideos} eyebrow={`FROM THE CHANNEL · ${gearVideos.length}`} title="every demo + jam tagged here" theme="dark" />
+
+            {/* IN THE WILD — articles, videos, movie scenes, podcasts, anywhere
+                this gear shows up beyond the studio. Editable in /studio under
+                gear.links[]. */}
+            {g.links && g.links.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
+                  IN THE WILD · {g.links.length}
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6 text-paper"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
+                >
+                  press · features · scenes
+                </h2>
+                <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                  {g.links.map((l, i) => (
+                    <a
+                      key={i}
+                      href={l.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block border border-paper p-4 transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#E83A1C] no-underline text-paper"
+                    >
+                      <div className="font-mono text-[10px] tracking-[.16em] uppercase text-redline mb-2 flex items-center gap-2">
+                        <span>{l.kind}</span>
+                        {l.source && <><span>·</span><span className="text-paper-2">{l.source}</span></>}
+                      </div>
+                      <div
+                        className="font-display font-semibold uppercase leading-tight"
+                        style={{ fontSize: "clamp(16px, 2vw, 20px)", letterSpacing: "-0.005em" }}
+                      >
+                        {l.title}
+                      </div>
+                      {l.note && (
+                        <p className="font-serif italic text-[14px] text-paper-2 mt-2 leading-snug line-clamp-3">{l.note}</p>
+                      )}
+                    </a>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {/* GALLERY — extra photos with captions. Edit in /studio under gear.gallery[]. */}
+            {g.gallery && g.gallery.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-2">
+                  GALLERY · {g.gallery.length}
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6 text-paper"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.01em" }}
+                >
+                  in context
+                </h2>
+                <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))" }}>
+                  {g.gallery.map((p, i) => {
+                    const src = urlFor(p.image).width(900).height(900).fit("crop").url();
+                    return (
+                      <figure key={i} className="border border-paper">
+                        <img src={src} alt={p.caption ?? g.name} className="block w-full aspect-square object-cover" loading="lazy" />
+                        {p.caption && (
+                          <figcaption className="font-mono text-[10px] tracking-[.1em] uppercase text-paper-2 p-3 leading-snug">
+                            {p.caption}
+                          </figcaption>
+                        )}
+                      </figure>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
           </div>
         </article>
       </main>

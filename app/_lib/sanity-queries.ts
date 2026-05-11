@@ -849,6 +849,10 @@ export type GearItem = {
   yearAcquired?: number;
   photo?: SanityImage;
   pinned?: boolean;
+  /** Count of YouTube `video` docs that have relatedGear → this doc.
+   *  Used to highlight gear cards that have associated demos / livestreams,
+   *  so visitors can spot "has videos" at a glance on the rack grid. */
+  videoCount?: number;
 };
 
 export async function getGear(): Promise<GearItem[]> {
@@ -863,7 +867,8 @@ export async function getGear(): Promise<GearItem[]> {
       note,
       yearAcquired,
       photo,
-      pinned
+      pinned,
+      "videoCount": count(*[_type == "video" && relatedGear._ref == ^._id && hidden != true])
     }
   `);
 }
@@ -894,7 +899,8 @@ export async function getGearForBrand(brandName: string): Promise<GearItem[]> {
       lower($name) match (lower(manufacturer) + "*")
     )]
       | order(pinned desc, status asc, name asc) {
-      _id, name, "slug": slug.current, category, status, manufacturer, note, yearAcquired, photo, pinned
+      _id, name, "slug": slug.current, category, status, manufacturer, note, yearAcquired, photo, pinned,
+      "videoCount": count(*[_type == "video" && relatedGear._ref == ^._id && hidden != true])
     }
   `, { name: brandName });
 }
@@ -932,8 +938,23 @@ const packListProjection = `
   featured
 `;
 
+export type GearLink = {
+  kind: "article" | "video" | "movie" | "interview" | "podcast" | "other";
+  title: string;
+  url: string;
+  source?: string;
+  note?: string;
+};
+
+export type GearGalleryPhoto = {
+  image: SanityImage;
+  caption?: string;
+};
+
 export type GearDetail = GearItem & {
   packs: PackListItem[];
+  links?: GearLink[];
+  gallery?: GearGalleryPhoto[];
 };
 
 export async function getPacks(): Promise<PackListItem[]> {
@@ -966,6 +987,8 @@ export async function getGearBySlug(slug: string): Promise<GearDetail | null> {
       yearAcquired,
       photo,
       pinned,
+      links,
+      "gallery": gallery[]{ image, caption },
       "packs": *[_type == "pack" && ^._id in gear[]._ref] | order(featured desc, releaseDate desc, year desc) {
         ${packListProjection}
       }
