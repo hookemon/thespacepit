@@ -4,7 +4,8 @@ import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
-import { getBrandBySlug, getBrandSlugs } from "../../_lib/sanity-queries";
+import { getBrandBySlug, getBrandSlugs, getVideosForBrand } from "../../_lib/sanity-queries";
+import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
@@ -31,6 +32,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params;
   const brand = await getBrandBySlug(slug);
   if (!brand) notFound();
+  const brandVideos = await getVideosForBrand(slug);
 
   const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("max").url() : null;
   // Hero background: prefer explicit backgroundImage, fall back to the
@@ -172,6 +174,7 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                 articleUrl={brand.articleUrl}
                 body={brand.articleBody}
                 heroImg={articleImg}
+                publishedNote="Feb. 8, 2017"
               />
             )}
 
@@ -379,6 +382,8 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                 </ul>
               </section>
             )}
+
+            <RelatedVideos videos={brandVideos} eyebrow={`FROM THE CHANNEL · ${brandVideos.length}`} title="every video tagged here" theme="dark" />
           </div>
         </article>
       </main>

@@ -3,7 +3,8 @@ import Link from "next/link";
 import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
-import { getProjectBySlug, getProjectSlugs } from "../../_lib/sanity-queries";
+import { getProjectBySlug, getProjectSlugs, getVideosForEra } from "../../_lib/sanity-queries";
+import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
@@ -32,6 +33,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
   const { slug } = await params;
   const p = await getProjectBySlug(slug);
   if (!p) notFound();
+  const videos = await getVideosForEra(slug);
 
   const cover = p.cover ? urlFor(p.cover).width(1200).height(800).fit("crop").url() : null;
   const years = p.yearStart ? (p.yearEnd ? `${p.yearStart}–${p.yearEnd}` : `${p.yearStart} → today`) : "";
@@ -262,6 +264,8 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
                 </div>
               </section>
             )}
+
+            <RelatedVideos videos={videos} eyebrow={`FROM THE CHANNEL · ${videos.length}`} title="videos" theme="dark" />
           </div>
         </article>
       </main>

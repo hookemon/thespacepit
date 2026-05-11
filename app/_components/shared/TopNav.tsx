@@ -54,21 +54,20 @@ export function TopNav({ current }: { current: Site }) {
     current === "label" ? "/heptagon-fill-black.png" :
     "/heptagon-transparent.png";
 
-  // Mobile: just heptagon + the active site name (compact). Desktop: full
-  // 3-site brand row with slashes.
-  const activeLabel =
-    current === "nick" ? "nick hook" :
-    current === "spacepit" ? "thespacepit" :
-    "calm + collect";
-
   return (
     <nav className={wrapClasses}>
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 w-full">
-        {/* TOP ROW: brand */}
-        <div className="flex items-center gap-2.5 font-display font-bold uppercase tracking-tight">
+        {/* TOP ROW: brand — all 3 sites navigable, just tighter on mobile */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 font-display font-bold uppercase tracking-tight">
           <img src={heptagonSrc} alt="" className="w-[22px] h-[22px] heptagon-spin shrink-0" />
-          {/* MOBILE: only active site name */}
-          <span className={`sm:hidden text-base ${activeColor}`}>{activeLabel}</span>
+          {/* MOBILE: 3 short labels with slashes */}
+          <div className="flex sm:hidden items-center gap-1.5 text-[13px]">
+            <SiteLink site="nick" current={current} activeColor={activeColor}>nick</SiteLink>
+            <span className={slashClasses}>/</span>
+            <SiteLink site="spacepit" current={current} activeColor={activeColor}>spacepit</SiteLink>
+            <span className={slashClasses}>/</span>
+            <SiteLink site="label" current={current} activeColor={activeColor}>c+c</SiteLink>
+          </div>
           {/* DESKTOP: full 3-site row */}
           <div className="hidden sm:flex items-center gap-2.5 text-xl">
             <SiteLink site="nick" current={current} activeColor={activeColor}>nick hook</SiteLink>

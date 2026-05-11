@@ -72,10 +72,23 @@ function parseArticleBody(html: string): ArticleBlock[] {
 
   const hits: Hit[] = [];
 
+  // Strip HTML but PRESERVE inline <a href="">text</a> as markdown
+  // [text](url) so the renderer can re-link them. <em>/<i> become *text*
+  // and <strong>/<b> become **text** so emphasis survives the round trip.
   const stripHtml = (s: string) =>
-    s.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
-     .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&ldquo;/g, "“")
-     .replace(/&rdquo;/g, "”").replace(/&hellip;/g, "…").replace(/\s+/g, " ").trim();
+    s
+      .replace(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi, (_m, href, inner) => {
+        const text = inner.replace(/<[^>]+>/g, "").trim();
+        return text ? `[${text}](${href})` : "";
+      })
+      .replace(/<(?:em|i)\b[^>]*>([\s\S]*?)<\/(?:em|i)>/gi, "*$1*")
+      .replace(/<(?:strong|b)\b[^>]*>([\s\S]*?)<\/(?:strong|b)>/gi, "**$1**")
+      .replace(/<[^>]+>/g, "")
+      .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&ldquo;/g, "“")
+      .replace(/&rdquo;/g, "”").replace(/&hellip;/g, "…").replace(/&ndash;/g, "–")
+      .replace(/&mdash;/g, "—")
+      .replace(/\s+/g, " ").trim();
 
   for (const m of art.matchAll(/<(h2|h3|p)\b[^>]*>([\s\S]*?)<\/\1>/g)) {
     const text = stripHtml(m[2]);
@@ -105,21 +118,24 @@ function parseArticleBody(html: string): ArticleBlock[] {
   // Also drop the "Download as Live Set" h2 — that's not really article body.
 
   const blocks: ArticleBlock[] = [];
+  // Track which hit indices have already been consumed as a video caption,
+  // so we don't double-emit them as standalone paragraphs.
+  const consumed = new Set<number>();
+
   for (let i = 0; i < hits.length; i++) {
+    if (consumed.has(i)) continue;
     const h = hits[i];
     if ((h.kind === "h2" || h.kind === "h3") && h.text === pageTitle) continue;
-    if (h.kind === "h2" && /^download.*live set/i.test(h.text)) continue;
 
     if (h.kind === "video") {
-      // Pull the immediately-preceding h3 (if within ~600 chars) as caption.
-      const prev = hits[i - 1];
+      // Find the caption: Ableton puts captions as a short <p> IMMEDIATELY
+      // AFTER the iframe. Look ahead one hit; if it's a <p> under ~140 chars,
+      // attach it as the video caption and mark it consumed.
       let caption: string | undefined;
-      if (prev && prev.kind === "h3" && h.idx - prev.idx < 800) {
-        caption = prev.text;
-        // pop the duplicate h3 we already emitted
-        if (blocks[blocks.length - 1]?.kind === "h3" && blocks[blocks.length - 1].text === prev.text) {
-          blocks.pop();
-        }
+      const next = hits[i + 1];
+      if (next && next.kind === "p" && next.text.length <= 140 && next.idx - h.idx < 1500) {
+        caption = next.text;
+        consumed.add(i + 1);
       }
       blocks.push({ _key: randomUUID().replace(/-/g, ""), kind: "video", url: h.url, caption });
       continue;

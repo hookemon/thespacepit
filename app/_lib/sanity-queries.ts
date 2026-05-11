@@ -521,6 +521,33 @@ export async function getVideosForEra(projectSlug: string): Promise<VideoListIte
   `, { slug: projectSlug });
 }
 
+export async function getVideosForBrand(brandSlug: string): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true && relatedBrand->slug.current == $slug]
+      | order(publishedAt desc) {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { slug: brandSlug });
+}
+
+export async function getVideosForArtist(artistSlug: string): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true && relatedArtist->slug.current == $slug]
+      | order(publishedAt desc) {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { slug: artistSlug });
+}
+
+export async function getVideosForGear(gearSlug: string): Promise<VideoListItem[]> {
+  return sanityFetch<VideoListItem[]>(groq`
+    *[_type == "video" && hidden != true && relatedGear->slug.current == $slug]
+      | order(publishedAt desc) {
+      _id, youtubeId, title, publishedAt, duration, viewCount, thumbnailUrl, thumbnail, tags, featured
+    }
+  `, { slug: gearSlug });
+}
+
 export async function getMixes(limit = 60): Promise<MixListItem[]> {
   return sanityFetch<MixListItem[]>(groq`
     *[_type == "mix"] | order(featured desc, date desc) [0...$limit] {

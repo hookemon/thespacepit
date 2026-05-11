@@ -11,7 +11,8 @@ import { TracklistAndCover } from "./TracklistAndCover";
 import { CoverPlayBadge } from "./CoverPlayBadge";
 import { Room } from "../../_components/shared/Room";
 import { PhotoGallery } from "../../_components/shared/PhotoGallery";
-import { getReleaseBySlug, getReleaseSlugs, getPacksForRelease } from "../../_lib/sanity-queries";
+import { getReleaseBySlug, getReleaseSlugs, getPacksForRelease, getVideosForRelease } from "../../_lib/sanity-queries";
+import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
@@ -69,6 +70,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
 
   // Packs that target this release (e.g. WYGD sample pack on the CC027 page).
   const releasePacks = await getPacksForRelease(slug);
+
+  // Videos auto-attached to this release (set via /studio → video.relatedRelease).
+  const releaseVideos = await getVideosForRelease(slug);
 
   return (
     <>
@@ -406,6 +410,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 </div>
               </Room>
             )}
+
+            <RelatedVideos videos={releaseVideos} eyebrow={`FROM THE CHANNEL · ${releaseVideos.length}`} title="videos" theme="light" />
           </div>
         </article>
       </main>

@@ -1,15 +1,57 @@
 /**
  * Inline article reader for a brand page. Renders the article body that was
- * scraped + stored on `brand.articleBody`, with video embeds in-context
- * (instead of just a link out to the original).
+ * scraped + stored on `brand.articleBody`, with video embeds in-context.
  *
- * Visual: long-form magazine reader. Big serif body type, ALL CAPS mono
- * questions/headings in redline accent, videos break the column at full width.
- * Sits inside a max-w-[760px] reader column with the embeds escaping to
- * max-w-[1080px] for that "article on the brand's own site" feeling.
+ * Visual: faithful recreation of Ableton's own blog article — clean sans
+ * body, bold for the interview questions, italic caption UNDER each video,
+ * blue inline links (preserved from the original via markdown-style
+ * [text](url) encoding in the source text).
  */
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
 import type { ArticleBodyBlock } from "../../_lib/sanity-queries";
+
+/**
+ * Render a text string with markdown-style links + emphasis.
+ * Supports:
+ *   [text](https://url)  → <a href="url">text</a>
+ *   *italic*             → <em>italic</em>
+ *   **bold**             → <strong>bold</strong>
+ *
+ * We only parse the three forms above — no nested constructs, no headings
+ * inside paragraphs. Anything we don't recognize stays as plain text.
+ */
+function renderInline(text: string): React.ReactNode[] {
+  if (!text) return [];
+  // Tokenize: alternating segments of [text](url) | **bold** | *italic* | plain
+  const re = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*/g;
+  const out: React.ReactNode[] = [];
+  let lastIdx = 0;
+  let m: RegExpExecArray | null;
+  let key = 0;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > lastIdx) out.push(text.slice(lastIdx, m.index));
+    if (m[1] && m[2]) {
+      out.push(
+        <a
+          key={`a-${key++}`}
+          href={m[2]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-collect underline decoration-1 underline-offset-2 hover:text-redline transition-colors"
+        >
+          {m[1]}
+        </a>
+      );
+    } else if (m[3]) {
+      out.push(<strong key={`b-${key++}`}>{m[3]}</strong>);
+    } else if (m[4]) {
+      out.push(<em key={`i-${key++}`}>{m[4]}</em>);
+    }
+    lastIdx = m.index + m[0].length;
+  }
+  if (lastIdx < text.length) out.push(text.slice(lastIdx));
+  return out;
+}
 
 export function ArticleReader({
   brandName,
@@ -32,7 +74,7 @@ export function ArticleReader({
 
   return (
     <section className="mt-16">
-      {/* Magazine masthead */}
+      {/* Magazine masthead — keep redline kicker as our spacepit voice */}
       <div className="border-t-2 border-b border-paper pb-5 pt-5 mb-10">
         <div className="font-mono text-[10px] tracking-[.24em] uppercase text-redline mb-3">
           ↓ THE ARTICLE · ORIGINALLY ON {host.toUpperCase()}
@@ -66,58 +108,61 @@ export function ArticleReader({
         </div>
       )}
 
-      {/* Article body — reader column. Videos escape to wider max width. */}
-      <div className="max-w-[760px] mx-auto">
+      {/* Article body — clean sans-serif reader, faithful to Ableton's style. */}
+      <div className="max-w-[720px] mx-auto font-sans text-paper">
         {body.map((b, i) => {
           if (b.kind === "h2") {
+            // h2 in the original Ableton article is a section CTA — usually
+            // a styled link like "Download Nick Hook feat. Novelist as an
+            // Ableton Live Set". Render it big + blue if its text contains a
+            // markdown link; otherwise as a regular subheader.
             return (
               <h3
                 key={b._key ?? i}
-                className="font-display font-bold uppercase m-0 mt-10 mb-4"
-                style={{ fontSize: "clamp(24px, 2.6vw, 32px)", lineHeight: 1.05, letterSpacing: "-0.015em" }}
+                className="m-0 mt-10 mb-4 font-display font-bold uppercase leading-tight tracking-[-0.01em]"
+                style={{ fontSize: "clamp(22px, 2.6vw, 30px)", color: "#0E4B3A" /* collect green */ }}
               >
-                {b.text}
+                {renderInline(b.text ?? "")}
               </h3>
             );
           }
           if (b.kind === "h3") {
-            // The article uses <h3> for Q&A questions — render them in
-            // redline mono caps like an interview transcript.
+            // The article's <h3> is the interview question — Ableton
+            // renders them in bold sans body weight, not a separate kicker.
             return (
-              <h4
+              <p
                 key={b._key ?? i}
-                className="font-mono text-[13px] tracking-[.04em] uppercase text-redline m-0 mt-10 mb-3 leading-snug"
+                className="m-0 mt-10 mb-3 text-[18px] sm:text-[19px] leading-[1.5] font-semibold text-paper"
               >
-                Q · {b.text}
-              </h4>
+                {renderInline(b.text ?? "")}
+              </p>
             );
           }
           if (b.kind === "p") {
             return (
               <p
                 key={b._key ?? i}
-                className="font-serif text-[18px] sm:text-[19px] leading-[1.6] text-paper m-0 mb-5"
+                className="m-0 mb-5 text-[17px] sm:text-[18px] leading-[1.65] text-paper"
               >
-                {b.text}
+                {renderInline(b.text ?? "")}
               </p>
             );
           }
           if (b.kind === "video" && b.url) {
             // Video embeds break out of the reader column so they sit big.
+            // Caption goes BELOW in small italic text — Ableton style.
             return (
-              <div key={b._key ?? i} className="my-8 -mx-2 sm:-mx-[140px]">
+              <div key={b._key ?? i} className="my-8 sm:-mx-[100px]">
                 <MediaEmbed url={b.url} title={b.caption ?? "video"} />
                 {b.caption && (
-                  <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 mt-2 text-center">
-                    ▶ {b.caption}
+                  <div className="text-[13px] italic text-paper-2 mt-2 leading-snug">
+                    {b.caption}
                   </div>
                 )}
               </div>
             );
           }
           if (b.kind === "soundcloud" && b.url) {
-            // SoundCloud uses its own iframe; pass through. Aspect ratio
-            // forced to ~8:1 since SC players are short.
             return (
               <div key={b._key ?? i} className="my-8">
                 <iframe
@@ -138,7 +183,10 @@ export function ArticleReader({
 
         {/* Footer citation */}
         {articleUrl && (
-          <div className="mt-10 pt-6 border-t border-paper/30">
+          <div className="mt-12 pt-6 border-t border-paper/30 flex items-center justify-between gap-4 flex-wrap">
+            <span className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2">
+              Posted on {publishedNote ?? ""} in Artists · Tags: HipHop
+            </span>
             <a
               href={articleUrl}
               target="_blank"

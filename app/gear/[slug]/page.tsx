@@ -3,7 +3,8 @@ import Link from "next/link";
 import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
-import { getGearBySlug, getGearSlugs, type PackKind } from "../../_lib/sanity-queries";
+import { getGearBySlug, getGearSlugs, getVideosForGear, type PackKind } from "../../_lib/sanity-queries";
+import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { CATEGORIES } from "../../_lib/gear-data";
@@ -54,6 +55,7 @@ export default async function GearDetailPage({ params }: { params: Promise<{ slu
   const { slug } = await params;
   const g = await getGearBySlug(slug);
   if (!g) notFound();
+  const gearVideos = await getVideosForGear(slug);
 
   const photo = g.photo ? urlFor(g.photo).width(2000).height(1100).fit("crop").url() : null;
   const categoryLabel = CATEGORIES.find((c) => c.key === g.category)?.label ?? g.category;
@@ -196,6 +198,8 @@ export default async function GearDetailPage({ params }: { params: Promise<{ slu
                 </p>
               </section>
             )}
+
+            <RelatedVideos videos={gearVideos} eyebrow={`FROM THE CHANNEL · ${gearVideos.length}`} title="every demo + jam tagged here" theme="dark" />
           </div>
         </article>
       </main>

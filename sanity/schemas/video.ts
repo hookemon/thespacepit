@@ -117,6 +117,13 @@ export const video = defineType({
       description: "Surfaces on the partner page.",
     }),
     defineField({
+      name: "relatedGear",
+      title: "Related gear / instrument",
+      type: "reference",
+      to: [{ type: "gear" }],
+      description: "Pin a video to a specific piece of gear (e.g. OP-XY) — surfaces on that gear's page.",
+    }),
+    defineField({
       name: "featured",
       type: "boolean",
       description: "Pin to the top of /watch.",
