@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Type — Mono & Metadata</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .card { border: 1px solid var(--ink); padding: 14px; }
+  .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 10px; }
+  .mono  { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+  .cat   { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+  .bpm   { font-size: 36px; font-weight: 500; letter-spacing: -0.02em; }
+  .time  { font-size: 14px; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card">
+      <div class="tag">catalog numbers · 11px caps</div>
+      <div class="mono cat">C+C–024 · RELATIONSHIPS · 2015</div>
+      <div class="mono cat" style="margin-top:4px">CALLLM–007 · THIRD EYE · 44:16</div>
+    </div>
+    <div class="card">
+      <div class="tag">timecodes & bpm</div>
+      <div class="mono bpm">128 BPM</div>
+      <div class="mono time">03:47 / 07:12</div>
+    </div>
+    <div class="card" style="grid-column: 1/-1">
+      <div class="tag">tracklist — tabular numerals</div>
+      <div class="mono" style="display:grid;grid-template-columns:30px 1fr 80px;gap:6px;font-size:13px">
+        <span>01</span><span>HEAD FT. 21 SAVAGE</span><span style="text-align:right">03:12</span>
+        <span>02</span><span>PEEPHOLE FT. GANGSTA BOO</span><span style="text-align:right">02:58</span>
+        <span>03</span><span>LA BURBUJA W/ QUAZZY</span><span style="text-align:right">04:31</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

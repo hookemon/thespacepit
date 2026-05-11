@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tags & Chips</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; align-items:center; }
+  .tag { font-family: var(--font-mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding: 4px 10px; border: 1px solid var(--ink); border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; background: var(--paper); }
+  .tag.filled { background: var(--ink); color: var(--paper); }
+  .tag.red { background: var(--redline); color: var(--paper); border-color: var(--redline); }
+  .tag.green { background: var(--collect); color: var(--paper); border-color: var(--collect); }
+  .label { font-family: var(--font-mono); font-size: 10px; letter-spacing:.08em; text-transform:uppercase; color: var(--fg-2); width: 80px; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="label">default</span><span class="tag">hip-hop</span><span class="tag">ambient</span><span class="tag">128 bpm</span><span class="tag">c+c–024</span></div>
+  <div class="row"><span class="label">filled</span><span class="tag filled">new</span><span class="tag red">LIVE NOW</span><span class="tag green">released</span></div>
+</body>
+</html>

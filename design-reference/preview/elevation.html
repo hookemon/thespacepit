@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Elevation — Hard Shadows</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { background: var(--paper); border: 1px solid var(--ink); padding: 16px; aspect-ratio: 1.3; display:flex;flex-direction:column;justify-content:space-between; }
+  .label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+  .spec  { font-family: var(--font-mono); font-size: 10px; color: var(--fg-2); }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card"><span class="label">shadow-0</span><span class="spec">none</span></div>
+    <div class="card" style="box-shadow: 2px 2px 0 #0B0B0B"><span class="label">shadow-1</span><span class="spec">2 2 0 ink</span></div>
+    <div class="card" style="box-shadow: 4px 4px 0 #0B0B0B"><span class="label">shadow-2</span><span class="spec">4 4 0 ink</span></div>
+    <div class="card" style="box-shadow: 4px 4px 0 #E83A1C"><span class="label">accent</span><span class="spec">4 4 0 redline</span></div>
+  </div>
+</body>
+</html>

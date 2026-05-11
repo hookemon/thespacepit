@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Colors — Property Accents</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .card { border: 1px solid var(--ink); background: var(--paper); padding: 12px; }
+  .swatch { height: 70px; border: 1px solid var(--ink); margin-bottom: 10px; position: relative; }
+  .label { font-family: var(--font-display); text-transform: uppercase; font-size: 20px; line-height: 1; letter-spacing: -0.01em; }
+  .prop { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-top: 2px; }
+  .hex { font-family: var(--font-mono); font-size: 11px; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card">
+      <div class="swatch" style="background:#E83A1C"></div>
+      <div class="label">redline</div>
+      <div class="prop">nick hook</div>
+      <div class="hex">#E83A1C</div>
+    </div>
+    <div class="card">
+      <div class="swatch" style="background:#F2B705"></div>
+      <div class="label">lamp</div>
+      <div class="prop">thespacepit</div>
+      <div class="hex">#F2B705</div>
+    </div>
+    <div class="card">
+      <div class="swatch" style="background:#0E4B3A"></div>
+      <div class="label" style="color:#F4EFE6;background:#0E4B3A;padding:2px 4px;display:inline-block">collect</div>
+      <div class="prop">calm + collect</div>
+      <div class="hex">#0E4B3A</div>
+    </div>
+    <div class="card">
+      <div class="swatch" style="background:#C9B9E8"></div>
+      <div class="label">calllm</div>
+      <div class="prop">sub-label</div>
+      <div class="hex">#C9B9E8</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brand — Wordmarks</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); display:flex;flex-direction:column;gap:16px; }
+  .wm { border: 1px solid var(--ink); padding: 22px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .name { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; letter-spacing: -0.015em; font-size: 44px; line-height: .9; }
+  .under { font-family: var(--font-mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--fg-2); margin-top: 6px; }
+  .chip { font-family: var(--font-mono); font-size: 10px; padding: 4px 8px; border: 1px solid var(--ink); border-radius: 999px; letter-spacing: .08em; text-transform: uppercase; }
+  .wm.dark { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .wm.dark .under, .wm.dark .chip { color: var(--paper); border-color: var(--paper); }
+  .heptagon { width: 36px; height: 36px; }
+  .spin { animation: sp 8s linear infinite; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="wm dark">
+    <div><div class="name" style="color:var(--redline)">NICK HOOK</div><div class="under">producer · dj · engineer</div></div>
+    <span class="chip">artist</span>
+  </div>
+  <div class="wm">
+    <div><div class="name">thespacepit</div><div class="under">studio · yt · discord · brooklyn → medellín</div></div>
+    <span class="chip" style="background:var(--lamp)">community</span>
+  </div>
+  <div class="wm">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="../assets/logos/calmcollect-mark.png" class="heptagon spin" alt="">
+      <div><div class="name">calm + collect</div><div class="under">record label · est. 2013</div></div>
+    </div>
+    <span class="chip" style="background:var(--collect);color:var(--paper);border-color:var(--collect)">label</span>
+  </div>
+</body>
+</html>

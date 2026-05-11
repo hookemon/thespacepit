@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Nick Hook — Design System Sheet</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  @page { size: Letter portrait; margin: 0.5in; }
+  html, body { margin: 0; padding: 0; background: #F4EFE6; color: #0B0B0B; font-family: 'Inter', system-ui, sans-serif; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .cover { min-height: 10in; padding: 48px 36px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid #0B0B0B; box-sizing: border-box; page-break-after: always; break-after: page; }
+  .cover .top { display:flex; align-items:center; gap: 16px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #3A362E; }
+  .cover img.mark { width: 36px; height: 36px; }
+  .cover h1 { font-family: 'Antonio', sans-serif; font-weight: 700; font-size: 120px; line-height: .88; letter-spacing: -0.02em; text-transform: uppercase; margin: 0; }
+  .cover h1 .plus { color: #0E4B3A; font-weight: 400; }
+  .cover .sub { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 24px; max-width: 520px; margin-top: 20px; line-height: 1.35; }
+  .cover .foot { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #3A362E; border-top: 1px solid #0B0B0B; padding-top: 14px; }
+
+  .section-head { page-break-before: always; break-before: page; padding: 14px 0 10px; border-bottom: 2px solid #0B0B0B; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: baseline; }
+  .section-head h2 { font-family: 'Antonio', sans-serif; font-weight: 700; font-size: 44px; line-height: .92; margin: 0; text-transform: uppercase; letter-spacing: -0.015em; }
+  .section-head .kicker { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: #3A362E; }
+
+  .card { border: 1px solid #0B0B0B; background: #F4EFE6; break-inside: avoid; page-break-inside: avoid; margin-bottom: 18px; overflow: hidden; }
+  .card .label { display: flex; justify-content: space-between; align-items: baseline; padding: 10px 14px; border-bottom: 1px solid #0B0B0B; background: #E8E2D4; }
+  .card .label .name { font-family: 'Antonio', sans-serif; font-weight: 600; font-size: 18px; text-transform: uppercase; letter-spacing: -0.005em; }
+  .card .label .sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: #3A362E; }
+  .card iframe { display: block; width: 100%; border: 0; background: #F4EFE6; }
+</style>
+</head>
+<body>
+
+<section class="cover">
+  <div class="top">
+    <img class="mark" src="../assets/logos/calmcollect-mark.png" alt="">
+    <span>NICK HOOK · THESPACEPIT · CALM + COLLECT</span>
+  </div>
+  <div>
+    <div style="font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#3A362E; margin-bottom: 14px;">The Design System · v1</div>
+    <h1>one world<br><span class="plus">+</span> three doors</h1>
+    <p class="sub">a shared skeleton — heavy condensed caps, warm cream paper, lamp amber &amp; deep collect green — with three accent worlds: nick hook (redline), thespacepit (lamp), calm + collect (collect green). we out here 🌱</p>
+  </div>
+  <div class="foot">
+    <span>april 2026</span>
+    <span>brooklyn · medellín</span>
+    <span>sheet 01 — foundations + components</span>
+  </div>
+</section>
+
+<!-- TYPE -->
+<div class="section-head"><h2>type</h2><span class="kicker">01 · DISPLAY, BODY, MONO</span></div>
+<div class="card"><div class="label"><span class="name">Type — Display</span><span class="sub">Antonio heavy · fly-poster register</span></div><iframe src="type-display.html" style="height:260px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Type — Body</span><span class="sub">Instrument Serif + Inter</span></div><iframe src="type-body.html" style="height:260px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Type — Mono</span><span class="sub">JetBrains Mono · catalog numerals</span></div><iframe src="type-mono.html" style="height:200px"></iframe></div>
+
+<!-- COLORS -->
+<div class="section-head"><h2>colors</h2><span class="kicker">02 · NEUTRALS, ACCENTS, CHAKRA</span></div>
+<div class="card"><div class="label"><span class="name">Neutrals</span><span class="sub">Ink, paper, paper-2, grain</span></div><iframe src="colors-neutrals.html" style="height:180px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Accents</span><span class="sub">Redline · lamp · collect · calllm</span></div><iframe src="colors-accents.html" style="height:180px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Chakra</span><span class="sub">Calllm sub-label · one per release</span></div><iframe src="colors-chakra.html" style="height:170px"></iframe></div>
+
+<!-- SPACING -->
+<div class="section-head"><h2>spacing &amp; surface</h2><span class="kicker">03 · SCALE, RADII, ELEVATION, TEXTURES</span></div>
+<div class="card"><div class="label"><span class="name">Spacing Scale</span><span class="sub">8px baseline</span></div><iframe src="spacing-scale.html" style="height:200px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Radii</span><span class="sub">Sharp or pill — nothing in between</span></div><iframe src="radii.html" style="height:180px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Elevation</span><span class="sub">Hard offset shadows · risograph</span></div><iframe src="elevation.html" style="height:200px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Textures</span><span class="sub">Grain, paper, tape — never gloss</span></div><iframe src="textures.html" style="height:200px"></iframe></div>
+
+<!-- COMPONENTS -->
+<div class="section-head"><h2>components</h2><span class="kicker">04 · BUTTONS, TAGS, FORMS, HEADER, CARD</span></div>
+<div class="card"><div class="label"><span class="name">Buttons</span><span class="sub">Primary, secondary, ghost</span></div><iframe src="buttons.html" style="height:220px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Tags / Chips</span><span class="sub">Pill, mono, tabular</span></div><iframe src="tags.html" style="height:170px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Forms</span><span class="sub">Input, label, helper</span></div><iframe src="forms.html" style="height:220px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Header</span><span class="sub">Sticky nav · three-door lockup</span></div><iframe src="header.html" style="height:180px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Release Card</span><span class="sub">Catalog row · listen CTA</span></div><iframe src="component-release-card.html" style="height:220px"></iframe></div>
+
+<!-- BRAND -->
+<div class="section-head"><h2>brand</h2><span class="kicker">05 · HEPTAGON, WORDMARKS, ICONS</span></div>
+<div class="card"><div class="label"><span class="name">Heptagon Mark</span><span class="sub">The universal seal · rotates 8s</span></div><iframe src="brand-heptagon.html" style="height:240px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Wordmarks</span><span class="sub">nick hook / thespacepit / calm + collect</span></div><iframe src="brand-wordmarks.html" style="height:260px"></iframe></div>
+<div class="card"><div class="label"><span class="name">Iconography</span><span class="sub">Lucide · 1.75px stroke</span></div><iframe src="iconography.html" style="height:180px"></iframe></div>
+
+<script>
+  // Wait for fonts + iframes, then auto-print
+  (async () => {
+    try { await document.fonts.ready; } catch(e){}
+    const frames = [...document.querySelectorAll('iframe')];
+    await Promise.all(frames.map(f => new Promise(res => {
+      if (f.contentDocument && f.contentDocument.readyState === 'complete') return res();
+      f.addEventListener('load', res, { once: true });
+      setTimeout(res, 3000);
+    })));
+    setTimeout(() => window.print(), 600);
+  })();
+</script>
+</body>
+</html>

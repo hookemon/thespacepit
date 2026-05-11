@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Iconography</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .group { margin-bottom: 12px; }
+  .group-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-bottom: 8px; }
+  .row { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  .row i { width: 26px; height: 26px; color: var(--ink); stroke-width: 1.75; }
+  .emoji { font-size: 22px; }
+  .glyph { font-family: var(--font-mono); font-size: 22px; font-weight: 500; }
+</style>
+</head>
+<body>
+  <div class="group">
+    <div class="group-label">lucide · 24px · stroke 1.75</div>
+    <div class="row">
+      <i data-lucide="play"></i>
+      <i data-lucide="pause"></i>
+      <i data-lucide="disc-3"></i>
+      <i data-lucide="headphones"></i>
+      <i data-lucide="mic"></i>
+      <i data-lucide="radio"></i>
+      <i data-lucide="sliders-horizontal"></i>
+      <i data-lucide="volume-2"></i>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-label">house emoji · part of the voice</div>
+    <div class="row"><span class="emoji">🌱</span><span class="emoji">🔊</span><span class="emoji">💿</span><span class="emoji">🎛️</span><span class="emoji">🔥</span><span class="emoji">✨</span><span class="emoji">📼</span><span class="emoji">🌈</span><span class="emoji">🪐</span><span class="emoji">☁️</span><span class="emoji">🤲</span><span class="emoji">💚</span></div>
+  </div>
+  <div class="group">
+    <div class="group-label">unicode chrome</div>
+    <div class="row"><span class="glyph">+</span><span class="glyph">·</span><span class="glyph">→</span><span class="glyph">▲</span><span class="glyph">▼</span><span class="glyph">/</span></div>
+  </div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

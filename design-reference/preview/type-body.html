@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Type — Body & Serif</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; }
+  .block { border-bottom: 1px solid var(--ink); padding: 14px 0; display:grid; grid-template-columns: 180px 1fr; gap: 20px; }
+  .block:last-child { border-bottom: 0; }
+  .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); }
+  .serif { font-family: var(--font-serif); font-size: 22px; line-height: 1.35; font-style: italic; }
+  .sans  { font-family: var(--font-sans); font-size: 15px; line-height: 1.55; }
+</style>
+</head>
+<body>
+  <div class="block">
+    <span class="tag">instrument serif<br>italic · 22/1.35</span>
+    <div class="serif">"the only thing that matters is that you care" — nick, from a session</div>
+  </div>
+  <div class="block">
+    <span class="tag">inter · 400<br>15/1.55</span>
+    <div class="sans">Body copy sits here. Lowercase by default, long-form prose reads calm and gets out of the way so the display can shout. Use for UI, captions, and liner-note paragraphs.</div>
+  </div>
+</body>
+</html>

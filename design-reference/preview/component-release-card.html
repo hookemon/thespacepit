@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Release Card</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .card { background: var(--paper); border: 1px solid var(--ink); padding: 14px; display: grid; grid-template-columns: 110px 1fr; gap: 14px; }
+  .card:hover { box-shadow: 4px 4px 0 var(--ink); transform: translate(-2px,-2px); transition: all 140ms; }
+  .cover { aspect-ratio: 1; background: var(--ink); position: relative; overflow:hidden; }
+  .cover.cov2 { background: var(--redline); }
+  .cover .hep { position: absolute; inset: 14px; border: 2px solid var(--paper); transform: rotate(12deg); }
+  .title { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; font-size: 24px; line-height: 1; letter-spacing: -0.01em; }
+  .artist { font-family: var(--font-sans); font-size: 13px; margin-top: 4px; }
+  .meta { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); margin-top: 10px; display:flex;gap:8px;flex-wrap:wrap; }
+  .meta span { border:1px solid var(--ink); border-radius: 999px; padding: 2px 8px; }
+</style>
+</head>
+<body>
+  <div class="grid">
+    <div class="card">
+      <div class="cover"><div class="hep"></div></div>
+      <div>
+        <div class="title">RELATIONSHIPS</div>
+        <div class="artist">nick hook</div>
+        <div class="meta"><span>c+c–024</span><span>2015</span><span>lp</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="cover cov2"></div>
+      <div>
+        <div class="title">THIRD EYE</div>
+        <div class="artist">spiritual friendship</div>
+        <div class="meta"><span>calllm–007</span><span>a · 44:16</span><span>drone</span></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Header Lockup</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .nav { border: 1px solid var(--ink); padding: 14px 20px; display:flex; align-items:center; justify-content:space-between; }
+  .brand { display:flex; align-items:center; gap: 10px; font-family: var(--font-display); text-transform: uppercase; font-weight:700; font-size: 22px; letter-spacing:-0.01em; }
+  .brand img { width: 26px; height: 26px; animation: sp 8s linear infinite; }
+  .brand .slash { color: var(--fg-3); font-weight: 500; }
+  .links { display:flex; gap:18px; font-family: var(--font-mono); font-size: 11px; letter-spacing:.08em; text-transform: uppercase; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <div class="brand">
+      <img src="../assets/logos/calmcollect-mark.png" alt="">
+      nick hook <span class="slash">/</span> thespacepit <span class="slash">/</span> calm + collect
+    </div>
+    <div class="links"><span>music</span><span>studio</span><span>label</span><span>discord</span></div>
+  </div>
+</body>
+</html>

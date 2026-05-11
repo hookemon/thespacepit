@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Brand — Heptagon Mark</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; align-items: center; }
+  .cell { border: 1px solid var(--ink); padding: 20px; display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;aspect-ratio:1; }
+  .mark { width: 90px; height: 90px; }
+  .label { font-family: var(--font-mono); font-size: 10px; letter-spacing:.08em; text-transform:uppercase; color: var(--fg-2); }
+  .dark { background: var(--ink); color: var(--paper); }
+  .red  { background: var(--redline); color: var(--paper); }
+  .spin img { animation: sp 8s linear infinite; }
+  @keyframes sp { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+  <div class="cell"><img src="../assets/logos/calmcollect-mark.png" class="mark" alt="heptagon"><span class="label">static · still frame</span></div>
+  <div class="cell spin"><img src="../assets/logos/calmcollect-mark.png" class="mark" alt="heptagon"><span class="label">rotating · 8s/cycle</span></div>
+  <div class="cell"><img src="../assets/logos/calmcollect-mark.gif" class="mark" alt="heptagon"><span class="label">source animated gif</span></div>
+</body>
+</html>

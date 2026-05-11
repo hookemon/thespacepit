@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Colors — Core Neutrals</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; }
+  .row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .sw { aspect-ratio: 1.15; border: 1px solid var(--ink); position: relative; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; }
+  .sw .name { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+  .sw .hex  { font-family: var(--font-mono); font-size: 11px; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <div class="sw" style="background:#0B0B0B;color:#F4EFE6"><span class="name">ink</span><span class="hex">#0B0B0B</span></div>
+    <div class="sw" style="background:#1C1A17;color:#F4EFE6"><span class="name">ink-2</span><span class="hex">#1C1A17</span></div>
+    <div class="sw" style="background:#3A362E;color:#F4EFE6"><span class="name">ink-3</span><span class="hex">#3A362E</span></div>
+    <div class="sw" style="background:#8C8677;color:#0B0B0B"><span class="name">mute</span><span class="hex">#8C8677</span></div>
+    <div class="sw" style="background:#D9D1BE;color:#0B0B0B"><span class="name">paper-3</span><span class="hex">#D9D1BE</span></div>
+    <div class="sw" style="background:#E8E2D4;color:#0B0B0B"><span class="name">paper-2</span><span class="hex">#E8E2D4</span></div>
+    <div class="sw" style="background:#F4EFE6;color:#0B0B0B"><span class="name">paper</span><span class="hex">#F4EFE6</span></div>
+    <div class="sw" style="background:#FFFFFF;color:#0B0B0B;border:1px dashed #0B0B0B"><span class="name">white</span><span class="hex">(avoid)</span></div>
+    <div class="sw" style="background:#000000;color:#F4EFE6;border:1px dashed #F4EFE6"><span class="name">black</span><span class="hex">(avoid)</span></div>
+    <div class="sw" style="background:repeating-linear-gradient(45deg,#0B0B0B 0 4px,#F4EFE6 4px 8px);color:#0B0B0B"><span class="name" style="background:#F4EFE6;padding:0 4px">rule</span><span class="hex" style="background:#F4EFE6;padding:0 4px">1px</span></div>
+  </div>
+</body>
+</html>

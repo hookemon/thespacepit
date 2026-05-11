@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>thespacepit</title>
+<link rel="stylesheet" href="../../colors_and_type.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  body { margin: 0; background: #F4EFE6; color: #0B0B0B; }
+  .topnav { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 14px 32px; background: rgba(244,239,230,0.9); backdrop-filter: blur(8px); border-bottom: 1px solid #0B0B0B; }
+  .brand { font-family: 'Antonio', sans-serif; font-weight: 700; font-size: 20px; letter-spacing: -0.01em; text-transform: uppercase; display:flex; gap:10px; align-items:center; }
+  .brand img { width: 22px; height: 22px; animation: tn-spin 8s linear infinite; }
+  @keyframes tn-spin { to { transform: rotate(360deg); } }
+  .brand .slash { color: #8C8677; font-weight: 500; }
+  .brand .here { color: #C48F00; }
+  .links { display:flex; gap: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+  .links a { text-decoration: none; color: #0B0B0B; }
+</style>
+</head>
+<body>
+<div class="topnav">
+  <div class="brand">
+    <img src="../../assets/logos/calmcollect-mark.png" alt="">
+    <a href="../nickhook/index.html" style="color:#0B0B0B;text-decoration:none">nick hook</a>
+    <span class="slash">/</span>
+    <span class="here">thespacepit</span>
+    <span class="slash">/</span>
+    <a href="../calmcollect/index.html" style="color:#0B0B0B;text-decoration:none">calm + collect</a>
+  </div>
+  <div class="links"><a>videos</a><a>gear</a><a>discord</a><a>visit</a></div>
+</div>
+<div id="root"></div>
+<script type="text/babel" src="Hero.jsx"></script>
+<script type="text/babel" src="VideoGrid.jsx"></script>
+<script type="text/babel" src="GearShelf.jsx"></script>
+<script type="text/babel" src="DiscordStrip.jsx"></script>
+<script type="text/babel" src="Footer.jsx"></script>
+<script type="text/babel">
+  function App() {
+    return (<><SPHero /><SPVideoGrid /><SPGearShelf /><SPDiscordStrip /><SPFooter /></>);
+  }
+  ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

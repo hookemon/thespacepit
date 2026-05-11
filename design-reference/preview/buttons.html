@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Buttons</title>
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+  body { padding: 20px; background: var(--paper); }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; }
+  .btn { font-family: var(--font-display); text-transform: uppercase; font-weight: 600; font-size: 15px; letter-spacing: .04em; padding: 10px 18px; border: 1px solid var(--ink); background: var(--ink); color: var(--paper); cursor: pointer; border-radius: 0; }
+  .btn.secondary { background: var(--paper); color: var(--ink); }
+  .btn.redline { background: var(--redline); color: var(--paper); border-color: var(--redline); }
+  .btn.lamp { background: var(--lamp); color: var(--ink); border-color: var(--ink); }
+  .btn.collect { background: var(--collect); color: var(--paper); border-color: var(--collect); }
+  .btn.ghost { background: transparent; border: 1px dashed var(--ink); }
+  .btn:hover { opacity: .75; transition: opacity 140ms; }
+  .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--fg-2); width: 90px; }
+</style>
+</head>
+<body>
+  <div class="row"><span class="tag">primary</span><button class="btn">pull up</button><button class="btn secondary">tap in</button><button class="btn ghost">get on the list</button></div>
+  <div class="row"><span class="tag">accents</span><button class="btn redline">hear it →</button><button class="btn lamp">join discord</button><button class="btn collect">listen</button></div>
+</body>
+</html>
