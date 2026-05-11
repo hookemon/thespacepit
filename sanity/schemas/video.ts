@@ -74,6 +74,7 @@ export const video = defineType({
               { value: "tutorial",          title: "Tutorial / walkthrough" },
               { value: "chakra",            title: "Chakra / meditation" },
               { value: "rtj",               title: "Run The Jewels" },
+              { value: "dam-funk",          title: "DāM-FunK" },
               { value: "mwc",               title: "Men Women & Children" },
               { value: "cubic-zirconia",    title: "Cubic Zirconia" },
               { value: "spiritual-friendship", title: "Spiritual Friendship" },

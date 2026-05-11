@@ -26,6 +26,7 @@ const TAG_ORDER: { value: string; label: string }[] = [
   { value: "chakra",               label: "chakra" },
   { value: "spiritual-friendship", label: "spiritual friendship" },
   { value: "rtj",                  label: "rtj" },
+  { value: "dam-funk",             label: "dām-funk" },
   { value: "mwc",                  label: "mwc" },
   { value: "cubic-zirconia",       label: "cubic zirconia" },
   { value: "mix",                  label: "mix / radio" },

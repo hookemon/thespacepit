@@ -40,6 +40,7 @@ const TAG_RULES: Array<{ tag: string; pattern: RegExp }> = [
   { tag: "chakra",               pattern: /\b(chakra|root|sacral|solar plexus|heart|throat|third eye|crown|meditation|drone|spiritual friendship)\b/i },
   { tag: "spiritual-friendship", pattern: /\b(spiritual friendship|gareth jones|drums (?:1|2|i+)?)\b/i },
   { tag: "rtj",                  pattern: /\b(run the jewels|rtj|killer mike|el-?p|cu4tro)\b/i },
+  { tag: "dam-funk",             pattern: /\b(dam[\s-]?funk|d[āa]m[\s-]?funk|dām[\s-]?funk)\b/i },
   { tag: "mwc",                  pattern: /\b(men women|mwc|tarbox|fridmann)\b/i },
   { tag: "cubic-zirconia",       pattern: /\b(cubic zirconia|tiombe|fuck work|josephine|black ?& ?blue|hoes come|follow your heart|take me high|darko)\b/i },
   { tag: "tutorial",             pattern: /\b(tutorial|how to|walkthrough|breakdown|explained|guide)\b/i },
