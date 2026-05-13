@@ -55,12 +55,43 @@ export const pack = defineType({
     defineField({ name: "releaseDate", title: "Release date", type: "date" }),
     defineField({ name: "year", type: "number" }),
     defineField({
-      name: "downloadUrl",
-      title: "Download / buy URL",
-      type: "url",
-      description: "Bandcamp, Splice, Gumroad, your own link — wherever people grab it.",
+      name: "access",
+      title: "Access tier",
+      type: "string",
+      initialValue: "free",
+      description:
+        "Who can get this pack? FREE = public download. VAULT = patreon/supporter unlock only. PURCHASE = one-time pay (gumroad, bandcamp).",
+      options: {
+        list: [
+          { value: "free",     title: "Free · public download" },
+          { value: "vault",    title: "Vault · supporter unlock (patreon, etc.)" },
+          { value: "purchase", title: "Purchase · one-time pay (gumroad, bandcamp)" },
+        ],
+        layout: "radio",
+      },
     }),
-    defineField({ name: "price", title: "Price (display string)", type: "string", description: 'e.g. "$15", "free", "name your price"' }),
+    defineField({
+      name: "downloadUrl",
+      title: "Direct download / buy URL",
+      type: "url",
+      description:
+        "FREE packs: a direct download link. PURCHASE: gumroad/bandcamp listing. (Leave blank for vault packs — those use vaultUrl instead.)",
+    }),
+    defineField({
+      name: "vaultUrl",
+      title: "Vault unlock URL",
+      type: "url",
+      description:
+        "For VAULT access only — the patreon post URL (or similar) where supporters claim it. Public visitors see a 🔒 + this link as 'unlock with patreon'.",
+    }),
+    defineField({
+      name: "previewUrl",
+      title: "Preview audio URL (optional)",
+      type: "url",
+      description:
+        "30s-1m taste of the pack — surfaces on the listing so visitors hear something before unlocking. Bandcamp/Soundcloud/direct mp3 all fine.",
+    }),
+    defineField({ name: "price", title: "Price (display string)", type: "string", description: 'e.g. "$15", "free", "name your price", "patreon $5+"' }),
     defineField({
       name: "youtubeUrl",
       title: "Walkthrough video URL (optional)",

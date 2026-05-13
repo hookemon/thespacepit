@@ -37,6 +37,24 @@ export const brand = defineType({
     defineField({ name: "logoColor", title: "Fallback bg color when no photo (hex)", type: "string", description: 'e.g. "#F4EFE6". Only used if no background photo is set.' }),
     defineField({ name: "websiteUrl", title: "Website URL", type: "url" }),
     defineField({
+      name: "featuredVideoUrl",
+      title: "Featured video (renders LARGE at top of brand page)",
+      type: "url",
+      description: 'Hero video for this brand page — paste a YouTube/Vimeo URL. Renders as a big inline player above the story. Use for "the one video" — like the Eventide H3000 fire demo.',
+    }),
+    defineField({
+      name: "samplePackUrl",
+      title: "Sample pack / freebie download URL",
+      type: "url",
+      description: 'Direct download link to a sample pack Nick made FOR this brand (e.g. the Eventide Nick Hook samples). Renders as a prominent CTA button on the brand page.',
+    }),
+    defineField({
+      name: "samplePackTitle",
+      title: "Sample pack label (optional)",
+      type: "string",
+      description: 'Short label for the download CTA. Default: "Download Nick\'s sample pack".',
+    }),
+    defineField({
       name: "youtubePlaylistId",
       title: "YouTube playlist (auto-syncs videos)",
       type: "string",

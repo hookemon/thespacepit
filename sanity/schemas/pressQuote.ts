@@ -101,11 +101,18 @@ export const pressQuote = defineType({
     }),
     defineField({
       name: "image",
-      title: "Article image",
+      title: "Article image (uploaded)",
       type: "image",
       fieldset: "links",
       options: { hotspot: true },
-      description: "Auto-pulled from og:image when ingested via the press script. Optional.",
+      description: "Manual upload — use this when you want to override the OG scrape with a curated shot.",
+    }),
+    defineField({
+      name: "imageUrl",
+      title: "Article image URL (OG scrape)",
+      type: "url",
+      fieldset: "links",
+      description: "Auto-pulled from <meta property=\"og:image\"> when the URL is scraped. Hotlinked — if the publisher takes the page down, replace with a manual upload above.",
     }),
     // === relations ===
     defineField({

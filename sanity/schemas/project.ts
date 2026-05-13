@@ -25,6 +25,20 @@ export const project = defineType({
     defineField({ name: "tagline", title: "Short descriptor", type: "string" }),
     defineField({ name: "color", title: "Bubble color (hex)", type: "string", description: "Used for the era pill on /nick-hook." }),
     defineField({
+      name: "layoutVariant",
+      title: "Page layout variant",
+      type: "string",
+      description: "Default = the standard era page. Horizontal-journey = left-to-right snap-scroll panels (e.g. Cubic Zirconia). Collage = scrapbook / vault wall (e.g. Gangsta Boo memorial vault).",
+      options: {
+        list: [
+          { title: "Default — vertical scroll", value: "default" },
+          { title: "Horizontal journey — left-to-right snap panels", value: "horizontal-journey" },
+          { title: "Collage — scrapbook / vault wall", value: "collage" },
+        ],
+      },
+      initialValue: "default",
+    }),
+    defineField({
       name: "story",
       title: "The story",
       type: "array",

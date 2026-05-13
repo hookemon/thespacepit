@@ -121,7 +121,6 @@ export const CITY_COORDS: Record<string, CityCoord> = {
   "Preston": { lat: 53.7593363, lng: -2.6992717, country: "United Kingdom" },
   "Princeton": { lat: 40.3496953, lng: -74.6597376, country: "United States" },
   "Providence": { lat: 41.8239891, lng: -71.4128343, country: "United States" },
-  "Pune": { lat: 18.5213738, lng: 73.8545071, country: "India" },
   "Raleigh": { lat: 35.7803977, lng: -78.6390989, country: "United States" },
   "Reno": { lat: 50.4693743, lng: 7.3499986, country: "Deutschland" },
   "Roubaix": { lat: 50.6915893, lng: 3.1741734, country: "France" },

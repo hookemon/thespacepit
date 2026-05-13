@@ -12,5 +12,9 @@ import { place } from "./place";
 import { gear } from "./gear";
 import { pack } from "./pack";
 import { video } from "./video";
+import { photo } from "./photo";
+import { flyer } from "./flyer";
+import { vaultDrop } from "./vaultDrop";
+import { highlight } from "./highlight";
 
-export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack, video];
+export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack, video, photo, flyer, vaultDrop, highlight];

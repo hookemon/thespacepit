@@ -66,7 +66,36 @@ export const release = defineType({
       initialValue: false,
       description: "Mark true if removed/delisted (e.g. CC008).",
     }),
+    defineField({
+      name: "status",
+      title: "Release status",
+      type: "string",
+      options: {
+        list: [
+          { title: "Out — public, in catalog", value: "out" },
+          { title: "Dropping — distro pitch / promo phase", value: "dropping" },
+          { title: "Upcoming — early planning, no public page yet", value: "upcoming" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "out",
+      description: '"Dropping" turns the page into a pitch one-sheet (DROPPING badge, stream chips hidden, private listening). "Upcoming" is internal-only. Use alongside `withdrawn` for delisted-after-release.',
+    }),
     defineField({ name: "cover", title: "Cover art", type: "image", options: { hotspot: true } }),
+    defineField({
+      name: "promoAudio",
+      title: "Promo audio (private MP3)",
+      type: "file",
+      description:
+        "Upload a single MP3 to render an in-page player right below the cover — for biz/press/DSP folks to listen instantly without click-outs. Hosted on Sanity's CDN. Use for pre-release/private listening; public catalog still uses Bandcamp/streaming URLs further down the page.",
+      options: { accept: "audio/mp3,audio/mpeg,audio/wav" },
+    }),
+    defineField({
+      name: "promoAudioUrl",
+      title: "Promo audio URL (external)",
+      type: "url",
+      description: "Fallback if the MP3 lives on an external CDN (Dropbox direct link, Drive direct, etc.) instead of being uploaded to Sanity.",
+    }),
     defineField({
       name: "coverColor",
       title: "Fallback cover color (if no art yet)",
@@ -90,7 +119,24 @@ export const release = defineType({
     defineField({ name: "spotifyUrl", title: "Spotify URL", type: "url" }),
     defineField({ name: "appleMusicUrl", title: "Apple Music URL", type: "url" }),
     defineField({ name: "youtubeUrl", title: "YouTube URL (full release/playlist)", type: "url" }),
+    defineField({ name: "youtubeMusicUrl", title: "YouTube Music URL", type: "url" }),
+    defineField({ name: "tidalUrl", title: "Tidal URL", type: "url" }),
+    defineField({ name: "amazonMusicUrl", title: "Amazon Music URL", type: "url" }),
+    defineField({ name: "deezerUrl", title: "Deezer URL", type: "url" }),
     defineField({ name: "soundcloudUrl", title: "SoundCloud URL", type: "url" }),
+    defineField({
+      name: "mainVideoUrl",
+      title: "Main music video URL (YouTube · Vimeo unlisted · IG reel)",
+      type: "url",
+      description: "Hero video shown at the top of the release page when in pitch mode. Paste any platform URL — YouTube/Vimeo unlisted is best for distro pitches (no public exposure pre-release).",
+    }),
+    defineField({
+      name: "mainVideoFile",
+      title: "Main music video — direct upload (alternative to URL)",
+      type: "file",
+      options: { accept: "video/*" },
+      description: "Optional fallback: upload the video file directly to Sanity. Use this for private distro pitches when you don't want the video on YouTube/Vimeo yet. Will render as a native <video> player.",
+    }),
     defineField({
       name: "youtubePlaylistId",
       title: "YouTube playlist (auto-syncs every video)",
@@ -197,7 +243,35 @@ export const release = defineType({
           fields: [
             { name: "title", type: "string", title: "Track title", validation: (r) => r.required() },
             { name: "duration", type: "string", title: "Duration (e.g. 3:42)" },
-            { name: "feature", type: "string", title: "feat. (optional)" },
+            { name: "feature", type: "string", title: "feat. (legacy single string)", description: "LEGACY — kept so old data renders. New entries should use the `features` array below for multi-feature support; this single-string field is auto-derived if blank." },
+            {
+              name: "features",
+              title: "Featured artists (multi)",
+              type: "array",
+              of: [{ type: "string" }],
+              options: { layout: "tags" },
+              description: 'Multiple featured artists, one per chip. e.g. ["21 Savage", "Bulletproof Dolphin"]. Renders as "feat. 21 Savage, Bulletproof Dolphin" on the tracklist row. Falls back to the legacy single-string `feature` field if empty.',
+            },
+            {
+              name: "remixer",
+              title: "Remixer (if a remix)",
+              type: "string",
+              description: 'For remix versions — who did the remix. e.g. "DJ Earl Remix" rows on the Head EP, "Tommy Trash Remix" rows on Darko.',
+            },
+            {
+              name: "isrc",
+              title: "ISRC",
+              type: "string",
+              description: 'International Standard Recording Code — your label\'s per-track unique ID. e.g. QMSDU1600242 for Relationships track 1. Auto-imported from delivery metadata; no need to type by hand.',
+            },
+            {
+              name: "writers",
+              title: "Writers / songwriters",
+              type: "array",
+              of: [{ type: "string" }],
+              options: { layout: "tags" },
+              description: 'Songwriting credits per track. e.g. for CZ "Follow Your Heart" tracks: ["Daud Sturdivant", "Tiombe Lockhart", "Nicholas Conceller"]. Order in the array reflects the BMI-registered order.',
+            },
             { name: "note", type: "string", title: "Note (optional)" },
             {
               name: "videoUrl",
@@ -213,10 +287,15 @@ export const release = defineType({
             },
           ],
           preview: {
-            select: { title: "title", subtitle: "duration", feature: "feature", videoUrl: "videoUrl" },
-            prepare({ title, subtitle, feature, videoUrl }) {
-              const sub = feature ? `${subtitle ?? ""}  ·  feat. ${feature}` : subtitle;
-              return { title: `${videoUrl ? "▶ " : ""}${title}`, subtitle: sub };
+            select: { title: "title", subtitle: "duration", feature: "feature", features: "features", remixer: "remixer", videoUrl: "videoUrl" },
+            prepare({ title, subtitle, feature, features, remixer, videoUrl }) {
+              // Prefer the multi-features array; fall back to legacy single string.
+              const ftList = Array.isArray(features) && features.length > 0 ? features.join(", ") : feature;
+              const parts: string[] = [];
+              if (subtitle) parts.push(subtitle);
+              if (ftList)   parts.push(`feat. ${ftList}`);
+              if (remixer)  parts.push(`(${remixer})`);
+              return { title: `${videoUrl ? "▶ " : ""}${title}`, subtitle: parts.join("  ·  ") };
             },
           },
         },
@@ -295,11 +374,30 @@ export const release = defineType({
               to: [{ type: "artist" }],
             },
             { name: "name", type: "string", title: "Name (fallback if no Person doc exists yet)" },
+            {
+              name: "instrument",
+              type: "string",
+              title: "Instrument / detail (optional)",
+              description: 'For performance roles — e.g. "vintage Wurlitzer", "DW Collector\'s with K Custom hats", "modular w/ Buchla LEM-1". Adds texture to the credit line.',
+            },
+            {
+              name: "tracks",
+              type: "array",
+              of: [{ type: "string" }],
+              title: "Track scope (optional)",
+              description: 'When this credit only applies to specific tracks, list the track titles (or "track 1", "track 2"). Empty = album-wide. Used for things like "Mike Mogis produced tracks 2, 6, 8, 9, 10, 11" on the MWC self-titled.',
+              options: { layout: "tags" },
+            },
           ],
           preview: {
-            select: { title: "name", personName: "person.name", subtitle: "role" },
-            prepare({ title, personName, subtitle }) {
-              return { title: personName ?? title ?? "?", subtitle };
+            select: { title: "name", personName: "person.name", subtitle: "role", instrument: "instrument", tracks: "tracks" },
+            prepare({ title, personName, subtitle, instrument, tracks }) {
+              const sub = [
+                subtitle,
+                instrument,
+                Array.isArray(tracks) && tracks.length > 0 ? `${tracks.length} track${tracks.length === 1 ? "" : "s"}` : null,
+              ].filter(Boolean).join("  ·  ");
+              return { title: personName ?? title ?? "?", subtitle: sub };
             },
           },
         },
@@ -310,6 +408,54 @@ export const release = defineType({
       title: "Photo gallery",
       type: "array",
       of: [{ type: "image", options: { hotspot: true } }],
+    }),
+    defineField({
+      name: "linerNotes",
+      title: "Liner notes (scans)",
+      type: "array",
+      description: 'Phone-photograph or scan the printed liner notes (front + back of the sleeve, gatefold, inner inserts, hand-written track scribbles, sticker sheet, etc.). Renders on the release page as "the physical" — full-bleed lightbox-able gallery, the way you would lay them on a table.',
+      of: [{
+        type: "object",
+        name: "linerNotePage",
+        fields: [
+          { name: "image", type: "image", title: "Page scan", options: { hotspot: true }, validation: (r) => r.required() },
+          { name: "caption", type: "string", title: "Caption (optional)", description: 'e.g. "Gatefold left panel", "Back cover", "Insert — handwritten thank-yous"' },
+        ],
+        preview: { select: { title: "caption", media: "image" }, prepare({ title, media }) { return { title: title || "Liner note page", media }; } },
+      }],
+    }),
+    defineField({
+      name: "physicalArtifacts",
+      title: "Physical artifacts",
+      type: "array",
+      description: "Things you would hand someone — test pressings, vinyl jackets, cassette J-cards, RIAA plaques, hand-written tracklists, master DAT, etc. Different kind than `linerNotes` because these are the OBJECTS, not the printed pages.",
+      of: [{
+        type: "object",
+        name: "physicalArtifact",
+        fields: [
+          { name: "image", type: "image", title: "Photo of the artifact", options: { hotspot: true }, validation: (r) => r.required() },
+          { name: "title", type: "string", title: "Title", description: 'e.g. "Test pressing #001", "Cassette J-card", "Hand-written tracklist (back of the napkin)"' },
+          {
+            name: "kind",
+            type: "string",
+            title: "Kind",
+            options: {
+              list: [
+                { title: "Test pressing",          value: "test-pressing" },
+                { title: "Vinyl jacket",           value: "vinyl-jacket" },
+                { title: "CD jewel case",          value: "cd-jewel" },
+                { title: "Cassette / J-card",      value: "cassette" },
+                { title: "Master tape / DAT",      value: "master-tape" },
+                { title: "Hand-written notes",     value: "handwritten" },
+                { title: "RIAA / award plaque",    value: "plaque" },
+                { title: "Other",                  value: "other" },
+              ],
+            },
+          },
+          { name: "note", type: "text", rows: 2, title: "Note (optional)", description: "Story behind the artifact — when, where, who handed it to you, etc." },
+        ],
+        preview: { select: { title: "title", subtitle: "kind", media: "image" } },
+      }],
     }),
     defineField({
       name: "relatedSession",

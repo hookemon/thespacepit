@@ -44,6 +44,32 @@ export const artist = defineType({
       type: "boolean",
       initialValue: true,
     }),
+    // === TSP Crew / Alumni ===
+    // Surfaces this artist on the /crew page — the home for everyone who
+    // came up through thespacepit (interns, residents, regulars). Pair
+    // with `crewRole` (the snapshot of how they're framed: "the gold-record
+    // intern", "the engineer", etc.) and `crewYearStart` (when they first
+    // showed up in the room).
+    defineField({
+      name: "tspCrew",
+      title: "TSP Crew / Alumni?",
+      type: "boolean",
+      description: "If true, this artist appears on /crew — the alumni page.",
+      initialValue: false,
+    }),
+    defineField({
+      name: "crewRole",
+      title: "Crew role / story tag",
+      type: "string",
+      description: 'One-line framing for the /crew card. e.g. "gold-record intern", "the engineer", "the producer next door".',
+      hidden: ({ document }) => !document?.tspCrew,
+    }),
+    defineField({
+      name: "crewYearStart",
+      title: "Year they first showed up at the pit",
+      type: "number",
+      hidden: ({ document }) => !document?.tspCrew,
+    }),
   ],
   preview: {
     select: { title: "name", subtitle: "city", media: "portrait" },

@@ -19,17 +19,46 @@ export type ReleaseListItem = {
   bandcampUrl?: string;
   spotifyUrl?: string;
   appleMusicUrl?: string;
+  /** Backfilled via MusicBrainz when ISRC is known. */
+  tidalUrl?: string;
+  deezerUrl?: string;
+  youtubeMusicUrl?: string;
+  amazonMusicUrl?: string;
   featured?: boolean;
   label?: string;
   /** If the release was originally on a different imprint (reclaimed catalog). */
   originalLabel?: string;
   originalReleaseNote?: string;
+  /** Release lifecycle. `dropping` = distro pitch / promo phase (no stream chips,
+   *  DROPPING badge). `out` (default when undefined) = public catalog page. */
+  status?: "out" | "dropping" | "upcoming";
+};
+
+/** A single resolved feature credit. `slug` is set when the featured
+ *  artist has a Sanity `artist` doc — the tracklist row renders that as
+ *  a clickable Link to /artists/<slug>. When no doc exists yet, the row
+ *  still shows the name as plain italic text. */
+export type FeatureLink = {
+  name: string;
+  slug?: string;
 };
 
 export type Track = {
   title: string;
   duration?: string;
+  /** LEGACY — single string of features ("21 Savage, Bulletproof Dolphin").
+   *  New data uses `features[]`; keeping this so old docs render. */
   feature?: string;
+  /** Multi-feature array — populated by the credit importer. Each entry is
+   *  a raw artist name string (matched at query time against artist docs
+   *  to produce `featureLinks`). */
+  features?: string[];
+  /** Resolved feature credits with optional slug for linkability. Computed
+   *  by the GROQ projection in getReleaseBySlug — not a stored field. */
+  featureLinks?: FeatureLink[];
+  remixer?: string;
+  isrc?: string;
+  writers?: string[];
   note?: string;
   videoUrl?: string;
   audioPreviewUrl?: string;
@@ -41,6 +70,12 @@ export type ReleaseCredit = {
   name?: string;
   /** Resolved person doc (when the credit was wired up via reference). */
   person?: { name: string; slug: string; portrait?: SanityImage };
+  /** Optional instrument / detail (e.g. "vintage Wurlitzer", "DW Collector's"). */
+  instrument?: string;
+  /** Optional per-track scope. When set, this credit applies ONLY to those
+   *  track titles. Empty/undefined = album-wide. Used by the per-song
+   *  pop-out on the release page tracklist. */
+  tracks?: string[];
 };
 
 export type Stem = {
@@ -56,9 +91,14 @@ export type Pad = {
   color?: string;
 };
 
+export type LinerNotePage = { image: SanityImage; caption?: string };
+export type PhysicalArtifact = { image: SanityImage; title?: string; kind?: string; note?: string };
+
 export type ReleaseDetail = ReleaseListItem & {
   notes?: unknown[];
   credits?: ReleaseCredit[];
+  linerNotes?: LinerNotePage[];
+  physicalArtifacts?: PhysicalArtifact[];
   gallery?: SanityImage[];
   bandcampAlbumId?: string;
   youtubeUrl?: string;
@@ -70,6 +110,10 @@ export type ReleaseDetail = ReleaseListItem & {
   stemsTrackTitle?: string;
   oneshots?: Pad[];
   bandcampTrackId?: string;
+  /** Resolved promo MP3 URL — either the uploaded Sanity asset OR the
+   *  external promoAudioUrl fallback. Set by the page projection. Powers
+   *  the in-house PromoPlayer that sits right below the cover. */
+  promoAudio?: string;
   relatedSession?: { title: string; slug: string; date: string; gallery?: SanityImage[] };
 };
 
@@ -84,12 +128,40 @@ export type ArtistListItem = {
    *  portrait — e.g. "NH" as a big monogram. Design-block over photo. */
   displayInitials?: boolean;
   onLabel?: boolean;
+  /** TSP crew / alumni — surfaces on /crew. */
+  tspCrew?: boolean;
+  /** One-line framing for the crew card. */
+  crewRole?: string;
+  /** Year they first showed up at the pit. */
+  crewYearStart?: number;
 };
 
 export type ArtistAppearance = {
   release: ReleaseListItem;
   /** Which roles this artist is credited with on the release. */
   roles: string[];
+};
+
+/**
+ * A studio session — one date, one room, the artists who were there, the
+ * gear used, what happened, and which records (if any) came out of it.
+ * Stored as a `studioSession` doc; surfaces on every artist's page who was
+ * referenced in `people`.
+ */
+export type SessionListItem = {
+  _id: string;
+  title: string;
+  slug: string;
+  date: string;
+  location?: string;
+  guests?: string[];
+  gear?: string[];
+  notes?: unknown[];
+  gallery?: SanityImage[];
+  /** Other people on this session (used on artist pages — "you and the rest"). */
+  people: { name: string; slug: string }[];
+  /** Releases that came from this session. Each is a click-through. */
+  becameReleases: { _id: string; title: string; slug: string; year?: number; coverColor?: string }[];
 };
 
 export type ArtistDetail = ArtistListItem & {
@@ -121,11 +193,16 @@ export type PressQuoteItem = {
   author?: string;
   date?: string;  // YYYY-MM-DD
   image?: SanityImage;
+  /** OG-scraped image URL (hotlinked) — fallback used when no `image` asset
+   *  upload exists. Populated by scripts/scrape-press-og-images.ts. */
+  imageUrl?: string;
   featured?: boolean;
   /** Resolved era reference for press attached to MWC, CZ, etc. */
   era?: { name: string; slug: string };
-  /** Resolved release if this piece reviews a specific record. */
-  release?: { _id: string; title: string; slug: string };
+  /** Resolved release if this piece reviews a specific record. Cover +
+   *  coverColor pulled in too so the press tile can fall back to the album
+   *  art when the article has no og:image. */
+  release?: { _id: string; title: string; slug: string; cover?: SanityImage; coverColor?: string };
 };
 
 export type LiveDateItem = {
@@ -168,6 +245,11 @@ export type ProjectListItem = {
   color?: string;
   cover?: SanityImage;
   featured?: boolean;
+  /** Page layout strategy. "default" = the standard vertical era page.
+   *  "horizontal-journey" = full-viewport snap-scroll panels left-to-right
+   *  (used by Cubic Zirconia). "collage" = scrapbook / vault wall (used by
+   *  Gangsta Boo memorial vault). */
+  layoutVariant?: "default" | "horizontal-journey" | "collage";
 };
 
 export type TourHighlight = {
@@ -196,6 +278,9 @@ export type ProjectDetail = ProjectListItem & {
   spotifyUrl?: string;
   youtubeUrl?: string;
   websiteUrl?: string;
+  /** Every photo tagged to this era (via relatedEra ref OR tag string).
+   *  Used to render a tiled mosaic background on the era hero when count >= 5. */
+  eraPhotos?: { _id: string; image: SanityImage; caption?: string }[];
 };
 
 export type BrandListItem = {
@@ -226,6 +311,13 @@ export type BrandDetail = BrandListItem & {
   story?: unknown[];
   youtubePlaylistId?: string;
   videos?: { title?: string; youtubeUrl: string }[];
+  /** Hero video that renders LARGE at the top of the brand page. Use for
+   *  the one signature video (e.g. Eventide H3000 fire demo). */
+  featuredVideoUrl?: string;
+  /** Direct download to a sample pack Nick made FOR this brand. Renders as
+   *  a prominent CTA button. */
+  samplePackUrl?: string;
+  samplePackTitle?: string;
   gear?: string[];
   articleUrl?: string;
   articleTitle?: string;
@@ -287,15 +379,28 @@ const releaseListProjection = `
   bandcampUrl,
   spotifyUrl,
   appleMusicUrl,
+  tidalUrl,
+  deezerUrl,
+  youtubeMusicUrl,
+  amazonMusicUrl,
   featured,
   label,
   originalLabel,
   originalReleaseNote,
+  status,
   "artists": artists[]->{ name, "slug": slug.current }
 `;
 
 // Imprint display order: main label first, then sub-imprints, then partner imprints.
+//
+// One pinned exception: Color Film "Until You Turn Blue" (CC001) is the
+// kickoff Calm + Collect single but chronologically belongs between the
+// Hookemon catalog and the LDCC × Cubic Zirconia catalog. Pin it to
+// priority 4.5 so the timeline reads cleanly — Without You → Until You
+// Turn Blue → Darko — instead of stranding it at the bottom of the
+// C+C block.
 const LABEL_PRIORITY = `select(
+  _id == "release-cc001-until-you-turn-blue" => 4.5,
   label == "Calm + Collect" => 1,
   label == "Calm + Collect Instrumental" => 2,
   label == "Calllm" => 3,
@@ -318,6 +423,28 @@ export async function getReleases(limit = 60): Promise<ReleaseListItem[]> {
   `, { limit });
 }
 
+/**
+ * Releases in distro-pitch / promo phase. These are intentionally hidden from
+ * the main catalogue (status='dropping' implies withdrawn=true so they don't
+ * surface in /releases) — they're meant to be reached via /calm-collect/upcoming,
+ * the dedicated 2026-slate pitch grid. As each record drops, flip its status to
+ * 'out' and clear withdrawn — it instantly graduates into the main catalogue.
+ *
+ * Sort: featured first (manual pin for the lead single), then catalog # ascending
+ * so the slate reads in release order rather than reverse.
+ */
+export async function getUpcomingReleases(): Promise<ReleaseListItem[]> {
+  // Coalesce featured: GROQ sorts `null` before `true` on `featured desc`,
+  // so an unset field would beat a pinned one. Coalescing to `false` puts
+  // the manual pin (true) at the top reliably.
+  return sanityFetch<ReleaseListItem[]>(groq`
+    *[_type == "release" && status == "dropping"]
+      | order(coalesce(featured, false) desc, catalogNumber asc) {
+      ${releaseListProjection}
+    }
+  `);
+}
+
 export async function getReleasesByArtist(artistSlug: string): Promise<ReleaseListItem[]> {
   // Chronological by releaseDate (newest first), then year as fallback for
   // releases without day-precision, then catalog # as final tiebreaker.
@@ -331,17 +458,141 @@ export async function getReleasesByArtist(artistSlug: string): Promise<ReleaseLi
   `, { slug: artistSlug });
 }
 
+/**
+ * Map of era project slug → list of release slugs that belong to that era,
+ * derived from `project.releases[]` (an array of references). Used by the
+ * STATIONS filter (era-based stations expand to "all releases in this era").
+ * Cheap query — one row per era, ~18 eras total.
+ */
+export async function getEraReleaseMap(): Promise<Record<string, string[]>> {
+  type Row = { slug: string; releaseSlugs: string[] };
+  const rows = await sanityFetch<Row[]>(groq`
+    *[_type == "project" && defined(slug.current)] {
+      "slug": slug.current,
+      "releaseSlugs": releases[]->slug.current
+    }
+  `);
+  const out: Record<string, string[]> = {};
+  for (const r of rows) {
+    out[r.slug] = (r.releaseSlugs ?? []).filter(Boolean);
+  }
+  return out;
+}
+
+/**
+ * A flat per-SONG view of the catalog — one entry per track in every release
+ * where the given artist is a primary. Used by /radio to feed the YouTube
+ * search-and-play loop with songs (rather than just release covers).
+ *
+ * Why we don't just project tracklist on the existing list query: the radio
+ * needs MUCH less metadata than the per-release page (no stems / liner notes /
+ * credits) but needs PER-TRACK fields the list query doesn't carry. Cleaner
+ * to keep this its own slim query.
+ */
+export type CatalogSong = {
+  /** Stable id: `${releaseSlug}#${trackIndex}` */
+  id: string;
+  releaseId: string;
+  releaseSlug: string;
+  releaseTitle: string;
+  releaseYear?: number;
+  releaseLabel?: string;
+  releaseCover?: SanityImage;
+  releaseCoverColor?: string;
+  releaseArtists: { name: string; slug: string }[];
+  trackIndex: number;
+  title: string;
+  duration?: string;
+  /** Combined "feat." line — uses features[] if populated, else legacy `feature` string */
+  features?: string[];
+  remixer?: string;
+  /** YouTube search-friendly query: "primary artist · track title (feat. X)". */
+  searchQuery: string;
+};
+
+export async function getCatalogSongs(artistSlug: string): Promise<CatalogSong[]> {
+  type Row = {
+    _id: string;
+    releaseSlug: string;
+    title: string;
+    year?: number;
+    label?: string;
+    cover?: SanityImage;
+    coverColor?: string;
+    artists: { name: string; slug: string }[];
+    tracklist?: {
+      title?: string;
+      duration?: string;
+      feature?: string;
+      features?: string[];
+      remixer?: string;
+    }[];
+  };
+  const rows = await sanityFetch<Row[]>(groq`
+    *[_type == "release" && (withdrawn != true) && $slug in artists[]->slug.current]
+      | order(releaseDate desc, year desc, catalogNumber desc) {
+      _id,
+      "releaseSlug": slug.current,
+      title,
+      year,
+      label,
+      cover,
+      coverColor,
+      "artists": artists[]->{ name, "slug": slug.current },
+      tracklist
+    }
+  `, { slug: artistSlug });
+  const out: CatalogSong[] = [];
+  for (const r of rows) {
+    const tl = r.tracklist ?? [];
+    if (tl.length === 0) continue;
+    const primaryArtist = r.artists[0]?.name ?? "Nick Hook";
+    for (let i = 0; i < tl.length; i += 1) {
+      const t = tl[i];
+      if (!t || !t.title) continue;
+      const features = (t.features && t.features.length > 0)
+        ? t.features
+        : (t.feature ? [t.feature] : undefined);
+      // Build a YouTube search query that prefers a clean "<artist> <title>"
+      // shape — adding feat. names sometimes hurts (YT match drift).
+      const q = `${primaryArtist} ${t.title}${t.remixer ? ` ${t.remixer}` : ""}`.trim();
+      out.push({
+        id: `${r.releaseSlug}#${i}`,
+        releaseId: r._id,
+        releaseSlug: r.releaseSlug,
+        releaseTitle: r.title,
+        releaseYear: r.year,
+        releaseLabel: r.label,
+        releaseCover: r.cover,
+        releaseCoverColor: r.coverColor,
+        releaseArtists: r.artists ?? [],
+        trackIndex: i,
+        title: t.title,
+        duration: t.duration,
+        features,
+        remixer: t.remixer,
+        searchQuery: q,
+      });
+    }
+  }
+  return out;
+}
+
 export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | null> {
-  return sanityFetch<ReleaseDetail | null>(groq`
+  const raw = await sanityFetch<(ReleaseDetail & { artistDirectory?: { name: string; slug: string }[] }) | null>(groq`
     *[_type == "release" && slug.current == $slug][0] {
       ${releaseListProjection},
       notes,
       "credits": credits[]{
         role,
         name,
+        instrument,
+        tracks,
         "person": person->{ name, "slug": slug.current, portrait }
       },
       gallery,
+      linerNotes,
+      physicalArtifacts,
       bandcampAlbumId,
       bandcampTrackId,
       youtubeUrl,
@@ -349,6 +600,19 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
       youtubePlaylistId,
       videos,
       tracklist,
+      // Coalesce the uploaded Sanity file asset (CDN URL via asset deref)
+      // OR fall back to the external promoAudioUrl. Page reads "promoAudio"
+      // regardless of source.
+      "promoAudio": coalesce(promoAudio.asset->url, promoAudioUrl),
+      // Bulk lookup: every artist doc's name → slug. Keyed by LOWERCASED
+      // name in JS land so we can resolve feature strings (which are
+      // free-text, not refs) to slugs without N round-trips. GROQ's
+      // projection-over-string-array doesn't work cleanly so we resolve
+      // featureLinks in the page wrapper instead.
+      "artistDirectory": *[_type == "artist" && defined(slug.current)]{
+        name,
+        "slug": slug.current
+      },
       stemsTrackTitle,
       "stems": stems[]{
         label,
@@ -364,6 +628,30 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
       "relatedSession": relatedSession->{ title, "slug": slug.current, date, gallery }
     }
   `, { slug });
+
+  if (!raw) return null;
+
+  // Resolve featureLinks in JS — for each track's `features[]` (array of
+  // strings), look up the matching artist doc by lowercased name and
+  // attach featureLinks: [{ name, slug? }] so the tracklist row can render
+  // each feature as a clickable Link when an artist doc exists. We do this
+  // here instead of in GROQ because GROQ projections over string arrays
+  // don't work cleanly (`features[]{...}` returns null per item).
+  const directory = new Map<string, string>();
+  for (const a of raw.artistDirectory ?? []) {
+    if (a?.name && a?.slug) directory.set(a.name.toLowerCase().trim(), a.slug);
+  }
+  const tracklist = raw.tracklist?.map((t) => {
+    const featureLinks: FeatureLink[] = (t.features ?? []).map((name) => ({
+      name,
+      slug: directory.get(name.toLowerCase().trim()),
+    }));
+    return { ...t, featureLinks };
+  });
+
+  // Strip artistDirectory from the returned object — it was just plumbing.
+  const { artistDirectory: _stripped, ...rest } = raw;
+  return { ...rest, ...(tracklist ? { tracklist } : {}) };
 }
 
 export async function getReleaseSlugs(): Promise<{ slug: string }[]> {
@@ -424,13 +712,39 @@ const artistListProjection = `
   tagline,
   portrait,
   displayInitials,
-  onLabel
+  onLabel,
+  tspCrew,
+  crewRole,
+  crewYearStart
 `;
 
 export async function getRosterArtists(): Promise<ArtistListItem[]> {
   return sanityFetch<ArtistListItem[]>(groq`
     *[_type == "artist" && onLabel == true] | order(name asc) {
       ${artistListProjection}
+    }
+  `);
+}
+
+/**
+ * The TSP crew/alumni list — every artist with tspCrew=true. Used to power
+ * the /crew page. Sorted by year they came up (oldest residents first =
+ * the OGs), with name as the tie-breaker. Also pulls the count of releases
+ * + videos each is credited on so the card can show their footprint.
+ */
+export type CrewMember = ArtistListItem & {
+  /** Releases where they appear in credits[]. */
+  creditCount: number;
+  /** Videos with relatedArtist === this doc OR title-mentions. */
+  videoCount: number;
+};
+
+export async function getCrew(): Promise<CrewMember[]> {
+  return sanityFetch<CrewMember[]>(groq`
+    *[_type == "artist" && tspCrew == true] | order(coalesce(crewYearStart, 9999) asc, name asc) {
+      ${artistListProjection},
+      "creditCount": count(*[_type == "release" && references(^._id)]),
+      "videoCount": count(*[_type == "video" && relatedArtist._ref == ^._id])
     }
   `);
 }
@@ -474,9 +788,9 @@ export async function getArtistSlugs(): Promise<{ slug: string }[]> {
 // round-trip.
 const pressProjection = `
   _id, quote, source, url, year,
-  kind, headline, excerpt, outlet, author, date, image, featured,
+  kind, headline, excerpt, outlet, author, date, image, imageUrl, featured,
   "era": relatedEra->{ name, "slug": slug.current },
-  "release": relatedRelease->{ _id, title, "slug": slug.current }
+  "release": relatedRelease->{ _id, title, "slug": slug.current, cover, coverColor }
 `;
 
 export async function getPressQuotes(limit = 8): Promise<PressQuoteItem[]> {
@@ -486,6 +800,31 @@ export async function getPressQuotes(limit = 8): Promise<PressQuoteItem[]> {
       ${pressProjection}
     }
   `, { limit });
+}
+
+// === Career highlights (EPK + /nick-hook#highlights) ===
+export type HighlightItem = {
+  _id: string;
+  name: string;
+  kind: "performance" | "tour" | "experience";
+  order?: number;
+  city?: string;
+  venue?: string;
+  yearStart?: number;
+  yearEnd?: number;
+  years?: number[];
+  note?: string;
+  image?: SanityImage;
+  url?: string;
+};
+
+export async function getHighlights(): Promise<HighlightItem[]> {
+  return sanityFetch<HighlightItem[]>(groq`
+    *[_type == "highlight" && hidden != true]
+      | order(kind asc, order asc, yearStart asc, name asc) {
+      _id, name, kind, order, city, venue, yearStart, yearEnd, years, note, image, url
+    }
+  `);
 }
 
 /**
@@ -599,6 +938,23 @@ export async function getVideosForArtist(artistSlug: string): Promise<VideoListI
   `, { slug: artistSlug });
 }
 
+/**
+ * Every studio session this artist was in — they're listed under `people`
+ * on the session doc. Returns the resolved roster of OTHERS on the same
+ * session (so on /artists/a-trak you see "with Nick Hook + Big Boi") plus
+ * any releases that came out of it.
+ */
+export async function getSessionsForArtist(artistSlug: string): Promise<SessionListItem[]> {
+  return sanityFetch<SessionListItem[]>(groq`
+    *[_type == "studioSession" && count(people[@->slug.current == $slug]) > 0]
+      | order(date desc) {
+      _id, title, "slug": slug.current, date, location, guests, gear, notes, gallery,
+      "people": people[]->{ name, "slug": slug.current },
+      "becameReleases": becameReleases[]->{ _id, title, "slug": slug.current, year, coverColor }
+    }
+  `, { slug: artistSlug });
+}
+
 export async function getVideosForGear(gearSlug: string): Promise<VideoListItem[]> {
   return sanityFetch<VideoListItem[]>(groq`
     *[_type == "video" && hidden != true && relatedGear->slug.current == $slug]
@@ -645,7 +1001,8 @@ const projectListProjection = `
   tagline,
   color,
   cover,
-  featured
+  featured,
+  layoutVariant
 `;
 
 export async function getProjects(limit = 30): Promise<ProjectListItem[]> {
@@ -671,7 +1028,20 @@ export async function getProjectBySlug(slug: string): Promise<ProjectDetail | nu
       "mixes": mixes[]->{ ${mixListProjection} },
       "pressQuotes": pressQuotes[]->{ _id, quote, source, url, year } | order(year asc),
       "tourHighlights": tourHighlights[]{ year, title, note, kind },
-      "timeline": timeline[]{ year, month, milestone }
+      "timeline": timeline[]{ year, month, milestone },
+      // Pull every photo tagged to this era (via relatedEra ref OR via the
+      // tag string matching the era's slug). Used to render a tiled mosaic
+      // background on the hero — when the era has 5+ photos, the page
+      // becomes a wall of context instead of a generic single-cover hero.
+      "eraPhotos": *[
+        _type == "photo"
+        && hidden != true
+        && (relatedEra->slug.current == $slug || $slug in tags)
+      ] | order(_id asc) {
+        _id,
+        image,
+        caption
+      }
     }
   `, { slug });
 }
@@ -710,6 +1080,9 @@ export async function getBrandBySlug(slug: string): Promise<BrandDetail | null> 
       story,
       youtubePlaylistId,
       videos,
+      featuredVideoUrl,
+      samplePackUrl,
+      samplePackTitle,
       gear,
       articleUrl,
       articleTitle,
@@ -740,6 +1113,22 @@ const studioListProjection = `
   color,
   featured
 `;
+
+/** Photo docs tagged for the spacepit studio — used by the "from the room"
+ *  mosaic on the homepage + the /studios page gallery. Defaults to a wide
+ *  pool (kind: studio OR tagged 'spacepit'+'studio') so the importer's
+ *  classification doesn't have to be perfect. */
+export async function getStudioDocPhotos(limit = 60): Promise<{ _id: string; image: SanityImage; caption?: string }[]> {
+  return sanityFetch<{ _id: string; image: SanityImage; caption?: string }[]>(groq`
+    *[
+      _type == "photo"
+      && hidden != true
+      && (kind == "studio" || ("spacepit" in tags && "studio" in tags))
+    ] | order(_createdAt desc) [0...$limit] {
+      _id, image, caption
+    }
+  `, { limit });
+}
 
 export async function getStudios(): Promise<StudioListItem[]> {
   return sanityFetch<StudioListItem[]>(groq`
@@ -913,16 +1302,24 @@ export async function getGearForBrand(brandName: string): Promise<GearItem[]> {
 export type PackKind =
   | "sample-pack" | "preset-pack" | "template" | "tutorial" | "loop-pack" | "drum-kit";
 
+/** Who can grab the pack. FREE = public download. VAULT = patreon/supporter
+ *  unlock only. PURCHASE = one-time pay (gumroad/bandcamp). Defaults to FREE
+ *  on legacy packs that pre-date this field. */
+export type PackAccess = "free" | "vault" | "purchase";
+
 export type PackListItem = {
   _id: string;
   name: string;
   slug: string;
   kind: PackKind;
+  access?: PackAccess;
   tagline?: string;
   cover?: SanityImage;
   releaseDate?: string;
   year?: number;
   downloadUrl?: string;
+  vaultUrl?: string;
+  previewUrl?: string;
   price?: string;
   youtubeUrl?: string;
   featured?: boolean;
@@ -933,11 +1330,14 @@ const packListProjection = `
   name,
   "slug": slug.current,
   kind,
+  access,
   tagline,
   cover,
   releaseDate,
   year,
   downloadUrl,
+  vaultUrl,
+  previewUrl,
   price,
   youtubeUrl,
   featured
@@ -968,6 +1368,107 @@ export async function getPacks(): Promise<PackListItem[]> {
       ${packListProjection}
     }
   `);
+}
+
+export type PackDetail = PackListItem & {
+  description?: unknown[]; // PortableText blocks
+  gearItems?: { name: string; slug: string }[];
+  relatedReleases?: { title: string; slug: string }[];
+};
+
+const packDetailProjection = `
+  ${packListProjection},
+  description,
+  "gearItems": gear[]->{ name, "slug": slug.current },
+  "relatedReleases": releases[]->{ title, "slug": slug.current }
+`;
+
+export async function getPackBySlug(slug: string): Promise<PackDetail | null> {
+  return sanityFetch<PackDetail | null>(
+    groq`
+      *[_type == "pack" && slug.current == $slug][0] {
+        ${packDetailProjection}
+      }
+    `,
+    { slug },
+  );
+}
+
+export async function getPackSlugs(): Promise<string[]> {
+  const rows = await sanityFetch<{ slug: string }[]>(groq`
+    *[_type == "pack" && defined(slug.current)] {
+      "slug": slug.current
+    }
+  `);
+  return rows.map((r) => r.slug).filter(Boolean);
+}
+
+// ============================================================================
+// VAULT DROPS — synced from Patreon by scripts/sync-patreon.ts
+// ============================================================================
+
+export type VaultDropKind =
+  | "post" | "video" | "audio" | "pdf"
+  | "sample-pack" | "session" | "office-hours";
+
+export type VaultDropListItem = {
+  _id: string;
+  title: string;
+  slug?: string;
+  kind: VaultDropKind;
+  excerpt?: string;
+  patreonUrl?: string;
+  publishedAt?: string;
+  isPaid?: boolean;
+  /** Patreon's min_cents_pledged_to_view — 500 = $5 tier, 2500 = $25 tier. */
+  minCentsPledged?: number | null;
+  cover?: SanityImage;
+  coverUrl?: string;
+  tags?: string[];
+  featured?: boolean;
+};
+
+const vaultDropProjection = `
+  _id,
+  title,
+  "slug": slug.current,
+  kind,
+  excerpt,
+  patreonUrl,
+  publishedAt,
+  isPaid,
+  minCentsPledged,
+  cover,
+  coverUrl,
+  tags,
+  featured
+`;
+
+export async function getVaultDrops(): Promise<VaultDropListItem[]> {
+  return sanityFetch<VaultDropListItem[]>(groq`
+    *[_type == "vaultDrop" && hidden != true]
+      | order(featured desc, publishedAt desc) {
+      ${vaultDropProjection}
+    }
+  `);
+}
+
+export async function getVaultDropsForRelease(slug: string): Promise<VaultDropListItem[]> {
+  return sanityFetch<VaultDropListItem[]>(groq`
+    *[_type == "vaultDrop" && hidden != true && relatedRelease->slug.current == $slug]
+      | order(featured desc, publishedAt desc) {
+      ${vaultDropProjection}
+    }
+  `, { slug });
+}
+
+export async function getVaultDropsForGear(gearId: string): Promise<VaultDropListItem[]> {
+  return sanityFetch<VaultDropListItem[]>(groq`
+    *[_type == "vaultDrop" && hidden != true && relatedGear._ref == $gearId]
+      | order(featured desc, publishedAt desc) {
+      ${vaultDropProjection}
+    }
+  `, { gearId });
 }
 
 export async function getPacksForRelease(slug: string): Promise<PackListItem[]> {

@@ -31,32 +31,48 @@ export const SOCIALS = {
   // Mixcloud
   mixcloud: "https://www.mixcloud.com/nickhook/",
 
+  // Gumroad — Nick's storefront. Houses the "Ask Doctor Nick" book
+  // (compiled from his XLR8R advice column) plus future drops (sample
+  // packs, gear cheat sheets, manuals, etc.). Surfaces in every footer.
+  gumroadNick: "https://nickhook.gumroad.com" as string | null,
+
   // Other
   beatport: null as string | null, // TODO: ask Nick — calm + collect on beatport?
   spotifyArtist: "https://open.spotify.com/artist/4ICbI408d4uYagVEL3xf7S",
 } as const;
 
+// Drop entries with a null href — lets us pre-wire links (gumroad, beatport,
+// etc.) so they appear in the footer the moment the URL gets filled in,
+// without rendering broken `href="null"` anchors in the meantime.
+type LinkRow = { href: string | null; label: string };
+function live<T extends LinkRow>(arr: T[]): Array<T & { href: string }> {
+  return arr.filter((l): l is T & { href: string } => typeof l.href === "string" && l.href.length > 0);
+}
+
 // Per-site footer link sets — keep order intentional.
 export const FOOTER_LINKS = {
-  nick: [
+  nick: live<LinkRow>([
     { href: SOCIALS.bandcampNickHook, label: "bandcamp" },
+    { href: SOCIALS.gumroadNick, label: "gumroad" },
     { href: SOCIALS.spotifyArtist, label: "spotify" },
     { href: SOCIALS.youtubeChannel, label: "youtube" },
     { href: SOCIALS.mixcloud, label: "mixcloud" },
     { href: SOCIALS.discordInvite, label: "discord" },
     { href: SOCIALS.instagramNick, label: "ig" },
     { href: "/contact", label: "contact" },
-  ],
-  spacepit: [
+  ]),
+  spacepit: live<LinkRow>([
     { href: SOCIALS.youtubeChannel, label: "youtube" },
     { href: SOCIALS.discordInvite, label: "discord" },
     { href: SOCIALS.instagramSpacepit, label: "ig" },
     { href: SOCIALS.bandcampLabel, label: "bandcamp" },
+    { href: SOCIALS.gumroadNick, label: "gumroad" },
     { href: "/contact", label: "contact" },
-  ],
-  label: [
+  ]),
+  label: live<LinkRow>([
     { href: SOCIALS.bandcampLabel, label: "bandcamp" },
+    { href: SOCIALS.gumroadNick, label: "gumroad" },
     { href: SOCIALS.instagramLabel, label: "ig" },
     { href: "/contact", label: "contact" },
-  ],
+  ]),
 } as const;

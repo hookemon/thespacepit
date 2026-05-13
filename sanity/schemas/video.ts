@@ -78,6 +78,7 @@ export const video = defineType({
               { value: "mwc",               title: "Men Women & Children" },
               { value: "cubic-zirconia",    title: "Cubic Zirconia" },
               { value: "spiritual-friendship", title: "Spiritual Friendship" },
+              { value: "brillstein",        title: "Brillstein" },
               { value: "sample-pack",       title: "Sample pack / drop" },
               { value: "mix",               title: "Mixtape / radio" },
               { value: "jam",               title: "Jam (modular / improv)" },

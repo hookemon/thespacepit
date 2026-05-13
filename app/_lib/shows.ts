@@ -46,16 +46,6 @@ export const SHOWS: Show[] = [
   {
     "era": "RTJ 10TH ANNIVERSARY",
     "year": 2023,
-    "date": "2023-09",
-    "venue": "Bacardi NH7 Weekender (offer)",
-    "city": "Pune",
-    "country": "India",
-    "support": "Run The Jewels",
-    "notes": "$110k offer submitted Sep 2023; awaiting Japan confirmation. Status unclear"
-  },
-  {
-    "era": "RTJ 10TH ANNIVERSARY",
-    "year": 2023,
     "date": "2023-09-13",
     "venue": "Terminal 5",
     "city": "New York",
@@ -121,7 +111,7 @@ export const SHOWS: Show[] = [
     "city": "Mumbai",
     "country": "India",
     "support": null,
-    "notes": "Nick: 'I am coming to Bombay Friday for the Ableton workshop.' Lead-in to tour. Possible Goa hip hop festival set (Tej offered to get Nick a set)"
+    "notes": "Nick: 'I am coming to Bombay Friday for the Ableton workshop.' Lead-in to tour."
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -131,7 +121,7 @@ export const SHOWS: Show[] = [
     "city": "Jaipur",
     "country": "India",
     "support": null,
-    "notes": "30k INR cash. Promoter covering flights + accommodation. Third Culture: Yash Upadhyay advance"
+    "notes": "Promoter covering flights + accommodation."
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -141,13 +131,13 @@ export const SHOWS: Show[] = [
     "city": "Guwahati",
     "country": "India",
     "support": null,
-    "notes": "25k INR cash. Nick noted 'Guwahati might be cancelled / adding Kolkata.' Status TBC"
+    "notes": "Nick noted 'Guwahati might be cancelled / adding Kolkata.' Status TBC"
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
     "year": 2020,
     "date": "2020-02-08",
-    "venue": "(Kolkata – added show)",
+    "venue": "(Kolkata \u2013 added show)",
     "city": "Kolkata",
     "country": "India",
     "support": null,
@@ -161,7 +151,7 @@ export const SHOWS: Show[] = [
     "city": "Gurgaon",
     "country": "India",
     "support": null,
-    "notes": "30k INR online transfer. Valentine's Day show. Landed deal – flights + hotel self-arranged"
+    "notes": "Valentine's Day show. Landed deal \u2013 flights + hotel self-arranged"
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -171,7 +161,7 @@ export const SHOWS: Show[] = [
     "city": "Bangalore",
     "country": "India",
     "support": null,
-    "notes": "30k INR online transfer. Flight tickets received by Third Culture. Nick's email: '15- Bangalore'"
+    "notes": "Flight tickets received by Third Culture. Nick's email: '15- Bangalore'"
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -181,7 +171,7 @@ export const SHOWS: Show[] = [
     "city": "Hyderabad",
     "country": "India",
     "support": null,
-    "notes": "30k INR online transfer. Nick's email: '19th Feb - Hylife Brewing Company - Hyderabad'"
+    "notes": "Nick's email: '19th Feb - Hylife Brewing Company - Hyderabad'"
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -191,7 +181,7 @@ export const SHOWS: Show[] = [
     "city": "Mumbai",
     "country": "India",
     "support": null,
-    "notes": "20k INR landed (Tej confirmed). Nick's email: '21st Feb- TBD- Bombay'. Tej closed this show"
+    "notes": "Nick's email: '21st Feb- TBD- Bombay'."
   },
   {
     "era": "ASIA / INDIA TOUR 2020",
@@ -201,7 +191,7 @@ export const SHOWS: Show[] = [
     "city": "Kathmandu",
     "country": "Nepal",
     "support": null,
-    "notes": "30k INR cash on day. AirBnB 2 nights provided. Nick's email: '28th Feb- TBD-Kathmandu Nepal'. Tour ended just before COVID lockdowns"
+    "notes": "AirBnB 2 nights provided. Nick's email: '28th Feb- TBD-Kathmandu Nepal'. Tour ended just before COVID lockdowns"
   },
   {
     "era": "ARTIST-REPORTED",
@@ -231,7 +221,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "4.20 event; $17 adv / $23 DOS; 50% door deal"
+    "notes": "4.20 event;"
   },
   {
     "era": "GANGSTA BOO",
@@ -241,13 +231,13 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Blockhead",
-    "notes": "Nick 11pm–11:50pm; Achillea Music"
+    "notes": "Nick 11pm\u201311:50pm;"
   },
   {
     "era": "ASIA / INDIA TOUR",
     "year": 2019,
     "date": "2019-05-29",
-    "venue": "(venue – Golden Triangle trip)",
+    "venue": "(venue \u2013 Golden Triangle trip)",
     "city": "Delhi",
     "country": "India",
     "support": null,
@@ -291,7 +281,7 @@ export const SHOWS: Show[] = [
     "city": "Shanghai",
     "country": "China",
     "support": null,
-    "notes": "Nick's own email + confirmed by Gaz Williams offer email; 2nd anniversary of ALL"
+    "notes": "2nd anniversary of ALL"
   },
   {
     "era": "GANGSTA BOO",
@@ -317,11 +307,11 @@ export const SHOWS: Show[] = [
     "era": "GANGSTA BOO",
     "year": 2019,
     "date": "2019-10-18",
-    "venue": "Sala Razzmatazz – Fuego",
+    "venue": "Sala Razzmatazz \u2013 Fuego",
     "city": "Barcelona",
     "country": "Spain",
     "support": "Gangsta Boo",
-    "notes": "Catalan protests outside; 2000€; Nick DJed for Boo"
+    "notes": "Catalan protests outside; 2000\u20ac; Nick DJed for Boo"
   },
   {
     "era": "ASIA / INDIA TOUR",
@@ -331,7 +321,7 @@ export const SHOWS: Show[] = [
     "city": "Tokyo",
     "country": "Japan",
     "support": "LAO (NAAFI crew)",
-    "notes": "Artist-confirmed: 'def played in tokyo at circus in 2019'. Nevin Hendrickson texting owners of Circus Tokyo + Osaka to book Nick + LAO from NAAFI. Foniks contac"
+    "notes": "Artist-confirmed: 'def played in tokyo at circus in 2019'. Foniks contac"
   },
   {
     "era": "ASIA / INDIA TOUR",
@@ -371,7 +361,7 @@ export const SHOWS: Show[] = [
     "city": "Durham",
     "country": "NC, USA",
     "support": "Gareth Jones",
-    "notes": "Contract confirmed; stayed extra nights"
+    "notes": "stayed extra nights"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -387,7 +377,7 @@ export const SHOWS: Show[] = [
     "era": "SONAR",
     "year": 2018,
     "date": "2018-06-16",
-    "venue": "Sonar By Day – RBMA Stage",
+    "venue": "Sonar By Day \u2013 RBMA Stage",
     "city": "Barcelona",
     "country": "Spain",
     "support": "DJ Earl, VJ Mariano Giacchino",
@@ -397,7 +387,7 @@ export const SHOWS: Show[] = [
     "era": "SONAR",
     "year": 2018,
     "date": "2018-06-16",
-    "venue": "Sonar By Day – RBMA Stage",
+    "venue": "Sonar By Day \u2013 RBMA Stage",
     "city": "Barcelona",
     "country": "Spain",
     "support": "DJ Earl, VJ Mariano Giacchino",
@@ -441,7 +431,7 @@ export const SHOWS: Show[] = [
     "city": "Mexico",
     "country": "Mexico",
     "support": null,
-    "notes": "Artist-reported: played NYE Mexico 2018→2019. Exact venue TBC"
+    "notes": "Artist-reported: played NYE Mexico 2018\u21922019. Exact venue TBC"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -451,7 +441,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Jen Lyon + Rogue Agency confirmed Feb 17 Good Room. 80% door deal. Detroit (The Works) Feb 18 was also discussed same trip"
+    "notes": "Detroit (The Works) Feb 18 was also discussed same trip"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -461,7 +451,7 @@ export const SHOWS: Show[] = [
     "city": "Detroit",
     "country": "MI, USA",
     "support": null,
-    "notes": "Hold placed for Feb 18 Detroit @ The Works (Jen Lyon Jan 3 2018). Same weekend as Good Room Feb 17. Outcome TBC"
+    "notes": "Same weekend as Good Room Feb 17. Outcome TBC"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -471,7 +461,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Jen Lyon March 2 2018: 'Nick this date is yours!' 100% of door deal. Nick noted frustration about absorbing Output Sep 2017 loss. Good Room March 24 2018 confir"
+    "notes": "Nick noted frustration about absorbing Output Sep 2017 loss. Good Room March 24 2018 confir"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -481,7 +471,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Mar 20 Jen email re: staffing cashier 'this sat'. MeanRed retaining 20% net. Email blast to 4k fans confirmed going out March 22. Saturday Good Room show"
+    "notes": "Email blast to 4k fans confirmed going out March 22. Saturday Good Room show"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -491,17 +481,17 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "Jen Lyon April 22 2018: 'May 3rd at The Works back room – fits 150 minimum.' 50/50 door or $150 flight contribution. Thursday party. Nick agreed in principle"
+    "notes": "Thursday party. Nick agreed in principle"
   },
   {
     "era": "FESTIVAL / EVENT",
     "year": 2018,
     "date": "2018-10-04",
-    "venue": "Output (Roof) – BEMF 2018",
+    "venue": "Output (Roof) \u2013 BEMF 2018",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Breakbot (h)",
-    "notes": "Jen Lyon June 25 2018: 'book you with Breakbot on 10/4 for a 1k fee as part of bemf.' Brooklyn Electronic Music Festival 2018. Nick as support. $1000 fee"
+    "notes": "Nick as support."
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -521,7 +511,7 @@ export const SHOWS: Show[] = [
     "city": "Washington",
     "country": "DC, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -531,7 +521,7 @@ export const SHOWS: Show[] = [
     "city": "Pittsburgh",
     "country": "PA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -541,7 +531,7 @@ export const SHOWS: Show[] = [
     "city": "Cleveland",
     "country": "OH, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -551,7 +541,7 @@ export const SHOWS: Show[] = [
     "city": "Nashville",
     "country": "TN, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -561,7 +551,7 @@ export const SHOWS: Show[] = [
     "city": "Norfolk",
     "country": "VA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -571,7 +561,7 @@ export const SHOWS: Show[] = [
     "city": "Washington",
     "country": "DC, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet: 'get rid of all drugs entering NC'"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -591,7 +581,7 @@ export const SHOWS: Show[] = [
     "city": "Atlanta",
     "country": "GA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day off Jan 22 – Mandarin Oriental"
+    "notes": "Day off Jan 22 \u2013 Mandarin Oriental"
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -601,7 +591,7 @@ export const SHOWS: Show[] = [
     "city": "St. Petersburg",
     "country": "FL, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -631,7 +621,7 @@ export const SHOWS: Show[] = [
     "city": "San Diego",
     "country": "CA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -641,7 +631,7 @@ export const SHOWS: Show[] = [
     "city": "Los Angeles",
     "country": "CA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -651,7 +641,7 @@ export const SHOWS: Show[] = [
     "city": "San Jose",
     "country": "CA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -661,13 +651,13 @@ export const SHOWS: Show[] = [
     "city": "Oakland",
     "country": "CA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
     "year": 2017,
     "date": "2017-02-05",
-    "venue": "Van Duzer Theatre – Humboldt State",
+    "venue": "Van Duzer Theatre \u2013 Humboldt State",
     "city": "Arcata",
     "country": "CA, USA",
     "support": "Run The Jewels, Gangsta Boo",
@@ -681,7 +671,7 @@ export const SHOWS: Show[] = [
     "city": "Portland",
     "country": "OR, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -691,7 +681,7 @@ export const SHOWS: Show[] = [
     "city": "Seattle",
     "country": "WA, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -701,7 +691,7 @@ export const SHOWS: Show[] = [
     "city": "Vancouver",
     "country": "BC, Canada",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -711,7 +701,7 @@ export const SHOWS: Show[] = [
     "city": "Denver",
     "country": "CO, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -741,7 +731,7 @@ export const SHOWS: Show[] = [
     "city": "Madison",
     "country": "WI, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -751,7 +741,7 @@ export const SHOWS: Show[] = [
     "city": "Chicago",
     "country": "IL, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day off Feb 16 – Conrad Hotel"
+    "notes": "Day off Feb 16 \u2013 Conrad Hotel"
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -781,7 +771,7 @@ export const SHOWS: Show[] = [
     "city": "Portland",
     "country": "ME, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "Day sheet confirmed"
+    "notes": null
   },
   {
     "era": "RUN THE JEWELS TOUR",
@@ -831,13 +821,13 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Run The Jewels, Gangsta Boo",
-    "notes": "TOUR FINALE – NYC show 3 of 3"
+    "notes": "TOUR FINALE \u2013 NYC show 3 of 3"
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2017,
     "date": "2017-03-14",
-    "venue": "Teklife – RBMA Radio broadcast",
+    "venue": "Teklife \u2013 RBMA Radio broadcast",
     "city": "New York (online)",
     "country": "NY, USA",
     "support": "DJ Earl, Mel G, Barnaby Bennett, Homesick",
@@ -847,7 +837,7 @@ export const SHOWS: Show[] = [
     "era": "RUN THE JEWELS TOUR",
     "year": 2017,
     "date": "2017-04",
-    "venue": "(RTJ European tour – Paris)",
+    "venue": "(RTJ European tour \u2013 Paris)",
     "city": "Paris",
     "country": "France",
     "support": "Run The Jewels",
@@ -867,7 +857,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2017,
     "date": "2017-05-20",
-    "venue": "Good Room – Bad Room (Little Boots)",
+    "venue": "Good Room \u2013 Bad Room (Little Boots)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Little Boots",
@@ -881,7 +871,7 @@ export const SHOWS: Show[] = [
     "city": "Barcelona",
     "country": "Spain",
     "support": "Novelist (planned)",
-    "notes": "4th+ Sonar; Roland DJ808 live; contract signed"
+    "notes": "4th+ Sonar; Roland DJ808 live;"
   },
   {
     "era": "FESTIVAL / EVENT",
@@ -891,7 +881,7 @@ export const SHOWS: Show[] = [
     "city": "Tilburg",
     "country": "Netherlands",
     "support": null,
-    "notes": "Contract Apr 4 2017"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -901,7 +891,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Gangsta Boo",
-    "notes": "'Final lineup' confirmed Aug 21 2017; Gangsta Boo added $500 + flight"
+    "notes": "'Final lineup' confirmed Aug 21 2017;"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -911,7 +901,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "4x CDJ2000 Nexus, Pioneer DJM900; advance confirmed"
+    "notes": "4x CDJ2000 Nexus, Pioneer DJM900;"
   },
   {
     "era": "NICK HOOK + DJ EARL TOUR",
@@ -927,11 +917,11 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2017,
     "date": "2017-03-04",
-    "venue": "Good Room – Bad Room",
+    "venue": "Good Room \u2013 Bad Room",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Nadus, Debit, Bloom, Lovenlerrone, Leon",
-    "notes": "'LINK HOOKE'S BACK LETS GET IT EDITION' – Nick's return to Good Room after RTJ tour. Free before 12 w/ RSVP. Nick arrived ~9:45pm. Full lineup: Nick Hook, Nadus"
+    "notes": "'LINK HOOKE'S BACK LETS GET IT EDITION' \u2013 Nick's return to Good Room after RTJ tour. Free before 12 w/ RSVP. Nick arrived ~9:45pm. Full lineup: Nick Hook, Nadus"
   },
   {
     "era": "NICK HOOK + DJ EARL TOUR",
@@ -971,7 +961,7 @@ export const SHOWS: Show[] = [
     "city": "San Diego",
     "country": "CA, USA",
     "support": "DJ Earl",
-    "notes": "Set 12–2am"
+    "notes": "Set 12\u20132am"
   },
   {
     "era": "NICK HOOK + DJ EARL TOUR",
@@ -981,7 +971,7 @@ export const SHOWS: Show[] = [
     "city": "El Paso",
     "country": "TX, USA",
     "support": "DJ Earl",
-    "notes": "Set 12–2am"
+    "notes": "Set 12\u20132am"
   },
   {
     "era": "NICK HOOK + DJ EARL TOUR",
@@ -991,7 +981,7 @@ export const SHOWS: Show[] = [
     "city": "Los Angeles",
     "country": "CA, USA",
     "support": "PBDY, Thee Mike B, DJ Earl 11pm, Captain Backpack",
-    "notes": "Nick 10pm–10:55pm; Brainfeeder collab night"
+    "notes": "Nick 10pm\u201310:55pm; Brainfeeder collab night"
   },
   {
     "era": "NICK HOOK + DJ EARL TOUR",
@@ -1067,21 +1057,21 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-04",
-    "venue": "Good Room – Bad Room (debut)",
+    "venue": "Good Room \u2013 Bad Room (debut)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Jen Lyon intro email Apr 24 2016; Good Room Bad Room debut"
+    "notes": "Good Room Bad Room debut"
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2016,
     "date": "2016-04-01",
-    "venue": "Superbooth Berlin – 1st show w/ Gareth Jones",
+    "venue": "Superbooth Berlin \u2013 1st show w/ Gareth Jones",
     "city": "Berlin",
     "country": "Germany",
     "support": "Gareth Jones",
-    "notes": "'Coming for superbooth to play first show with gareth jones' – email confirmed"
+    "notes": "'Coming for superbooth to play first show with gareth jones' \u2013 email confirmed"
   },
   {
     "era": "SONAR",
@@ -1107,11 +1097,11 @@ export const SHOWS: Show[] = [
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-06-27",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "WEEK 1 of Halcyon Monday residency. Deal signed Jun 22 2016. $300/week, % of bar over target"
+    "notes": "WEEK 1 of Halcyon Monday residency. Deal signed Jun 22 2016."
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1121,33 +1111,33 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Gorgon City (main), Rudimental (main)",
-    "notes": "Jen Lyon email May 17 2016: 'JUST confirmed an after party with Gorgon City and Rudimental at Output for this Wednesday.' Nick confirmed same day. Fee $350"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-04",
-    "venue": "Good Room – Bad Room (debut booking)",
+    "venue": "Good Room \u2013 Bad Room (debut booking)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Jen Lyon intro email April 24 2016. Ana Fernandes (anapfernandes12@) asked for music samples. First Good Room Bad Room booking – exact date late April/early May"
+    "notes": "Ana Fernandes (anapfernandes12@) asked for music samples. First Good Room Bad Room booking \u2013 exact date late April/early May"
   },
   {
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-07-04",
-    "venue": "Halcyon (Output) – Independence Day Monday",
+    "venue": "Halcyon (Output) \u2013 Independence Day Monday",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "WEEK 2. July 4th. Bar hit $1869.18 that night. Invoice #1"
+    "notes": "WEEK 2. July 4th."
   },
   {
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-07-11",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Michna (dancehall 45s), Ocean Light Zone",
@@ -1157,17 +1147,17 @@ export const SHOWS: Show[] = [
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-07-25",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "DJ Spinn (Teklife), Canblaster (Club Cheval)",
-    "notes": "WEEK 5. 'Invoice for Link#5' July 27. DJ Spinn + Canblaster as special guests"
+    "notes": "WEEK 5. DJ Spinn + Canblaster as special guests"
   },
   {
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-08-29",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -1177,7 +1167,7 @@ export const SHOWS: Show[] = [
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-09-12",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -1191,13 +1181,13 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "'I got a party on the 26th. come thru. at output' – email to VICE's Brendon DuVall"
+    "notes": "'I got a party on the 26th. come thru. at output' \u2013 email to VICE's Brendon DuVall"
   },
   {
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-09-26",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -1207,7 +1197,7 @@ export const SHOWS: Show[] = [
     "era": "HALCYON MONDAYS RESIDENCY",
     "year": 2016,
     "date": "2016-10-03",
-    "venue": "Halcyon (Output) – Monday night",
+    "venue": "Halcyon (Output) \u2013 Monday night",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -1217,7 +1207,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-10-13",
-    "venue": "(tour opener – own van)",
+    "venue": "(tour opener \u2013 own van)",
     "city": "USA",
     "country": "USA",
     "support": null,
@@ -1231,7 +1221,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Toro y Moi (main room)",
-    "notes": "Jen Lyon email July 7 2016: 'Nick is going to be support on this date, fee is $500.' Billed as 'Nick Hook [Fool's Gold].' Gabe invoiced. Part of Halcyon residen"
+    "notes": "Part of Halcyon residen"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1267,7 +1257,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-10-21",
-    "venue": "(venue – Palace Hotel)",
+    "venue": "(venue \u2013 Palace Hotel)",
     "city": "San Francisco",
     "country": "CA, USA",
     "support": null,
@@ -1281,7 +1271,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "'OK, Dracula party' – hosted for friend's release party"
+    "notes": "'OK, Dracula party' \u2013 hosted for friend's release party"
   },
   {
     "era": "RED BULL / RBMA",
@@ -1301,13 +1291,13 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "Nick: 'unfortunately i gotta speak at the microsoft store' – June 17 2016 email to Boiler Room. Same day as declined BR party"
+    "notes": "Nick: 'unfortunately i gotta speak at the microsoft store' \u2013 June 17 2016 email to Boiler Room. Same day as declined BR party"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-06-17",
-    "venue": "(venue TBC – upstate NY)",
+    "venue": "(venue TBC \u2013 upstate NY)",
     "city": "Upstate",
     "country": "NY, USA",
     "support": "Antibalas",
@@ -1321,7 +1311,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": "DJ Target, L-Vis 1990 b2b Jubilee, J Cush (Rinse), Novelist (secret)",
-    "notes": "Nick headlined; Novelist unannounced secret guest; advance confirmed"
+    "notes": "Nick headlined; Novelist unannounced secret guest;"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1337,7 +1327,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2016,
     "date": "2016-12-02",
-    "venue": "Mana Art Basel – Bushwick Collective",
+    "venue": "Mana Art Basel \u2013 Bushwick Collective",
     "city": "Miami",
     "country": "FL, USA",
     "support": null,
@@ -1354,50 +1344,50 @@ export const SHOWS: Show[] = [
     "notes": "Artist transportation deadline confirmed"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2015,
     "date": "2015-04-15",
     "venue": "Rocket",
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "Contract Mar 12 2015"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2015,
     "date": "2015-04-16",
     "venue": "Badaboum",
     "city": "Paris",
     "country": "France",
     "support": null,
-    "notes": "Contract Mar 4 2015"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2015,
     "date": "2015-04-17",
     "venue": "RBMA Weekender",
     "city": "Warsaw",
     "country": "Poland",
     "support": null,
-    "notes": "Contract Feb 26 2015"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2015,
     "date": "2015-04-18",
     "venue": "Sala Razzmatazz",
     "city": "Barcelona",
     "country": "Spain",
     "support": null,
-    "notes": "Contract Mar 3 2015; 3rd Razzmatazz"
+    "notes": "3rd Razzmatazz"
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2015,
     "date": "2015-05-08",
-    "venue": "Red Bull event – A$AP Rocky support",
+    "venue": "Red Bull event \u2013 A$AP Rocky support",
     "city": "New York",
     "country": "NY, USA",
     "support": "A$AP Rocky",
@@ -1421,7 +1411,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Karizma, DJ Spinn, Novelist, Recloose",
-    "notes": "WFUV calendar confirmed – Output show Oct 8 2015"
+    "notes": "WFUV calendar confirmed \u2013 Output show Oct 8 2015"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1431,7 +1421,7 @@ export const SHOWS: Show[] = [
     "city": "Playa del Carmen",
     "country": "Mexico",
     "support": null,
-    "notes": "AM Only contract Dec 12 2014. BPM Festival confirmed"
+    "notes": "BPM Festival confirmed"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1441,7 +1431,7 @@ export const SHOWS: Show[] = [
     "city": "San Francisco",
     "country": "CA, USA",
     "support": null,
-    "notes": "AM Only contract Jan 28 2015. Nick came from LA (renting car or bus)"
+    "notes": "Nick came from LA (renting car or bus)"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1451,7 +1441,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract Feb 26 2015. Sandro is a Paris fashion brand. Wire transfer paid"
+    "notes": "Sandro is a Paris fashion brand. Wire transfer paid"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1471,7 +1461,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract April 29 2015. Verboten – major Brooklyn electronic club"
+    "notes": "Verboten \u2013 major Brooklyn electronic club"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1481,7 +1471,7 @@ export const SHOWS: Show[] = [
     "city": "Philadelphia",
     "country": "PA, USA",
     "support": null,
-    "notes": "AM Only contract April 28 2015. Nick: 'I'm no longer working with [Surefire]' – May 7 2015"
+    "notes": "Nick: 'I'm no longer working with [Surefire]' \u2013 May 7 2015"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1491,7 +1481,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract June 5 2015. Second Verboten booking"
+    "notes": "Second Verboten booking"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1501,7 +1491,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract July 20 2015. Meet & greet confirmed ('Would you be cool with doing a brief meet and greet?' / 'yes 100%')"
+    "notes": "Meet & greet confirmed ('Would you be cool with doing a brief meet and greet?' / 'yes 100%')"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1511,7 +1501,7 @@ export const SHOWS: Show[] = [
     "city": "San Francisco",
     "country": "CA, USA",
     "support": null,
-    "notes": "AM Only contract Aug 11 2015. Nick came from LA ('taking a bus up to SF and got a ride')"
+    "notes": "Nick came from LA ('taking a bus up to SF and got a ride')"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1521,7 +1511,7 @@ export const SHOWS: Show[] = [
     "city": "Los Angeles",
     "country": "CA, USA",
     "support": null,
-    "notes": "AM Only contract Aug 11 2015. Skybar at the Mondrian on Sunset Blvd. Tom @ La Affaire Musicale also cc'd"
+    "notes": "Skybar at the Mondrian on Sunset Blvd. Tom @ La Affaire Musicale also cc'd"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1531,17 +1521,17 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Shama, Sporting Life",
-    "notes": "Skinny Macho: 'Chasing Cool w/ Shama & Sporting Life' – confirmed past event. Year/exact date TBC"
+    "notes": "Skinny Macho: 'Chasing Cool w/ Shama & Sporting Life' \u2013 confirmed past event. Year/exact date TBC"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2014,
     "date": "2014-02-10",
-    "venue": "Brooklyn Bowl – Skrillex/Just Blaze afterparty",
+    "venue": "Brooklyn Bowl \u2013 Skrillex/Just Blaze afterparty",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Skrillex, Just Blaze",
-    "notes": "Nick on bill; advance received Feb 10 2014"
+    "notes": "Nick on bill;"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1597,51 +1587,51 @@ export const SHOWS: Show[] = [
     "era": "SONAR",
     "year": 2014,
     "date": "2014-06",
-    "venue": "Sonar By Day – RBMA Stage",
+    "venue": "Sonar By Day \u2013 RBMA Stage",
     "city": "Barcelona",
     "country": "Spain",
     "support": null,
     "notes": "Artist-reported: played Sonar 2014 day stage w/ Red Bull. Date TBC"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-06-21",
     "venue": "Sala Razzmatazz",
     "city": "Barcelona",
     "country": "Spain",
     "support": null,
-    "notes": "Contract May 8 2014; 1st Razzmatazz"
+    "notes": "1st Razzmatazz"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-07-04",
-    "venue": "Urban Art Forms – RBMA Stage",
+    "venue": "Urban Art Forms \u2013 RBMA Stage",
     "city": "Vienna",
     "country": "Austria",
     "support": null,
-    "notes": "Contract Feb 3 2014"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-07-18",
-    "venue": "Positivus Festival – RBMA Stage",
-    "city": "Salacgrīva",
+    "venue": "Positivus Festival \u2013 RBMA Stage",
+    "city": "Salacgr\u012bva",
     "country": "Latvia",
     "support": null,
-    "notes": "Contract Jun 9 2014"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2014,
     "date": "2014-06-04",
-    "venue": "Output – Panther Room ('Calm & Collect')",
+    "venue": "Output \u2013 Panther Room ('Calm & Collect')",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Luca (Drop The Lime), DKDS + more (unannounced)",
-    "notes": "'Calm & Collect' party. Guests included Luca (Drop the Lime), DKDS, more kept secret til day-of. Attendium guestlist login set up for Nick. Cashier issue night-"
+    "notes": "'Calm & Collect' party. Guests included Luca (Drop the Lime), DKDS, more kept secret til day-of. Attendium guestlist login set up for Nick."
   },
   {
     "era": "RED BULL / RBMA",
@@ -1657,7 +1647,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2014,
     "date": "2014-06-21",
-    "venue": "Output – Panther Room",
+    "venue": "Output \u2013 Panther Room",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -1671,37 +1661,37 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "First show under AM Only. Contract signed April 18 2014. Serato + CDJs. 'Super excited' – Nick"
+    "notes": "First show under AM Only. Serato + CDJs. 'Super excited' \u2013 Nick"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-07-25",
     "venue": "Naudo Beach Club",
     "city": "Arcachon",
     "country": "France",
     "support": null,
-    "notes": "Contract May 19 2014"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-08-16",
     "venue": "Hotel Villa Olimpica Suites",
     "city": "Barcelona",
     "country": "Spain",
     "support": null,
-    "notes": "Contract Aug 15 2014"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-08-19",
     "venue": "Nuba",
     "city": "Barcelona",
     "country": "Spain",
     "support": null,
-    "notes": "Contract Jun 17 2014"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1711,37 +1701,37 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract – subject 'Nick Hook Agreement - 060714 - NEW YORK @ WEBSTER HALL'. July 7 countersign"
+    "notes": "July 7 countersign"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-08-21",
     "venue": "Wanderlust",
     "city": "Paris",
     "country": "France",
     "support": "Mad Mats",
-    "notes": "Contract Aug 5; Don Julio on rider"
+    "notes": "Don Julio on rider"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-08-29",
     "venue": "Pratersauna",
     "city": "Vienna",
     "country": "Austria",
     "support": null,
-    "notes": "Contract Aug 4 2014"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2014,
     "date": "2014-09-05",
     "venue": "Jam Bar",
     "city": "Moscow",
     "country": "Russia",
     "support": null,
-    "notes": "Contract Aug 14 2014 — RUSSIA CONFIRMED"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1751,7 +1741,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": null,
-    "notes": "AM Only contract issued July 28 2014. Second Up and Down booking"
+    "notes": "Second Up and Down booking"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1761,7 +1751,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Jubilee, Lee Bannon, MikeQ (discussed)",
-    "notes": "Nick planning CMJ 2014 show Oct 16 email. 'homies play on the secret' – planning surprise guests. Status TBC but CMJ context confirms NYC Oct 2014 activity"
+    "notes": "Nick planning CMJ 2014 show Oct 16 email. 'homies play on the secret' \u2013 planning surprise guests. Status TBC but CMJ context confirms NYC Oct 2014 activity"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1771,7 +1761,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "Confirmed by Skinny Macho @ Boiler Room Jan 2016: 'most notably at Boiler Room Halloween party in LDN'. Year TBC – likely 2013 or 2014"
+    "notes": "Confirmed by Skinny Macho @ Boiler Room Jan 2016: 'most notably at Boiler Room Halloween party in LDN'. Year TBC \u2013 likely 2013 or 2014"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1827,17 +1817,17 @@ export const SHOWS: Show[] = [
     "era": "RED BULL / RBMA",
     "year": 2013,
     "date": "2013-05-21",
-    "venue": "Tammany Hall – RBMA Participants Show",
+    "venue": "Tammany Hall \u2013 RBMA Participants Show",
     "city": "New York",
     "country": "NY, USA",
     "support": "RBMA participants",
-    "notes": "$500 offer"
+    "notes": null
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2013,
     "date": "2013-06-14",
-    "venue": "Sonar – RBMA Stage",
+    "venue": "Sonar \u2013 RBMA Stage",
     "city": "Barcelona",
     "country": "Spain",
     "support": "Andrea Balency (live vocals)",
@@ -1847,11 +1837,11 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2013,
     "date": "2013-06-27",
-    "venue": "(MeanRed venue – Prefuse 73 support)",
+    "venue": "(MeanRed venue \u2013 Prefuse 73 support)",
     "city": "New York",
     "country": "NY, USA",
     "support": "Prefuse 73 (h)",
-    "notes": "Nick email Jun 26 2013: 'really looking forward to playing tomorrow.' MeanRed / Glicata (Prefuse TM) advancing. Set amendment requested day of"
+    "notes": "Set amendment requested day of"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1867,21 +1857,21 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2013,
     "date": "2013-07",
-    "venue": "(venue TBC – Korea DJ gig)",
+    "venue": "(venue TBC \u2013 Korea DJ gig)",
     "city": "Seoul",
     "country": "South Korea",
     "support": null,
-    "notes": "Nick emailed MeanRed July 7 2013: 'hey from korea. xoxo.' – confirmed he was on a DJ gig trip in Korea around early July 2013. Exact venue/date TBC"
+    "notes": "Nick emailed MeanRed July 7 2013: 'hey from korea. xoxo.' \u2013 confirmed he was on a DJ gig trip in Korea around early July 2013. Exact venue/date TBC"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2013,
     "date": "2013-08-01",
-    "venue": "Output – Panther Room (w/ SBTRKT)",
+    "venue": "Output \u2013 Panther Room (w/ SBTRKT)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "SBTRKT",
-    "notes": "Set times confirmed: 10-1:30pm Nick Hook, 1:30-3am SBTRKT, 3-4am Nick Hook. Devin @ Surefire advancing. Nick was at Sonar when show was being booked"
+    "notes": "Set times confirmed: 10-1:30pm Nick Hook, 1:30-3am SBTRKT, 3-4am Nick Hook. Nick was at Sonar when show was being booked"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1901,7 +1891,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Toro y Moi (h)",
-    "notes": "Artist-reported: 'def opened for toro y moi at output.' Exact date TBC – searching Gmail for advance"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -1914,27 +1904,27 @@ export const SHOWS: Show[] = [
     "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-02",
     "venue": "Betty's",
     "city": "Auckland",
     "country": "New Zealand",
     "support": null,
-    "notes": "Contract Sept 18 2013"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-05",
     "venue": "Fort Lane & Imperial Basement",
     "city": "Auckland",
     "country": "New Zealand",
     "support": null,
-    "notes": "Contract Aug 8 2013"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-11",
     "venue": "(venue)",
@@ -1954,40 +1944,40 @@ export const SHOWS: Show[] = [
     "notes": "CMJ 2013"
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-19",
     "venue": "The Berkeley Suite",
     "city": "Glasgow",
     "country": "UK",
     "support": null,
-    "notes": "Contract Jul 9 2013"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-25",
     "venue": "Studio 22",
     "city": "Brussels",
     "country": "Belgium",
     "support": null,
-    "notes": "Contract Oct 4 2013"
+    "notes": null
   },
   {
-    "era": "ELASTIC ARTISTS – EUROPE",
+    "era": "ELASTIC ARTISTS \u2013 EUROPE",
     "year": 2013,
     "date": "2013-10-31",
     "venue": "Melkweg",
     "city": "Amsterdam",
     "country": "Netherlands",
     "support": null,
-    "notes": "Contract Sept 6 2013"
+    "notes": null
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2013,
     "date": "2013-11-08",
-    "venue": "Glasslands – BEMF 2013",
+    "venue": "Glasslands \u2013 BEMF 2013",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
@@ -2001,23 +1991,23 @@ export const SHOWS: Show[] = [
     "city": "Montreal",
     "country": "QC, Canada",
     "support": "Machinedrum, Star Slinger, Ango",
-    "notes": "$175/no hotel; Nick unhappy"
+    "notes": "Nick unhappy"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2013,
     "date": "2013-12-31",
-    "venue": "285 Kent – Lit City Trax (NYE 2013→2014)",
+    "venue": "285 Kent \u2013 Lit City Trax (NYE 2013\u21922014)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "DJ Spinn + secret guest (DJ Rashad), Traxman, L-Vis 1990, J-Cush, Durban, TCJ",
-    "notes": "285 Kent NYE 2013→2014 – 'DJ Spinn & Secret Guest' confirmed Brooklyn Vegan. Secret = Rashad"
+    "notes": "285 Kent NYE 2013\u21922014 \u2013 'DJ Spinn & Secret Guest' confirmed Brooklyn Vegan. Secret = Rashad"
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2012,
     "date": "2012-06",
-    "venue": "Sonar – RBMA Stage",
+    "venue": "Sonar \u2013 RBMA Stage",
     "city": "Barcelona",
     "country": "Spain",
     "support": "Andrea Balency, Jesse Boykins III, Brenmar",
@@ -2027,7 +2017,7 @@ export const SHOWS: Show[] = [
     "era": "SONAR",
     "year": 2012,
     "date": "2012-06-14",
-    "venue": "Sonar – RBMA Stage (Day)",
+    "venue": "Sonar \u2013 RBMA Stage (Day)",
     "city": "Barcelona",
     "country": "Spain",
     "support": "Jesse Boykins III, Brenmar, Andrea Balency",
@@ -2047,17 +2037,17 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2012,
     "date": "2012-07-08",
-    "venue": "Dark Disco – DL Rooftop",
+    "venue": "Dark Disco \u2013 DL Rooftop",
     "city": "New York",
     "country": "NY, USA",
     "support": "Flosstradamus (h), Pase Rock",
-    "notes": "95 Delancey; 'Flosstradamus headlining Dark Disco party on the DL rooftop' – FG post"
+    "notes": "95 Delancey; 'Flosstradamus headlining Dark Disco party on the DL rooftop' \u2013 FG post"
   },
   {
     "era": "RED BULL / RBMA",
     "year": 2012,
     "date": "2012-07-08",
-    "venue": "RBMA x SummerStage – East River Park",
+    "venue": "RBMA x SummerStage \u2013 East River Park",
     "city": "New York",
     "country": "NY, USA",
     "support": "Flosstradamus, Araabmuzik, Teengirl Fantasy",
@@ -2081,7 +2071,7 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "Michna, Project Matt, 'very very special guests'",
-    "notes": "Dre Day 2012 @ Tammany Hall, 152 Orchard St. 10pm-4am, 21+. First 100 tix $10 then $15. Nick Hook + Michna + Project Matt residents. Jen handling $ per BEMF set"
+    "notes": "Dre Day 2012 @ Tammany Hall, 152 Orchard St. 10pm-4am, 21+. Nick Hook + Michna + Project Matt residents. Jen handling $ per BEMF set"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -2091,13 +2081,13 @@ export const SHOWS: Show[] = [
     "city": "New York",
     "country": "NY, USA",
     "support": "SBTRKT",
-    "notes": "Nick's debut live show; confirmed advancing email"
+    "notes": "Nick's debut live show;"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2012,
     "date": "2012-10-17",
-    "venue": "School Night CMJ – Manderley Bar",
+    "venue": "School Night CMJ \u2013 Manderley Bar",
     "city": "New York",
     "country": "NY, USA",
     "support": null,
@@ -2127,11 +2117,11 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2012,
     "date": "2012-12-31",
-    "venue": "285 Kent – Lit City Rave (NYE 2012→2013)",
+    "venue": "285 Kent \u2013 Lit City Rave (NYE 2012\u21922013)",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "DJ Rashad + DJ Manny b2b, Sasha Go Hard, J-Cush, Durban",
-    "notes": "285 Kent NYE 2012→2013; Lit City Rave afters 1am doors – Brooklyn Vegan confirmed"
+    "notes": "285 Kent NYE 2012\u21922013; Lit City Rave afters 1am doors \u2013 Brooklyn Vegan confirmed"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -2141,7 +2131,7 @@ export const SHOWS: Show[] = [
     "city": "Gisborne",
     "country": "New Zealand",
     "support": null,
-    "notes": "Artist-reported: played Rhythm and Vines NYE 2012→2013. Confirmed via artist"
+    "notes": "Artist-reported: played Rhythm and Vines NYE 2012\u21922013. Confirmed via artist"
   },
   {
     "era": "CUBIC ZIRCONIA",
@@ -2171,13 +2161,13 @@ export const SHOWS: Show[] = [
     "city": "Roubaix",
     "country": "France",
     "support": null,
-    "notes": "Contract May 23 2011"
+    "notes": null
   },
   {
     "era": "CUBIC ZIRCONIA",
     "year": 2011,
     "date": "2011-08",
-    "venue": "Bestival – Big Top Stage",
+    "venue": "Bestival \u2013 Big Top Stage",
     "city": "Isle of Wight",
     "country": "UK",
     "support": "L-Vis 1990",
@@ -2191,7 +2181,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "Contract Jun 28 2011"
+    "notes": null
   },
   {
     "era": "CUBIC ZIRCONIA",
@@ -2211,7 +2201,7 @@ export const SHOWS: Show[] = [
     "city": "Eastnor, Herefordshire",
     "country": "UK",
     "support": null,
-    "notes": "Contract Apr 26 2011; withholding tax claimed back"
+    "notes": "withholding tax claimed back"
   },
   {
     "era": "CUBIC ZIRCONIA",
@@ -2231,7 +2221,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "SBTRKT",
-    "notes": "'SBTRKT w/ Cubic Zirconia' $15 adv"
+    "notes": null
   },
   {
     "era": "CUBIC ZIRCONIA",
@@ -2261,7 +2251,7 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Advance Jan 28 2010; 4pm load-in"
+    "notes": "4pm load-in"
   },
   {
     "era": "CUBIC ZIRCONIA",
@@ -2337,7 +2327,7 @@ export const SHOWS: Show[] = [
     "era": "SOLO DJ / LIVE",
     "year": 2010,
     "date": "2010",
-    "venue": "(venue TBC – Baauer show)",
+    "venue": "(venue TBC \u2013 Baauer show)",
     "city": "Tokyo",
     "country": "Japan",
     "support": "Baauer",
@@ -2347,11 +2337,11 @@ export const SHOWS: Show[] = [
     "era": "CUBIC ZIRCONIA",
     "year": 2010,
     "date": "2010-12",
-    "venue": "BEMF – Music Hall of Williamsburg",
+    "venue": "BEMF \u2013 Music Hall of Williamsburg",
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": null,
-    "notes": "Brooklyn EMF 2010; drum kit advance confirmed Dec 16 2010"
+    "notes": "Brooklyn EMF 2010;"
   },
   {
     "era": "SOLO DJ / LIVE",
@@ -2481,13 +2471,13 @@ export const SHOWS: Show[] = [
     "city": "Brooklyn",
     "country": "NY, USA",
     "support": "Michna, Project Matt",
-    "notes": "MeanRed NYE 2009→2010 at 232 3rd St Brooklyn. $25 adv incl. Colt 45 open bar + champagne toast midnight. $50 incl 3hr open bar. 'Goodbye to the 00s' - Ticketfly"
+    "notes": "MeanRed NYE 2009\u21922010 at 232 3rd St Brooklyn. Colt 45 open bar + champagne toast midnight. 'Goodbye to the 00s' - Ticketfly"
   },
   {
     "era": "SOLO DJ / LIVE",
     "year": 2009,
     "date": "2009",
-    "venue": "(venue TBC – The Clipse Dec 30)",
+    "venue": "(venue TBC \u2013 The Clipse Dec 30)",
     "city": "New York",
     "country": "NY, USA",
     "support": "The Clipse (Pusha T + No Malice)",
@@ -2497,7 +2487,7 @@ export const SHOWS: Show[] = [
     "era": "CUBIC ZIRCONIA",
     "year": 2009,
     "date": "2009",
-    "venue": "(various) – Yak Ballz shows",
+    "venue": "(various) \u2013 Yak Ballz shows",
     "city": "New York",
     "country": "NY, USA",
     "support": "Yak Ballz",
@@ -2507,7 +2497,7 @@ export const SHOWS: Show[] = [
     "era": "CUBIC ZIRCONIA",
     "year": 2009,
     "date": "2009-01-16",
-    "venue": "(CZ first show – venue TBC)",
+    "venue": "(CZ first show \u2013 venue TBC)",
     "city": "New York",
     "country": "NY, USA",
     "support": null,
@@ -2541,7 +2531,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "BLAG party; traveling party of 7; advance confirmed Jan 12 2007"
+    "notes": "BLAG party; traveling party of 7;"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -2667,7 +2657,7 @@ export const SHOWS: Show[] = [
     "era": "MEN WOMEN & CHILDREN",
     "year": 2007,
     "date": "2007-02-28",
-    "venue": "London Astoria – NME Brats",
+    "venue": "London Astoria \u2013 NME Brats",
     "city": "London",
     "country": "UK",
     "support": "The Rapture, Shiny Toy Guns, Shit Disco",
@@ -3071,7 +3061,7 @@ export const SHOWS: Show[] = [
     "city": "East Rutherford",
     "country": "NJ, USA",
     "support": "Multiple artists",
-    "notes": "BAMBOOZLE 2007 – confirmed in Anna ECG tour schedule email"
+    "notes": "BAMBOOZLE 2007 \u2013 confirmed in Anna ECG tour schedule email"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3101,7 +3091,7 @@ export const SHOWS: Show[] = [
     "city": "Los Angeles",
     "country": "CA, USA",
     "support": "Something For Rockets, Action Action",
-    "notes": "Tom Gates email Jan 4 2006"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3211,7 +3201,7 @@ export const SHOWS: Show[] = [
     "city": "Boston",
     "country": "MA, USA",
     "support": "Metric (h)",
-    "notes": "Opening for Metric; Tom Gates email confirmed"
+    "notes": "Opening for Metric;"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3367,7 +3357,7 @@ export const SHOWS: Show[] = [
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-03-28",
-    "venue": "Ohio Room – IUP",
+    "venue": "Ohio Room \u2013 IUP",
     "city": "Indiana",
     "country": "PA, USA",
     "support": "Motion City Soundtrack (h)",
@@ -3421,13 +3411,13 @@ export const SHOWS: Show[] = [
     "city": "Birmingham",
     "country": "UK",
     "support": "Panic! At The Disco (h)",
-    "notes": "10 sold-out UK shows; 2700 cap – Tom Gates email Feb 16 2006"
+    "notes": "10 sold-out UK shows;"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-04-19",
-    "venue": "The Great Hall – Cardiff Uni",
+    "venue": "The Great Hall \u2013 Cardiff Uni",
     "city": "Cardiff",
     "country": "Wales, UK",
     "support": "Panic! At The Disco (h)",
@@ -3497,7 +3487,7 @@ export const SHOWS: Show[] = [
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-04-27",
-    "venue": "Rock City – Main Hall",
+    "venue": "Rock City \u2013 Main Hall",
     "city": "Nottingham",
     "country": "UK",
     "support": "Panic! At The Disco (h)",
@@ -3521,7 +3511,7 @@ export const SHOWS: Show[] = [
     "city": "Manchester",
     "country": "UK",
     "support": "Multiple artists",
-    "notes": "12k/day – Tom Gates confirmed"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3531,17 +3521,17 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": "Multiple artists",
-    "notes": "12k/day festival"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-05-01",
-    "venue": "(venue TBC – Wales)",
+    "venue": "(venue TBC \u2013 Wales)",
     "city": "Cardiff",
     "country": "Wales, UK",
     "support": "Lostprophets (h)",
-    "notes": "Lost Prophets Wales show 1 of 4. Offered in Tom Gates email Feb 16 2006 – 'right after GIAN'"
+    "notes": "Lost Prophets Wales show 1 of 4."
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3551,13 +3541,13 @@ export const SHOWS: Show[] = [
     "city": "Baton Rouge",
     "country": "LA, USA",
     "support": "30 Seconds to Mars (h)",
-    "notes": "Tom Gates email May 22 2006"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-05-02",
-    "venue": "(venue TBC – Wales)",
+    "venue": "(venue TBC \u2013 Wales)",
     "city": "Newport",
     "country": "Wales, UK",
     "support": "Lostprophets (h)",
@@ -3567,7 +3557,7 @@ export const SHOWS: Show[] = [
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-05-03",
-    "venue": "(venue TBC – Wales)",
+    "venue": "(venue TBC \u2013 Wales)",
     "city": "Swansea",
     "country": "Wales, UK",
     "support": "Lostprophets (h)",
@@ -3577,11 +3567,11 @@ export const SHOWS: Show[] = [
     "era": "MEN WOMEN & CHILDREN",
     "year": 2006,
     "date": "2006-05-04",
-    "venue": "(venue TBC – Wales)",
+    "venue": "(venue TBC \u2013 Wales)",
     "city": "Wrexham",
     "country": "Wales, UK",
     "support": "Lostprophets (h)",
-    "notes": "Lost Prophets Wales show 4 of 4. May 16 email from Geoff Meall: 'Grates can't do it / Lets look for another' – possible renegotiation mid-run"
+    "notes": "Lost Prophets Wales show 4 of 4. May 16 email from Geoff Meall: 'Grates can't do it / Lets look for another' \u2013 possible renegotiation mid-run"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3591,7 +3581,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "Nick: 'we just wanna maximize our time in london' – pitched DJ set at Trash via Denny/Hot Pink. Status unclear"
+    "notes": "Nick: 'we just wanna maximize our time in london' \u2013 pitched DJ set at Trash via Denny/Hot Pink. Status unclear"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3601,7 +3591,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": "Geoff (Thursday, unannounced), AFI member",
-    "notes": "Alt Press takeover night at Miss Shapes London. Confirmed via Tom Gates email April 24 2006. MWC DJ set"
+    "notes": "Alt Press takeover night at Miss Shapes London. MWC DJ set"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3661,7 +3651,7 @@ export const SHOWS: Show[] = [
     "city": "London",
     "country": "UK",
     "support": null,
-    "notes": "'Dance In My Blood' UK single show – Tom Gates May 22 2006"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -3991,7 +3981,7 @@ export const SHOWS: Show[] = [
     "city": "Birmingham",
     "country": "AL, USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – MWC offered 2nd of 4 bands. 1-2k cap venues. Tom Gates email Jun 5 + Jul 25 2006"
+    "notes": "1-2k cap venues."
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4001,7 +3991,7 @@ export const SHOWS: Show[] = [
     "city": "(city TBC)",
     "country": "USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – date confirmed in Larry Webman routing email"
+    "notes": "Head Automatica tour \u2013 date confirmed in Larry Webman routing email"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4011,7 +4001,7 @@ export const SHOWS: Show[] = [
     "city": "Kansas City",
     "country": "MO, USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – confirmed in routing email"
+    "notes": "Head Automatica tour \u2013 confirmed in routing email"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4041,7 +4031,7 @@ export const SHOWS: Show[] = [
     "city": "Denver",
     "country": "CO, USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – Denver / Ft. Collins run"
+    "notes": "Head Automatica tour \u2013 Denver / Ft. Collins run"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4051,7 +4041,7 @@ export const SHOWS: Show[] = [
     "city": "Ft. Collins",
     "country": "CO, USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – Denver / Ft. Collins run"
+    "notes": "Head Automatica tour \u2013 Denver / Ft. Collins run"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4081,7 +4071,7 @@ export const SHOWS: Show[] = [
     "city": "Portland",
     "country": "OR, USA",
     "support": "Head Automatica (h), Rock Kills Kid",
-    "notes": "Head Automatica tour – final confirmed date in routing"
+    "notes": "Head Automatica tour \u2013 final confirmed date in routing"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4091,7 +4081,7 @@ export const SHOWS: Show[] = [
     "city": "Baltimore",
     "country": "MD, USA",
     "support": "Nightmare of You",
-    "notes": "Baltimore advancing note; MWC order confirmed"
+    "notes": "MWC order confirmed"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4101,7 +4091,7 @@ export const SHOWS: Show[] = [
     "city": "Wilkes-Barre",
     "country": "PA, USA",
     "support": "Nightmare of You",
-    "notes": "Wilkes-Barre mentioned in advancing email"
+    "notes": null
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4111,7 +4101,7 @@ export const SHOWS: Show[] = [
     "city": "Poughkeepsie",
     "country": "NY, USA",
     "support": "Nightmare of You",
-    "notes": "NOY co-headline summer tour; routing email Adam Weiser WMG June 2005"
+    "notes": "NOY co-headline summer tour;"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4211,7 +4201,7 @@ export const SHOWS: Show[] = [
     "city": "Providence",
     "country": "RI, USA",
     "support": "Gang of Four",
-    "notes": "Gang of Four fall tour – NE/East Coast start"
+    "notes": "Gang of Four fall tour \u2013 NE/East Coast start"
   },
   {
     "era": "MEN WOMEN & CHILDREN",
@@ -4351,6 +4341,6 @@ export const SHOWS: Show[] = [
     "city": "Various",
     "country": "USA",
     "support": null,
-    "notes": "MWC active from 2004; 'barely out of his teens when he hit the road in 2004' – Bandsintown bio"
+    "notes": "MWC active from 2004; 'barely out of his teens when he hit the road in 2004' \u2013 Bandsintown bio"
   }
 ];
