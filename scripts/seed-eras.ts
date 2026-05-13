@@ -74,7 +74,7 @@ const ERAS: EraSeed[] = [
     name: "Calm + Collect",
     yearStart: 2013,
     kind: "label era",
-    tagline: "the main label. nick + gareth jones. 29 main releases and counting. brooklyn → medellín.",
+    tagline: "calm + collect. making records since 2013. brooklyn → medellín.",
     color: "#0E4B3A",
     featured: true,
   },

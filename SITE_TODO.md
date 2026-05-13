@@ -66,7 +66,10 @@ Drop the answers/files in chat and I bulk-add via script.
 
 ### Newsletter (Mailchimp)
 
-- [ ] **Mailchimp API key + audience ID** → I build a custom newsletter signup form in the design system and wire it to add subscribers automatically. One section per site.
+- [x] **Newsletter signup form built** — `NewsletterForm` component + `/api/newsletter` route, live on `/packs`. Returns a friendly 503 until keys arrive. _(Done 2026-05-12.)_
+- [ ] **Mailchimp API key + audience ID** → set `MAILCHIMP_API_KEY` + `MAILCHIMP_LIST_ID` in `.env.local` and on Netlify. Form switches from "wiring up" to live signup with zero code changes.
+- [ ] **Add NewsletterForm to `/sessions`** — currently only on `/packs`. Sessions traffic from the socials push should also have a capture point.
+- [ ] **Add NewsletterForm slot to Footer** — across-site capture surface.
 
 ### Discord live data
 
@@ -93,12 +96,20 @@ Drop the answers/files in chat and I bulk-add via script.
 
 ---
 
+## 🎯 active strategic push — Move-centric product line
+
+_Promoted from "v2 ideas" 2026-05-12. Move is Nick's main instrument + the scene is hot — strongest entry point for the spacepit product line. Plan lives at [PACK_PLAN.md](./PACK_PLAN.md)._
+
+- [ ] **FREE pack — "Nick Hook Move Sessions — Starter 5"** — Nick has 5 sessions already done. Needs: pick the 5, host the ZIP, add Sanity Pack entry with `access: free` + `gear: Ableton Move`. Becomes the lead magnet for newsletter capture.
+- [ ] **PURCHASE pack — "Nick Hook Song Starters — 32 Move Sessions"** — premium product, $39-79. Move project files + Ableton Live ports + Drift patches + per-kit videos + stems bonus. Open question: how many of the 32 kits does Nick already have ready? Determines curation vs production effort.
+- [ ] **Move + Note workflow video series** — content engine. ~30s vertical for social, longer YouTube breakdowns. Each demo video also doubles as a pack preview.
+- [ ] **Sales channel decision** — Gumroad-now-migrate vs wait-for-Shopify-spacepit-store. Trade-off in PACK_PLAN.md.
+
 ## 🧠 ideas parked for "v2"
 
 Nothing on the critical path. Captured here so we don't forget.
 
 - **Custom audio player** — a spacepit-themed in-page player (vs. just the Bandcamp embed). Bigger lift, lower priority unless the brand demands it.
-- **Sample pack store** — the spacepit-as-sample-platform vision from your memory. Pre-formatted bundles per device (Move, OP-1, EP-133, etc.).
 - **Digital twin rooms** — playable in-browser approximations of your gear (TR-808, SP-1200, EMT 250). Multi-month build.
 - **Production credit detail pages** — each `/credits/[slug]` becomes its own page with the story, video clips, audio examples. Right now they're a table.
 - **Show detail pages** — same pattern for individual shows.

@@ -99,10 +99,14 @@ function similarity(a: string, b: string): number {
 async function findITunesUrl(artist: string, title: string): Promise<string | null> {
   const term = encodeURIComponent(`${normalize(primaryArtist(artist))} ${normalize(title)}`.trim());
   if (!term) return null;
-  // Try album first, then song
+  // Try album first, then song. NOTE: iTunes Search API returns empty
+  // bodies to bare fetch() calls — needs a Mozilla-style User-Agent header
+  // to actually return JSON. Without this, this function falsely returns
+  // null for releases that DO exist on iTunes.
+  const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36";
   for (const entity of ["album", "song"] as const) {
-    const url = `https://itunes.apple.com/search?term=${term}&entity=${entity}&limit=15`;
-    const res = await fetch(url);
+    const url = `https://itunes.apple.com/search?term=${term}&entity=${entity}&limit=15&country=us`;
+    const res = await fetch(url, { headers: { "user-agent": UA } });
     if (!res.ok) continue;
     const data = (await res.json()) as { results: ITunesResult[] };
     let best: { score: number; r: ITunesResult } | null = null;
@@ -118,19 +122,30 @@ async function findITunesUrl(artist: string, title: string): Promise<string | nu
   return null;
 }
 
-async function odesliLookup(url: string): Promise<OdesliResponse | null> {
+// Odesli's free tier rate-limits HARD (~10 req/min). On 429 we back off and
+// retry. Without this, a one-shot run on the catalog gets ~90% of requests
+// rejected.
+async function odesliLookup(url: string, attempts = 4): Promise<OdesliResponse | null> {
   const api = `https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(url)}&songIfSingle=false`;
-  try {
-    const res = await fetch(api);
-    if (!res.ok) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const res = await fetch(api);
+      if (res.status === 200) return (await res.json()) as OdesliResponse;
+      if (res.status === 429) {
+        // exponential backoff: 8s, 16s, 32s
+        const delay = 8000 * Math.pow(2, i);
+        process.stdout.write(` ⏳429,wait ${delay/1000}s `);
+        await new Promise((r) => setTimeout(r, delay));
+        continue;
+      }
       console.warn(`  ⚠ odesli ${res.status}`);
       return null;
+    } catch (err) {
+      console.warn("  ⚠ odesli error:", (err as Error).message);
+      await new Promise((r) => setTimeout(r, 4000));
     }
-    return (await res.json()) as OdesliResponse;
-  } catch (err) {
-    console.warn("  ⚠ odesli error:", (err as Error).message);
-    return null;
   }
+  return null;
 }
 
 async function main() {
@@ -199,8 +214,10 @@ async function main() {
       okCount += 1;
     }
 
-    // Odesli unauth allows 60 req/min — be polite
-    await new Promise((res) => setTimeout(res, 1100));
+    // Odesli free-tier is ~10 req/min (we observed 429s at 1100ms). Throttle
+    // at 6.5s between calls = ~9/min, under the cap, with retry-on-429 above
+    // for the occasional spike.
+    await new Promise((res) => setTimeout(res, 6500));
   }
 
   console.log(`\n✅ ${okCount} updated · ${skipCount} skipped`);

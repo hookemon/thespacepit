@@ -50,10 +50,10 @@ const STORIES: Record<string, string[]> = {
     "Operating today as the same entity as Calm + Collect — the imprint is technically retired but the catalog stays alive on the label site.",
   ],
   "project-calm-collect": [
-    "The main label. Launched 2013 by Nick Hook + Gareth Jones — the long-time Spiritual Friendship duo.",
+    "Nick's main label. Launched 2013. Brooklyn → Medellín.",
     "29 main-imprint releases and counting (CC001 → CC029, 2025). Plus the Calllm ambient sub-label, the Lockhart Dynasty × C+C imprint for the Cubic Zirconia catalog, and the Instrumental imprint for the producer-driven cuts.",
-    "Roster includes Nick Hook, Spiritual Friendship, Quazzy, Geraldina, Sinister Dane, Superhero Killer, Camo UFOs.",
-    "Hip-hop, experimental, and ambient — released with care, one after the other. Brooklyn → Medellín.",
+    "Roster includes Nick Hook, Spiritual Friendship, Quazzy, Geraldina, Sinister Dane, Superhero Killer, Camo UFOs, Gareth Jones (Electrogenetic).",
+    "Hip-hop, experimental, and ambient — released with care, one at a time.",
   ],
   "project-calllm-ambient-sub-label": [
     "Calm + Collect's ambient and meditative wing. The full chakra series of seven drone records by Spiritual Friendship — Root through Crown.",
