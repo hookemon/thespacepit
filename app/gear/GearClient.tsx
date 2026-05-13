@@ -7,7 +7,7 @@ import type { GearItem } from "../_lib/sanity-queries";
 import type { GearCategory, CategoryMeta } from "../_lib/gear-data";
 import { CATEGORIES } from "../_lib/gear-data";
 
-type Filter = GearCategory | "all";
+type Filter = GearCategory | "all" | "with-videos";
 
 const CATEGORY_KEYS = new Set<string>(CATEGORIES.map((c) => c.key));
 const CAT_BY_KEY: Record<string, CategoryMeta> = Object.fromEntries(
@@ -17,6 +17,7 @@ const CAT_BY_KEY: Record<string, CategoryMeta> = Object.fromEntries(
 function readCatFromUrl(): Filter {
   if (typeof window === "undefined") return "all";
   const cat = new URLSearchParams(window.location.search).get("cat");
+  if (cat === "with-videos") return "with-videos";
   if (cat && CATEGORY_KEYS.has(cat)) return cat as GearCategory;
   return "all";
 }
@@ -37,9 +38,17 @@ export function GearClient({ items }: { items: GearItem[] }) {
     window.history.replaceState(null, "", url.toString());
   }, [filter]);
 
-  const visible = useMemo(
-    () => (filter === "all" ? items : items.filter((g) => g.category === filter)),
-    [filter, items]
+  const visible = useMemo(() => {
+    if (filter === "all") return items;
+    if (filter === "with-videos") return items.filter((g) => (g.videoCount ?? 0) > 0);
+    return items.filter((g) => g.category === filter);
+  }, [filter, items]);
+
+  // Total gear pieces with at least one video. Used to label the filter chip
+  // so visitors see how much there is before clicking in.
+  const withVideosCount = useMemo(
+    () => items.filter((g) => (g.videoCount ?? 0) > 0).length,
+    [items]
   );
 
   // Track which categories have anything so we hide empty chips.
@@ -56,7 +65,10 @@ export function GearClient({ items }: { items: GearItem[] }) {
     [items]
   );
 
-  // Group visible items by category, in CATEGORIES display order.
+  // Group visible items by category, in CATEGORIES display order. Within each
+  // bucket, gear that has videos floats to the front — heavy video coverage
+  // first, then the rest. This makes "the gear we've actually documented" the
+  // first thing you see on every shelf.
   const grouped = useMemo(() => {
     const order: GearCategory[] = CATEGORIES.map((c) => c.key);
     const buckets = new Map<GearCategory, GearItem[]>();
@@ -65,6 +77,14 @@ export function GearClient({ items }: { items: GearItem[] }) {
       const arr = buckets.get(cat) ?? [];
       arr.push(item);
       buckets.set(cat, arr);
+    }
+    for (const arr of buckets.values()) {
+      arr.sort((a, b) => {
+        const av = a.videoCount ?? 0;
+        const bv = b.videoCount ?? 0;
+        if (av !== bv) return bv - av;
+        return a.name.localeCompare(b.name);
+      });
     }
     return order
       .filter((cat) => buckets.has(cat))
@@ -77,6 +97,17 @@ export function GearClient({ items }: { items: GearItem[] }) {
       <div className="px-5 sm:px-8 py-6 border-b border-paper sticky top-[60px] z-[5] bg-ink/95 backdrop-blur-md">
         <div className="flex flex-wrap gap-2">
           <Chip active={filter === "all"} onClick={() => setFilter("all")} label="all" />
+          {/* "with videos" chip — shortcut to the slice of the rack that has
+              documented demos / livestreams attached. Counter shows how
+              many pieces qualify. */}
+          {withVideosCount > 0 && (
+            <Chip
+              active={filter === "with-videos"}
+              onClick={() => setFilter("with-videos")}
+              label={`▶ with videos (${withVideosCount})`}
+              accent="#F2B705"
+            />
+          )}
           {CATEGORIES.map((c) => {
             if (!populated.has(c.key)) return null;
             return (
@@ -264,6 +295,19 @@ function GearCard({ g, featured = false }: { g: GearItem; featured?: boolean }) 
         <div className="font-mono text-[9px] tracking-[.14em] uppercase text-paper-2 mt-3 flex items-center gap-2">
           <span>{statusLabel(g.status)}</span>
           {g.yearAcquired && <span>· since {g.yearAcquired}</span>}
+          {/* Inline video count — bigger and louder than the corner badge.
+              When there are videos, this becomes the loudest thing in the
+              card footer so visitors know "click here for tape." */}
+          {g.videoCount && g.videoCount > 0 && (
+            <span
+              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full"
+              style={{ background: accent, color: "#0B0B0B" }}
+            >
+              <span>▶</span>
+              <span className="tabular-nums">{g.videoCount}</span>
+              <span>{g.videoCount === 1 ? "video" : "videos"}</span>
+            </span>
+          )}
           <span
             className="ml-auto opacity-0 group-hover:opacity-100 transition-opacity"
             style={{ color: accent }}

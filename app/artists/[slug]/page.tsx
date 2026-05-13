@@ -3,7 +3,7 @@ import Link from "next/link";
 import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
-import { getArtistBySlug, getArtistSlugs } from "../../_lib/sanity-queries";
+import { getArtistBySlug, getArtistSlugs, getSessionsForArtist } from "../../_lib/sanity-queries";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
@@ -35,6 +35,11 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
   const { slug } = await params;
   const artist = await getArtistBySlug(slug);
   if (!artist) notFound();
+  // Sessions = every studioSession doc referencing this artist in `people[]`.
+  // Each session lists the OTHER artists who were there, and any releases
+  // that came from it. Lights up A-Trak / Big Boi / anyone — but only when
+  // session docs actually exist for them (none yet by default).
+  const sessions = await getSessionsForArtist(slug);
 
   const useInitials = artist.displayInitials || !artist.portrait;
   const portraitUrl = artist.portrait ? urlFor(artist.portrait).width(800).height(800).fit("crop").url() : null;
@@ -117,6 +122,46 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
                       </a>
                     );
                   })}
+                  {/* === Collab world banner === when an artist has a dedicated
+                      tribute / shared-history page under /collabs/, surface
+                      it loudly so visitors hit the deep page, not just the
+                      generic credits list. */}
+                  {artist.slug === "gangsta-boo" && (
+                    <Link
+                      href="/collabs/gangsta-boo"
+                      className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
+                      style={{ borderColor: "#F2C84B", color: "#0B0B0B", background: "#F2C84B" }}
+                    >
+                      boo + hook world →
+                    </Link>
+                  )}
+                  {(artist.slug === "run-the-jewels" || artist.slug === "el-p") && (
+                    <Link
+                      href="/collabs/run-the-jewels"
+                      className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
+                      style={{ borderColor: "#9B1B1B", color: "#fff", background: "#9B1B1B" }}
+                    >
+                      rtj + hook world →
+                    </Link>
+                  )}
+                  {(artist.slug === "cubic-zirconia" || artist.slug === "tiombe-lockhart") && (
+                    <Link
+                      href="/collabs/cubic-zirconia"
+                      className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
+                      style={{ borderColor: "#4B2E83", color: "#fff", background: "#4B2E83" }}
+                    >
+                      cubic zirconia world →
+                    </Link>
+                  )}
+                  {artist.slug === "men-women-children-band" && (
+                    <Link
+                      href="/collabs/men-women-children"
+                      className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
+                      style={{ borderColor: "#E2651A", color: "#fff", background: "#E2651A" }}
+                    >
+                      mwc world →
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
@@ -125,6 +170,73 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
               <section className="mt-16 max-w-[720px]">
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-3">BIO</div>
                 <PortableText value={artist.bio} />
+              </section>
+            )}
+
+            {/* === SESSIONS === every studioSession doc that references
+                this artist. Each tile shows: date · location · the OTHER
+                people on the session · any released records that came from
+                it. Empty list = no sessions catalogued yet for them (most
+                artists will be empty until Nick populates /studio). */}
+            {sessions.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
+                  SESSIONS @ THE SPACEPIT · {sessions.length}
+                </div>
+                <ol className="list-none p-0 m-0 grid gap-3 max-w-[920px]">
+                  {sessions.map((s) => {
+                    const others = s.people.filter((p) => p.slug !== artist.slug);
+                    return (
+                      <li key={s._id} className="border border-ink/40 p-4">
+                        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+                          <div>
+                            <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect tabular-nums">
+                              {new Date(s.date + "T00:00:00").toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
+                              {s.location && <span className="text-ink-3"> · {s.location}</span>}
+                            </div>
+                            <div className="font-display font-semibold text-[20px] sm:text-[22px] uppercase tracking-[-0.005em] leading-tight mt-1">
+                              {s.title}
+                            </div>
+                          </div>
+                          {s.becameReleases && s.becameReleases.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5">
+                              {s.becameReleases.map((r) => (
+                                <Link
+                                  key={r._id}
+                                  href={`/releases/${r.slug}`}
+                                  className="font-mono text-[10px] tracking-[.12em] uppercase px-2.5 py-1 border border-collect rounded-full no-underline text-collect hover:bg-collect hover:text-paper transition-colors"
+                                >
+                                  ▶ {r.title}{r.year ? ` (${r.year})` : ""}
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        {others.length > 0 && (
+                          <div className="font-mono text-[10px] tracking-[.1em] text-ink-3 mt-2 flex flex-wrap gap-x-2">
+                            <span className="text-ink-3/60 uppercase tracking-[.14em]">with</span>
+                            {others.map((p, i) => (
+                              <span key={p.slug}>
+                                <Link
+                                  href={`/artists/${p.slug}`}
+                                  className="underline underline-offset-2 hover:text-collect no-underline"
+                                >
+                                  {p.name}
+                                </Link>
+                                {i < others.length - 1 ? " ·" : ""}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        {s.guests && s.guests.length > 0 && (
+                          <div className="font-mono text-[10px] tracking-[.1em] text-ink-3 mt-1">
+                            <span className="text-ink-3/60 uppercase tracking-[.14em]">guests:</span> {s.guests.join(" · ")}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ol>
               </section>
             )}
 

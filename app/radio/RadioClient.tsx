@@ -4,29 +4,39 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import type { DiscogsRelease } from "../_lib/discogs";
 import { cleanArtistName, discogsUrl, primaryFormat } from "../_lib/discogs";
-import type { ReleaseListItem, VideoListItem } from "../_lib/sanity-queries";
+import type { CatalogSong, VideoListItem } from "../_lib/sanity-queries";
 import { urlFor } from "../_lib/sanity";
+
+/** The serializable subset of Station that the client needs. The server
+ *  already resolved each station's release-slug set, so the client only
+ *  needs to display the chip + look up its count. */
+type StationCardProps = { slug: string; label: string; blurb?: string };
 
 type FormatFilter = "all" | "Vinyl" | "Cassette" | "CD";
 type Stream = "all" | "crate" | "catalog" | "videos";
 
-// One unified track shape across all 3 streams. The `youtubeId` is set
+// One unified track shape across ALL streams. The `youtubeId` is set
 // directly when known (videos / future enriched releases). When null, the
 // player uses the title/artist as a search query against /api/radio-search.
 type Track = {
-  kind: "crate" | "catalog" | "video";
+  kind: "crate" | "catalog" | "video" | "song";
   key: string;
   title: string;
   artist: string;
+  /** Sub-line under the title — e.g. release name for songs */
+  subline?: string;
   coverUrl: string | null;
   year?: number | string;
   format?: string;
   externalUrl?: string;
   /** Pre-known YouTube id (videos only). Else we'll search. */
   youtubeId?: string | null;
+  /** Used as the YouTube search query — bypass auto-build when present */
+  searchQueryOverride?: string;
 };
 
 function searchQueryFor(t: Track): string {
+  if (t.searchQueryOverride) return t.searchQueryOverride;
   if (/various/i.test(t.artist) || !t.artist) return t.title;
   return `${t.artist} ${t.title}`;
 }
@@ -62,17 +72,21 @@ function crateToTrack(r: DiscogsRelease): Track {
     externalUrl: discogsUrl(r.id),
   };
 }
-function catalogToTrack(r: ReleaseListItem): Track {
-  const cover = r.cover ? urlFor(r.cover).width(600).height(600).fit("crop").url() : null;
+function songToTrack(s: CatalogSong): Track {
+  const cover = s.releaseCover ? urlFor(s.releaseCover).width(600).height(600).fit("crop").url() : null;
+  const primary = s.releaseArtists[0]?.name ?? "Nick Hook";
+  const featLine = s.features && s.features.length > 0 ? ` · feat. ${s.features.join(", ")}` : "";
   return {
-    kind: "catalog",
-    key: `catalog-${r._id}`,
-    title: r.title,
-    artist: r.artists.map((a) => a.name).join(" · "),
+    kind: "song",
+    key: `song-${s.id}`,
+    title: s.title,
+    artist: primary,
+    subline: `${s.releaseTitle}${featLine}`,
     coverUrl: cover,
-    year: r.year,
-    format: r.format ?? r.label,
-    externalUrl: `/releases/${r.slug}`,
+    year: s.releaseYear,
+    format: s.releaseLabel,
+    externalUrl: `/releases/${s.releaseSlug}`,
+    searchQueryOverride: s.searchQuery,
   };
 }
 function videoToTrack(v: VideoListItem): Track {
@@ -91,14 +105,23 @@ function videoToTrack(v: VideoListItem): Track {
 
 export function RadioClient({
   records,
-  catalogTracks,
+  songs,
   musicVideos,
+  stations,
+  stationReleaseSlugs,
+  stationTrackCounts,
 }: {
   records: DiscogsRelease[];
-  catalogTracks: ReleaseListItem[];
+  songs: CatalogSong[];
   musicVideos: VideoListItem[];
+  stations: StationCardProps[];
+  /** station slug → array of release slugs in that station */
+  stationReleaseSlugs: Record<string, string[]>;
+  /** station slug → number of songs in that station */
+  stationTrackCounts: Record<string, number>;
 }) {
-  const [stream, setStream] = useState<Stream>("all");
+  const [stream, setStream] = useState<Stream>("catalog");
+  const [station, setStation] = useState<string>("the-catalog");
   const [format, setFormat] = useState<FormatFilter>("all");
   const [seed, setSeed] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -106,18 +129,36 @@ export function RadioClient({
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [lookupBusy, setLookupBusy] = useState(false);
 
-  // Build the unified pool from selected stream(s)
+  // Build the unified pool from selected stream(s) + active station.
+  // When stream === "catalog", we use the per-SONG flattened list (so each
+  // song is its own queue entry), narrowed by the station's release-slug set
+  // when one is picked. For other streams, the station has no effect.
   const pool = useMemo<Track[]>(() => {
     let crate = records.map(crateToTrack);
     if (format !== "all") crate = crate.filter((t) => t.format === format);
-    const cat = catalogTracks.map(catalogToTrack);
+
+    // Catalog → per-song, station-filtered
+    const releaseSlugFilter: Set<string> | null =
+      station && station !== "the-catalog"
+        ? new Set(stationReleaseSlugs[station] ?? [])
+        : null;
+    let songTracks = songs.map(songToTrack);
+    if (releaseSlugFilter) {
+      songTracks = songTracks.filter((t) => {
+        // each song's externalUrl is /releases/<slug>
+        const m = /^\/releases\/(.+)$/.exec(t.externalUrl ?? "");
+        return m && releaseSlugFilter.has(m[1]);
+      });
+    }
+
     const vids = musicVideos.map(videoToTrack);
+
     if (stream === "crate") return crate;
-    if (stream === "catalog") return cat;
+    if (stream === "catalog") return songTracks;
     if (stream === "videos") return vids;
-    // all = mix all three
-    return [...crate, ...cat, ...vids];
-  }, [records, catalogTracks, musicVideos, stream, format]);
+    // all = mix everything
+    return [...crate, ...songTracks, ...vids];
+  }, [records, songs, musicVideos, stream, format, station, stationReleaseSlugs]);
 
   // Shuffled queue. Re-shuffles whenever pool or seed changes.
   const queueRef = useRef<Track[]>([]);
@@ -137,6 +178,16 @@ export function RadioClient({
 
   const playerRef = useRef<YTPlayer | null>(null);
   const playerHostRef = useRef<HTMLDivElement | null>(null);
+
+  // Counter for consecutive YouTube-lookup failures. When too many records
+  // in a row can't be matched (common with obscure crate cuts), we used to
+  // auto-skip every 1.2s — visually that read as "records scoring through"
+  // because the user couldn't see what was happening. Now we slow down the
+  // skip and pause auto-advance entirely after 3 failures in a row, so the
+  // listener can manually click "next →" to keep going.
+  const consecutiveFailsRef = useRef(0);
+  const STUCK_THRESHOLD = 3;
+  const SKIP_DELAY_MS = 3500;
 
   const advance = useCallback(() => {
     setIndex((i) => {
@@ -173,10 +224,21 @@ export function RadioClient({
       setLookupBusy(false);
       if (cancelled) return;
       if (!videoId) {
-        setLookupError("no youtube match · skipping");
-        setTimeout(() => { if (!cancelled) advance(); }, 1200);
+        consecutiveFailsRef.current += 1;
+        // Auto-pause after 3 unmatchable tracks in a row — better UX than
+        // the records scoring through and the user not knowing why.
+        if (consecutiveFailsRef.current >= STUCK_THRESHOLD) {
+          setLookupError(`stuck — ${consecutiveFailsRef.current} tracks in a row had no youtube match. click next → to keep digging.`);
+          setPlaying(false);
+          consecutiveFailsRef.current = 0;
+          return;
+        }
+        setLookupError(`no youtube match · skipping in ${SKIP_DELAY_MS / 1000}s`);
+        setTimeout(() => { if (!cancelled) advance(); }, SKIP_DELAY_MS);
         return;
       }
+      // Successful match — reset the streak.
+      consecutiveFailsRef.current = 0;
       const YT = await loadYouTubeAPI();
       if (cancelled) return;
       if (!playerRef.current && playerHostRef.current) {
@@ -206,8 +268,8 @@ export function RadioClient({
     };
   }, []);
 
-  // Reset position when stream/format changes.
-  useEffect(() => { setIndex(0); setSeed((s) => s + 1); setPlaying(false); }, [stream, format]);
+  // Reset position when stream/format/station changes.
+  useEffect(() => { setIndex(0); setSeed((s) => s + 1); setPlaying(false); }, [stream, format, station]);
 
   if (!currentTrack) {
     return (
@@ -220,19 +282,65 @@ export function RadioClient({
   const STREAM_BADGE: Record<Track["kind"], { label: string; color: string }> = {
     crate:   { label: "crate",   color: "#F2B705" },
     catalog: { label: "yours",   color: "#E83A1C" },
+    song:    { label: "song",    color: "#E83A1C" },
     video:   { label: "video",   color: "#7BD3A8" },
   };
   const badge = STREAM_BADGE[currentTrack.kind];
 
   return (
     <div className="px-6 sm:px-8 py-8">
-      {/* STREAM SELECTOR */}
+      {/* STREAM SELECTOR — top-level: which pool of stuff to draw from */}
       <div className="flex flex-wrap gap-2 mb-3">
-        <Chip active={stream === "all"}     onClick={() => setStream("all")}     label={`all · ${records.length + catalogTracks.length + musicVideos.length}`} />
+        <Chip active={stream === "all"}     onClick={() => setStream("all")}     label={`all · ${records.length + songs.length + musicVideos.length}`} />
         <Chip active={stream === "crate"}   onClick={() => setStream("crate")}   label={`crate · ${records.length}`} />
-        <Chip active={stream === "catalog"} onClick={() => setStream("catalog")} label={`yours · ${catalogTracks.length}`} />
+        <Chip active={stream === "catalog"} onClick={() => setStream("catalog")} label={`catalog · ${songs.length} songs`} />
         <Chip active={stream === "videos"}  onClick={() => setStream("videos")}  label={`videos · ${musicVideos.length}`} />
       </div>
+
+      {/* STATION SELECTOR — only meaningful when catalog is in scope. Each
+          chip narrows the catalog pool to a curated sub-vibe (era / label /
+          year band / hand-picked). Picking a station also implicitly switches
+          the stream to "catalog" so you immediately hear it. */}
+      {(stream === "catalog" || stream === "all") && (
+        <div className="mt-2 mb-6">
+          <div className="font-mono text-[10px] tracking-[.16em] uppercase text-lamp/80 mb-2">
+            STATIONS · {stationTrackCounts[station] ?? 0} songs in this station
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {stations.map((s) => {
+              const count = stationTrackCounts[s.slug] ?? 0;
+              if (count === 0 && s.slug !== "the-catalog") return null;
+              return (
+                <button
+                  key={s.slug}
+                  type="button"
+                  title={s.blurb}
+                  onClick={() => {
+                    setStation(s.slug);
+                    if (stream !== "catalog") setStream("catalog");
+                  }}
+                  className={`font-mono text-[10px] tracking-[.14em] uppercase px-3 py-1.5 border transition-colors ${
+                    station === s.slug
+                      ? "bg-lamp text-ink border-lamp"
+                      : "text-paper border-paper hover:bg-paper hover:text-ink"
+                  }`}
+                >
+                  {s.label} · {count}
+                </button>
+              );
+            })}
+          </div>
+          {/* Active station blurb */}
+          {(() => {
+            const s = stations.find((x) => x.slug === station);
+            return s?.blurb ? (
+              <p className="font-serif italic text-[14px] text-paper-2 mt-2">
+                {s.blurb}
+              </p>
+            ) : null;
+          })()}
+        </div>
+      )}
 
       {/* FORMAT (only relevant when crate is in scope) */}
       {(stream === "all" || stream === "crate") && (
@@ -274,6 +382,11 @@ export function RadioClient({
               {currentTrack.artist}
             </div>
             <div className="font-serif italic text-[18px] text-paper-2 mt-1">{currentTrack.title}</div>
+            {currentTrack.subline && (
+              <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2/80 mt-1">
+                from · {currentTrack.subline}
+              </div>
+            )}
             <div className="flex flex-wrap gap-2 mt-4">
               {!playing && (
                 <button
@@ -297,7 +410,7 @@ export function RadioClient({
                   target={currentTrack.externalUrl.startsWith("http") ? "_blank" : undefined}
                   className="font-mono text-[10px] tracking-[.14em] uppercase px-3 py-1.5 border border-paper rounded-full hover:bg-paper hover:text-ink transition-colors no-underline text-paper self-center"
                 >
-                  {currentTrack.kind === "crate" ? "discogs ↗" : currentTrack.kind === "catalog" ? "release →" : "youtube ↗"}
+                  {currentTrack.kind === "crate" ? "discogs ↗" : currentTrack.kind === "video" ? "youtube ↗" : "release →"}
                 </Link>
               )}
             </div>

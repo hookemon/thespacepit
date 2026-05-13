@@ -204,14 +204,14 @@ export default function ContactPage() {
               brooklyn · medellín
             </h2>
             <p className="font-serif italic text-[20px] mt-4 max-w-[640px] text-paper-2">
-              the spacepit lives in two places — brooklyn studio + the garden in medellín. nothing turned off, ever.
+              two rooms, two cities. the pit in brooklyn + la burbuja in medellín — where the windows stay open and the birds sit in. nothing turned off, ever.
             </p>
 
             {/* Two big rooms — let the rooms speak. Swap srcs in /public/epk to retune. */}
             <div className="mt-10 grid gap-5 md:grid-cols-2">
               {[
                 { src: "/epk/spacepit-3-0.jpg", eyebrow: "BROOKLYN · THE PIT", title: "the room with the yellow walls", note: "tracking · mixing · sessions · residencies" },
-                { src: "/epk/spacepit-4-0.png", eyebrow: "MEDELLÍN · LA BURBUJA", title: "the garden room", note: "the garden in medellín · sessions + writing camps" },
+                { src: "/epk/spacepit-4-0.png", eyebrow: "MEDELLÍN · LA BURBUJA", title: "where the birds work the room", note: "writing camps · open windows · come grow with us" },
               ].map((r) => (
                 <figure key={r.src} className="relative overflow-hidden border border-paper aspect-[4/3] group">
                   <img

@@ -63,6 +63,22 @@ const CHANNELS: Channel[] = [
     tags: ["chakra", "spiritual-friendship"],
     accent: "#E3D4F2", // chakra-crown lavender
   },
+  {
+    id: "pit",
+    number: "07",
+    name: "THE PIT",
+    description: "everything in the room · brooklyn + medellín · vlogs · phone uploads",
+    tags: ["spacepit", "medellin", "vlog"],
+    accent: "#F2C84B", // chakra-solar yellow
+  },
+  {
+    id: "exclusive",
+    number: "08",
+    name: "EXCLUSIVE",
+    description: "rare cuts · unreleased · members-only territory",
+    tags: ["exclusive"],
+    accent: "#E2651A", // chakra-sacral orange
+  },
 ];
 
 export default async function TVPage() {

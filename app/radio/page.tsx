@@ -1,9 +1,17 @@
 import { TopNav } from "../_components/shared/TopNav";
 import { Footer } from "../_components/shared/Footer";
 import { getCollection } from "../_lib/discogs";
-import { getReleasesByArtist, getVideos } from "../_lib/sanity-queries";
+import {
+  getCatalogSongs,
+  getEraReleaseMap,
+  getReleasesByArtist,
+  getVideos,
+} from "../_lib/sanity-queries";
+// Note: getReleasesByArtist is used to power the station builder (we filter
+// stations against the FULL release list, not just those with tracklists).
 import { FOOTER_LINKS } from "../_lib/social-links";
 import { RadioClient } from "./RadioClient";
+import { STATIONS, buildStationMap, countTracksPerStation } from "../_lib/stations";
 
 export const revalidate = 3600;
 
@@ -13,18 +21,44 @@ export const metadata = {
 };
 
 export default async function RadioPage() {
-  // 3 streams in parallel: discogs crate, nick's own catalog, music videos.
-  const [crate, catalog, allVideos] = await Promise.all([
+  // 5 streams in parallel: discogs crate, nick's own catalog (releases),
+  // every song flattened from those releases, era→release map for stations,
+  // and music videos.
+  const [crate, catalog, songs, eraReleaseMap, allVideos] = await Promise.all([
     getCollection(),
     getReleasesByArtist("nick-hook"),
+    getCatalogSongs("nick-hook"),
+    getEraReleaseMap(),
     getVideos(500),
   ]);
   const { total, records } = crate;
   // Music videos = videos tagged "music-video" with a youtubeId.
   const musicVideos = allVideos.filter((v) => v.tags?.includes("music-video") && v.youtubeId);
-  // Catalog tracks = releases where Nick is primary artist (cap to keep the queue
-  // searchable; the same titles show up in the chronological catalog wall too).
-  const catalogTracks = catalog.slice(0, 200);
+
+  // Resolve stations server-side: each station → set of release slugs that
+  // belong to it (era-expanded + label-matched + year-filtered + explicit).
+  const stationReleaseMap = buildStationMap(catalog, eraReleaseMap);
+  // Per-station track count (for chip labels). Built from the flattened
+  // songs list so it reflects ACTUAL listenable songs, not just release count.
+  const releaseToTrackCount: Record<string, number> = {};
+  for (const s of songs) {
+    releaseToTrackCount[s.releaseSlug] = (releaseToTrackCount[s.releaseSlug] ?? 0) + 1;
+  }
+  const stationTrackCounts = countTracksPerStation(stationReleaseMap, releaseToTrackCount);
+
+  // Convert Sets → string[] for serialization to the client component.
+  const stationReleaseSlugs: Record<string, string[]> = {};
+  for (const [k, set] of Object.entries(stationReleaseMap)) {
+    stationReleaseSlugs[k] = [...set];
+  }
+  // Strip non-serializable matchers (titleMatch is a RegExp) before sending
+  // to the client. The client only needs the display fields — the matching
+  // already happened on the server (stationReleaseSlugs is the resolved set).
+  const clientStations = STATIONS.map((s) => ({
+    slug: s.slug,
+    label: s.label,
+    blurb: s.blurb,
+  }));
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
@@ -32,7 +66,7 @@ export default async function RadioPage() {
       <main className="flex-1">
         <header className="px-5 sm:px-8 pt-16 pb-8 border-b border-paper">
           <div className="font-mono text-[11px] tracking-[.14em] uppercase text-lamp mb-2">
-            THE RADIO · {total.toLocaleString()} RECORDS · {catalogTracks.length} RELEASES · {musicVideos.length} MUSIC VIDEOS
+            THE RADIO · {total.toLocaleString()} RECORDS · {songs.length} SONGS · {musicVideos.length} MUSIC VIDEOS
           </div>
           <h1
             className="font-display font-bold uppercase m-0"
@@ -41,15 +75,18 @@ export default async function RadioPage() {
             the radio
           </h1>
           <p className="font-serif italic text-[20px] mt-4 max-w-[760px] text-paper-2">
-            three streams in one — your discogs crate, your own catalog, your music videos. random pulls, youtube finds the match. press play. skip whenever. reshuffle the mood.
+            three streams, infinite stations — your discogs crate, every song from your own catalog, and your music videos. pick a station to filter the catalog into a vibe — calm + collect, the bands, the rappers, the drones. press play. youtube finds the match. shuffle whenever.
           </p>
         </header>
 
-        {records.length > 0 || catalogTracks.length > 0 || musicVideos.length > 0 ? (
+        {records.length > 0 || songs.length > 0 || musicVideos.length > 0 ? (
           <RadioClient
             records={records}
-            catalogTracks={catalogTracks}
+            songs={songs}
             musicVideos={musicVideos}
+            stations={clientStations}
+            stationReleaseSlugs={stationReleaseSlugs}
+            stationTrackCounts={stationTrackCounts}
           />
         ) : (
           <div className="px-5 sm:px-8 py-16">

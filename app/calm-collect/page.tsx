@@ -8,7 +8,7 @@ import { FOOTER_LINKS } from "../_lib/social-links";
 
 export const metadata = {
   title: "calm + collect",
-  description: "a record label · est. 2013 · ny → mde. cultivating records where the sound is shared.",
+  description: "calm + collect. making records since 2013.",
 };
 
 export default function CalmCollectPage() {
@@ -25,7 +25,7 @@ export default function CalmCollectPage() {
         theme="paper"
         heptagon="fill-black"
         signoff="stay high 💚"
-        meta="calm + collect · a record label · 2013 → today"
+        meta="calm + collect · making records since 2013"
         links={[...FOOTER_LINKS.label]}
         id="shop"
       />

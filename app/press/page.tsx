@@ -18,11 +18,22 @@ export default async function PressPage() {
   const all = await getAllPress();
 
   // Prepare card-ready data (URL-resolved image, normalized year for sort).
+  // Image precedence: scraped article og:image > linked release cover art >
+  // null (tile falls back to a colored title-block). The cover-fallback is
+  // why so many pre-scrape press tiles light up immediately — every release-
+  // attached piece (Pitchfork review of Relationships, etc.) shows the album
+  // square instead of an empty card.
   const items = all.map((p) => {
     const year = p.date ? parseInt(p.date.slice(0, 4), 10) : p.year;
-    const imageUrl = p.image
+    const articleImageUrl = p.image
       ? urlFor(p.image).width(640).height(480).fit("crop").url()
       : null;
+    const coverImageUrl = p.release?.cover
+      ? urlFor(p.release.cover).width(640).height(640).fit("crop").url()
+      : null;
+    const imageUrl = articleImageUrl ?? coverImageUrl;
+    const imageKind: "article" | "cover" | null =
+      articleImageUrl ? "article" : (coverImageUrl ? "cover" : null);
     // Build a clean display source: prefer outlet + author, fall back to legacy `source`.
     const outletDisplay = p.outlet
       ? (p.author ? `${p.author} · ${p.outlet}` : p.outlet)
@@ -39,6 +50,8 @@ export default async function PressPage() {
       year,
       date: p.date,
       imageUrl,
+      imageKind,
+      coverColor: p.release?.coverColor,
       eraSlug: p.era?.slug,
       eraName: p.era?.name,
       releaseSlug: p.release?.slug,

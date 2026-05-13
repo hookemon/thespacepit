@@ -168,6 +168,43 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
               </section>
             )}
 
+            {/* === FEATURED VIDEO + SAMPLE PACK CTA === when the brand has
+                a signature video (Eventide H3000 demo etc.) + a downloadable
+                sample pack Nick made for them. Renders LARGE — the video
+                takes the full width of the content column at 16:9. Sample
+                pack download sits as a fat CTA right below. */}
+            {(brand.featuredVideoUrl || brand.samplePackUrl) && (
+              <section className="mt-12">
+                {brand.featuredVideoUrl && (
+                  <div className="mb-6">
+                    <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                      ▶ THE FIRE
+                    </div>
+                    <div className="border border-ink overflow-hidden">
+                      <MediaEmbed url={brand.featuredVideoUrl} title={`${brand.name} — featured video`} />
+                    </div>
+                  </div>
+                )}
+                {brand.samplePackUrl && (
+                  <div className="mt-6 flex flex-wrap gap-3 items-center">
+                    <a
+                      href={brand.samplePackUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-3 font-display font-bold uppercase tracking-tight px-6 py-3.5 bg-ink text-paper border-2 border-ink hover:bg-paper hover:text-ink transition-colors no-underline"
+                      style={{ fontSize: "clamp(16px, 1.4vw, 20px)" }}
+                    >
+                      <span aria-hidden>↓</span>
+                      <span>{brand.samplePackTitle ?? `download nick's sample pack`}</span>
+                    </a>
+                    <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3">
+                      free · made by nick for {brand.name.toLowerCase()}
+                    </span>
+                  </div>
+                )}
+              </section>
+            )}
+
             {/* === THE ARTICLE — INLINE READER === if this brand has an
                 article body scraped onto its doc, render it big as the lead
                 long-form section. Recreates the article on Nick's site so

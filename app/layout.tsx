@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ListeningProvider } from "./_components/listening/ListeningProvider";
+import { MiniPlayer } from "./_components/listening/MiniPlayer";
 
 export const metadata: Metadata = {
   title: "thespacepit",
@@ -13,7 +15,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full flex flex-col bg-paper text-ink">{children}</body>
+      {/* The ListeningProvider wraps the whole app so any track row anywhere
+          can pipe audio to the singleton player. The MiniPlayer renders only
+          when something's loaded — sticky bottom bar, persists across
+          navigation. */}
+      <body className="min-h-full flex flex-col bg-paper text-ink">
+        <ListeningProvider>
+          {children}
+          <MiniPlayer />
+        </ListeningProvider>
+      </body>
     </html>
   );
 }

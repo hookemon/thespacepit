@@ -80,7 +80,16 @@ export function TVClient({ channels }: { channels: StockedChannel[] }) {
     setCursors((prev) => ({ ...prev, [activeId]: 0 }));
   }, [activeId, channels]);
 
-  // Boot / update the iframe player when current video changes
+  // Boot / update the iframe player when current video changes.
+  //
+  // CRITICAL: `playing` MUST NOT be in the deps array. The `autoplay` player
+  // var is only read at FIRST construction. After that, `loadVideoById` is
+  // what swaps videos. If we re-ran this effect on `playing` changes, the
+  // video would reload every time YouTube fired state=1 (playing), which
+  // bumped `playing` to true and re-triggered the effect — a feedback loop
+  // that caused the visible "flashing" / restart bug on /tv. We snapshot the
+  // initial autoplay state in a ref so re-renders don't re-arm the effect.
+  const initialAutoplayRef = useRef(playing);
   useEffect(() => {
     if (!current?.youtubeId) return;
     const videoId = current.youtubeId;
@@ -90,7 +99,7 @@ export function TVClient({ channels }: { channels: StockedChannel[] }) {
           height: "100%",
           width: "100%",
           videoId,
-          playerVars: { autoplay: playing ? 1 : 0, rel: 0, modestbranding: 1, playsinline: 1 },
+          playerVars: { autoplay: initialAutoplayRef.current ? 1 : 0, rel: 0, modestbranding: 1, playsinline: 1 },
           events: {
             onStateChange: (e) => {
               // YT state codes: 0 = ended, 1 = playing, 2 = paused
@@ -104,7 +113,8 @@ export function TVClient({ channels }: { channels: StockedChannel[] }) {
         playerRef.current.loadVideoById(videoId);
       }
     });
-  }, [current?.youtubeId, next, playing]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [current?.youtubeId, next]);
 
   // Destroy player on unmount
   useEffect(() => () => {

@@ -26,8 +26,12 @@ export async function CCArtistRoster() {
       </h2>
       <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))" }}>
         {list.map((a) => {
+          // Respect the per-artist displayInitials flag — same toggle the artist
+          // detail page uses. When ON, the roster card shows the lit
+          // amber-on-ink initials block instead of the portrait.
+          const useInitials = "displayInitials" in a && a.displayInitials === true;
           const portraitUrl =
-            "portrait" in a && a.portrait
+            !useInitials && "portrait" in a && a.portrait
               ? urlFor(a.portrait).width(480).height(480).fit("crop").url()
               : null;
           return (
@@ -38,9 +42,11 @@ export async function CCArtistRoster() {
             >
               <div
                 className="aspect-square border border-paper mb-2 overflow-hidden flex items-center justify-center"
-                style={{ background: portraitUrl ? "#0B0B0B" : "rgba(244,239,230,0.06)" }}
+                style={{ background: useInitials ? "#F2B705" : portraitUrl ? "#0B0B0B" : "rgba(244,239,230,0.06)" }}
               >
-                {portraitUrl ? (
+                {useInitials ? (
+                  <RosterInitials name={a.name} />
+                ) : portraitUrl ? (
                   <img src={portraitUrl} alt={a.name} className="w-full h-full object-cover" />
                 ) : (
                   <RosterPlaceholder name={a.name} />
@@ -54,6 +60,25 @@ export async function CCArtistRoster() {
         })}
       </div>
     </section>
+  );
+}
+
+// Lit initials block for artists who opted in via displayInitials — same
+// design treatment as the artist detail page (lamp amber bg, ink-black NH).
+function RosterInitials({ name }: { name: string }) {
+  const parts = name.replace(/[\(\[\{].*?[\)\]\}]/g, "").split(/\s+/).filter(Boolean);
+  const initials =
+    parts.length === 0 ? "·" :
+    parts.length === 1 ? parts[0].slice(0, 2).toUpperCase() :
+    (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  return (
+    <span
+      className="font-display font-black uppercase text-ink select-none leading-none"
+      style={{ fontSize: "clamp(72px, 9vw, 140px)", letterSpacing: "-0.04em" }}
+      aria-label={name}
+    >
+      {initials}
+    </span>
   );
 }
 

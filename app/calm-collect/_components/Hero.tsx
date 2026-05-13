@@ -35,7 +35,7 @@ export async function CCHero() {
             className="font-serif italic mt-5 max-w-[620px] leading-snug"
             style={{ fontSize: "clamp(20px, 2.2vw, 26px)" }}
           >
-            cultivating records where the sound is shared. nick hook &amp; gareth jones. hip-hop, experimental, and ambient — released with care, one after the other.
+            making records since 2013.
           </p>
           <div className="mt-8 flex gap-5 flex-wrap font-mono text-[11px] tracking-[.1em] uppercase text-ink-3">
             <span>releases</span>

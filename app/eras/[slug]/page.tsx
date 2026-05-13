@@ -7,6 +7,8 @@ import { getProjectBySlug, getProjectSlugs, getVideosForEra } from "../../_lib/s
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
+import { HorizontalJourney } from "./HorizontalJourney";
+import { CollageEra } from "./CollageEra";
 
 export const revalidate = 60;
 
@@ -29,11 +31,50 @@ const SOCIALS = [
   { key: "websiteUrl" as const, label: "website" },
 ];
 
+// /watch filters by VIDEO TAG, not era slug, and a couple of legacy tags
+// don't match their era slug 1:1 (mwc / men-women-children, etc.). Most
+// eras line up — cubic-zirconia, spiritual-friendship, rtj, dam-funk all
+// share a slug and a tag — so we only override the divergent ones.
+const ERA_SLUG_TO_VIDEO_TAG: Record<string, string> = {
+  "men-women-children": "mwc",
+};
+
 export default async function EraPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const p = await getProjectBySlug(slug);
   if (!p) notFound();
   const videos = await getVideosForEra(slug);
+
+  // Branch on layoutVariant — most eras render with the default vertical
+  // page below; CZ + Boo (set in their project doc) get bespoke layouts.
+  if (p.layoutVariant === "horizontal-journey") {
+    return (
+      <div className="bg-ink text-paper min-h-screen">
+        <TopNav current="nick" />
+        <HorizontalJourney
+          era={{ ...p, slug }}
+          eraPhotos={p.eraPhotos}
+          ariaLabel={`${p.name} — left-to-right journey`}
+        />
+      </div>
+    );
+  }
+  if (p.layoutVariant === "collage") {
+    return (
+      <div className="bg-ink text-paper min-h-screen flex flex-col">
+        <TopNav current="nick" />
+        <main className="flex-1">
+          <CollageEra era={p} eraPhotos={p.eraPhotos} videos={videos} />
+        </main>
+        <Footer
+          theme="dark"
+          signoff="rip gangsta boo 🌹"
+          meta="memorial vault · jan 2023"
+          links={[...FOOTER_LINKS.nick]}
+        />
+      </div>
+    );
+  }
 
   const cover = p.cover ? urlFor(p.cover).width(1200).height(800).fit("crop").url() : null;
   const years = p.yearStart ? (p.yearEnd ? `${p.yearStart}–${p.yearEnd}` : `${p.yearStart} → today`) : "";
@@ -43,13 +84,85 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
       <TopNav current="nick" />
       <main className="flex-1">
         <article>
-          <header className="relative px-6 sm:px-8 py-16 border-b border-paper overflow-hidden" style={{ background: p.color ?? "#1C1A17" }}>
-            {cover && (
-              <>
-                <img src={cover} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute inset-0 bg-ink/55" />
-              </>
-            )}
+          <header className="relative px-6 sm:px-8 py-16 border-b border-paper overflow-hidden min-h-[560px] flex items-center" style={{ background: p.color ?? "#1C1A17" }}>
+            {/* MOSAIC BACKGROUND — when this era has 5+ photos tagged to it,
+                the hero becomes a wall of context: every photo from the era
+                tiled at varying sizes with a duotone treatment matching the
+                era color. The text content sits inside a translucent panel
+                so it stays readable. When < 5 photos, falls back to the
+                single cover image (or color block) as before. */}
+            {(() => {
+              const photos = p.eraPhotos ?? [];
+              if (photos.length >= 5) {
+                // Take up to 24 photos, varying sizes for a flyer-wall feel.
+                // Slight rotation per tile to read as taped-up artifacts.
+                const tiles = photos.slice(0, 24);
+                return (
+                  <>
+                    <div
+                      aria-hidden
+                      className="absolute inset-0 grid gap-1 opacity-90"
+                      style={{
+                        gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))",
+                        gridAutoRows: "180px",
+                      }}
+                    >
+                      {tiles.map((ph, i) => {
+                        const src = urlFor(ph.image).width(440).height(440).fit("crop").url();
+                        // Every 3rd tile spans 2 cells for visual rhythm
+                        const span2 = i % 5 === 2;
+                        const rot = ((i * 37) % 7) - 3; // -3..+3 deg
+                        return (
+                          <div
+                            key={ph._id}
+                            className="overflow-hidden"
+                            style={{
+                              gridColumn: span2 ? "span 2" : undefined,
+                              gridRow: span2 ? "span 2" : undefined,
+                              transform: `rotate(${rot * 0.4}deg)`,
+                            }}
+                          >
+                            <img
+                              src={src}
+                              alt=""
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                              style={{
+                                // Duotone-ish: grayscale + slight contrast +
+                                // hue shift toward the era color via mix.
+                                filter: "grayscale(100%) contrast(1.1) brightness(0.7)",
+                              }}
+                            />
+                          </div>
+                        );
+                      })}
+                    </div>
+                    {/* Color wash matching the era palette so the mosaic
+                        reads as one cohesive surface instead of a chaotic
+                        photo grid. */}
+                    <div
+                      aria-hidden
+                      className="absolute inset-0"
+                      style={{
+                        background: `linear-gradient(180deg, ${p.color ?? "#1C1A17"}cc 0%, ${p.color ?? "#1C1A17"}ee 100%)`,
+                        mixBlendMode: "multiply",
+                      }}
+                    />
+                    <div aria-hidden className="absolute inset-0 bg-ink/30" />
+                  </>
+                );
+              }
+              // Fallback — original single-cover hero for eras with < 5 photos
+              if (cover) {
+                return (
+                  <>
+                    <img src={cover} alt="" aria-hidden className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-ink/55" />
+                  </>
+                );
+              }
+              return null;
+            })()}
             <div className="relative max-w-[1180px] mx-auto">
               <Link href="/eras" className="font-mono text-[11px] tracking-[.14em] uppercase text-paper hover:opacity-70 no-underline">
                 ← back to eras
@@ -81,6 +194,32 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
                     </a>
                   );
                 })}
+              </div>
+
+              {/* Portal nav — every era is its own world. These three pills jump
+                  you into the master rooms (catalog / press / videos) pre-filtered
+                  to just this era. Treated as bigger / more prominent than the
+                  external social links above so the era reads as a destination,
+                  not a dead end. */}
+              <div className="mt-7 flex flex-wrap gap-2.5">
+                <Link
+                  href={`/catalog?era=${slug}`}
+                  className="font-mono text-[11px] tracking-[.14em] uppercase px-4 py-2 bg-redline text-paper border border-paper hover:bg-paper hover:text-ink transition-colors no-underline"
+                >
+                  catalog →
+                </Link>
+                <Link
+                  href={`/press?era=${slug}`}
+                  className="font-mono text-[11px] tracking-[.14em] uppercase px-4 py-2 bg-collect text-paper border border-paper hover:bg-paper hover:text-ink transition-colors no-underline"
+                >
+                  press →
+                </Link>
+                <Link
+                  href={`/watch?filter=${ERA_SLUG_TO_VIDEO_TAG[slug] ?? slug}`}
+                  className="font-mono text-[11px] tracking-[.14em] uppercase px-4 py-2 bg-ink text-paper border border-paper hover:bg-paper hover:text-ink transition-colors no-underline"
+                >
+                  videos →
+                </Link>
               </div>
             </div>
           </header>
@@ -180,18 +319,50 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
                 <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
                   {p.releases.map((r) => {
                     const cv = r.cover ? urlFor(r.cover).width(440).height(440).fit("crop").url() : null;
+                    // Build the platform-link row from whatever this release has
+                    // populated. Each link is its own clickable target so the
+                    // visitor can listen straight from the era page without
+                    // clicking through to the release detail. Surfaces only
+                    // platforms that actually have a URL on this release.
+                    const platforms: { href: string; label: string }[] = [];
+                    if (r.spotifyUrl)      platforms.push({ href: r.spotifyUrl,      label: "spotify" });
+                    if (r.appleMusicUrl)   platforms.push({ href: r.appleMusicUrl,   label: "apple" });
+                    if (r.youtubeMusicUrl) platforms.push({ href: r.youtubeMusicUrl, label: "yt music" });
+                    if (r.tidalUrl)        platforms.push({ href: r.tidalUrl,        label: "tidal" });
+                    if (r.deezerUrl)       platforms.push({ href: r.deezerUrl,       label: "deezer" });
+                    if (r.amazonMusicUrl)  platforms.push({ href: r.amazonMusicUrl,  label: "amazon" });
+                    if (r.bandcampUrl)     platforms.push({ href: r.bandcampUrl,     label: "bandcamp" });
                     return (
-                      <Link
+                      <div
                         key={r._id}
-                        href={`/releases/${r.slug}`}
-                        className="block border border-paper p-3.5 transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#E83A1C] no-underline text-paper"
+                        className="border border-paper p-3.5 transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#E83A1C]"
                       >
-                        <div className="aspect-square border border-paper mb-3 overflow-hidden" style={{ background: r.coverColor ?? "#1C1A17" }}>
-                          {cv && <img src={cv} alt={r.title} className="w-full h-full object-cover" />}
-                        </div>
-                        <div className="font-display font-bold text-[18px] uppercase leading-none">{r.title}</div>
-                        {r.year && <div className="font-mono text-[10px] tracking-[.1em] uppercase text-on-dark mt-1.5">{r.year}</div>}
-                      </Link>
+                        <Link
+                          href={`/releases/${r.slug}`}
+                          className="block no-underline text-paper"
+                        >
+                          <div className="aspect-square border border-paper mb-3 overflow-hidden" style={{ background: r.coverColor ?? "#1C1A17" }}>
+                            {cv && <img src={cv} alt={r.title} className="w-full h-full object-cover" />}
+                          </div>
+                          <div className="font-display font-bold text-[18px] uppercase leading-none">{r.title}</div>
+                          {r.year && <div className="font-mono text-[10px] tracking-[.1em] uppercase text-on-dark mt-1.5">{r.year}</div>}
+                        </Link>
+                        {platforms.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-2.5">
+                            {platforms.map((pl) => (
+                              <a
+                                key={pl.label}
+                                href={pl.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="font-mono text-[9px] tracking-[.14em] uppercase px-2 py-0.5 border border-paper rounded-full hover:bg-paper hover:text-ink transition-colors no-underline"
+                              >
+                                {pl.label} ↗
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
