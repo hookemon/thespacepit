@@ -3,8 +3,8 @@ import { getDiscordWidget } from "../_lib/discord";
 
 const SPACEPIT_FOUNDED = 2011;
 
-// Hero background photo — the actual spacepit hallway, lifted from the EPK.
-// Yellow graffiti walls signed by every artist who's recorded here.
+// Hero background photo — the spacepit hallway shot in /public.
+// Set to null for a clean paper-on-ink text-only layout instead.
 const HERO_BG_IMAGE: string | null = "/spacepit-hallway.jpg";
 
 function formatCount(n: number): string {

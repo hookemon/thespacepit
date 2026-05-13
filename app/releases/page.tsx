@@ -85,9 +85,16 @@ export default async function ReleasesIndex() {
                           </span>
                         )}
                       </div>
-                      <div className="mt-2">
+                      {/* Pin the meta block to a consistent footprint so cards
+                          in the same row don't visually mismatch when titles
+                          wrap differently. Cover above is already aspect-square
+                          (identical width/height per column), so the only thing
+                          that was making cards "look different sizes" was the
+                          title overflowing past 2 lines on long names while
+                          short ones stayed at 1. line-clamp + min-h fixes it. */}
+                      <div className="mt-2 min-h-[88px]">
                         <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3">{r.catalogNumber}</div>
-                        <div className="font-display font-semibold text-[18px] uppercase tracking-[-0.005em] leading-tight mt-0.5">{r.title}</div>
+                        <div className="font-display font-semibold text-[18px] uppercase tracking-[-0.005em] leading-tight mt-0.5 line-clamp-2">{r.title}</div>
                         <div className="font-sans text-[12px] text-ink-3 mt-0.5 line-clamp-1">{artists}</div>
                       </div>
                     </Link>

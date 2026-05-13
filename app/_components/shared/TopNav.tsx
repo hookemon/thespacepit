@@ -15,10 +15,14 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
     // so visitors landing from nick-hook see his performances first, then can
     // clear the chip to see everything else.
     { href: "/watch?filter=music-video", label: "watch" },
+    // /tv + /radio are also cross-platform — same channels, same crate,
+    // exposed to nick-hook visitors so they can lean back on his content.
+    { href: "/tv", label: "tv" },
+    { href: "/radio", label: "radio" },
     { href: "/mixes", label: "mixes" },
     { href: "/shows", label: "shows" },
     { href: "/partners", label: "partners" },
-    { href: "/nick-hook#press", label: "press" },
+    { href: "/press", label: "press" },
     { href: "/contact", label: "contact" },
   ],
   spacepit: [
@@ -28,21 +32,27 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
     { href: "/mixes", label: "mixes" },
     { href: "/listening", label: "listening" },
     { href: "/packs", label: "packs" },
+    { href: "/vault", label: "vault" },
     { href: "/map", label: "map" },
     { href: "/studios", label: "studios" },
     { href: "/gear", label: "gear" },
     { href: "/#clients", label: "in the room" },
+    { href: "/crew", label: "crew" },
+    { href: "/press", label: "press" },
     { href: "/#discord", label: "discord" },
+    { href: "/support", label: "support" },
     { href: "/contact", label: "contact" },
   ],
   label: [
     { href: "/releases", label: "releases" },
-    // CC nav: same /watch, pre-filtered to label-adjacent video sets. We don't
-    // have a single "c+c" tag, so we land on the broadest CC-flavored chip
-    // ("music-video") — the user can swap chips from there.
+    // CC nav: same /watch + tv + radio. Pre-filter watch to music-videos
+    // since CC's content is largely the visual side of the catalog.
     { href: "/watch?filter=music-video", label: "watch" },
+    { href: "/tv", label: "tv" },
+    { href: "/radio", label: "radio" },
     { href: "/calm-collect#artists", label: "artists" },
     { href: "/calm-collect#calllm", label: "calllm" },
+    { href: "/press", label: "press" },
     { href: "/contact", label: "contact" },
   ],
 };
@@ -69,11 +79,13 @@ export function TopNav({ current }: { current: Site }) {
         {/* TOP ROW: brand — all 3 sites navigable, just tighter on mobile */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 font-display font-bold uppercase tracking-tight">
           <img src={heptagonSrc} alt="" className="w-[22px] h-[22px] heptagon-spin shrink-0" />
-          {/* MOBILE: 3 short labels with slashes */}
+          {/* MOBILE: nick + c+c abbreviate, but thespacepit ALWAYS reads as
+              "thespacepit" — that's the brand wordmark, one word, lowercase,
+              never shortened. */}
           <div className="flex sm:hidden items-center gap-1.5 text-[13px]">
             <SiteLink site="nick" current={current} activeColor={activeColor}>nick</SiteLink>
             <span className={slashClasses}>/</span>
-            <SiteLink site="spacepit" current={current} activeColor={activeColor}>spacepit</SiteLink>
+            <SiteLink site="spacepit" current={current} activeColor={activeColor}>thespacepit</SiteLink>
             <span className={slashClasses}>/</span>
             <SiteLink site="label" current={current} activeColor={activeColor}>c+c</SiteLink>
           </div>
@@ -106,6 +118,41 @@ export function TopNav({ current }: { current: Site }) {
   );
 }
 
+/**
+ * Each of the three worlds gets a tiny real-image glyph next to its name in
+ * the nav — pinhole-size little artifacts that pack each world into ~12px.
+ *
+ *   ◐ nick hook        the Relationships LP cover (his solo statement)
+ *   ◐ thespacepit      a sliver of the modular wall — gear = the pit
+ *   ◐ calm + collect   the c+c mark (the label logo)
+ *
+ * All rendered as rounded-full <img> at the requested size with object-cover
+ * so we get a clean circular postage-stamp slice. objectPosition tunes the
+ * crop where it matters (the gear photo wants the left modular, not Nick's
+ * face). Active state is conveyed by the wordmark text color next to it —
+ * we don't try to tint the images.
+ */
+function SiteIcon({ site, size = 12 }: { site: Site; size?: number }) {
+  const src =
+    site === "nick"     ? "/relationships-cover.jpg" :
+    site === "spacepit" ? "/epk/nick-6-0.jpg" :
+                          "/calmcollect-mark.png";
+  // The gear shot has Nick on the right; pull the crop hard-left to land on
+  // the modular's patch cables — instantly reads as "gear" at thumbnail size.
+  const objectPosition = site === "spacepit" ? "15% 35%" : "center";
+  return (
+    <img
+      src={src}
+      alt=""
+      aria-hidden
+      width={size}
+      height={size}
+      className="inline-block shrink-0 rounded-full object-cover"
+      style={{ width: size, height: size, objectPosition }}
+    />
+  );
+}
+
 function SiteLink({
   site,
   current,
@@ -118,10 +165,16 @@ function SiteLink({
   children: React.ReactNode;
 }) {
   if (site === current) {
-    return <span className={activeColor}>{children}</span>;
+    return (
+      <span className={`${activeColor} inline-flex items-baseline gap-1.5`}>
+        <SiteIcon site={site} />
+        {children}
+      </span>
+    );
   }
   return (
-    <Link href={ROUTES[site]} className="hover:opacity-70 transition-opacity">
+    <Link href={ROUTES[site]} className="hover:opacity-70 transition-opacity inline-flex items-baseline gap-1.5">
+      <SiteIcon site={site} />
       {children}
     </Link>
   );
