@@ -74,7 +74,12 @@ function crateToTrack(r: DiscogsRelease): Track {
 }
 function songToTrack(s: CatalogSong): Track {
   const cover = s.releaseCover ? urlFor(s.releaseCover).width(600).height(600).fit("crop").url() : null;
-  const primary = s.releaseArtists[0]?.name ?? "Nick Hook";
+  // Show ALL primary artists, not just the first one. So a record by
+  // Nick Hook + Vin Sol + Matrixxman reads correctly, not just "Nick Hook"
+  // giant on the radio card. Featured artists still go in the subline.
+  const primary = s.releaseArtists.length > 0
+    ? s.releaseArtists.map((a) => a.name).join(" + ")
+    : "Nick Hook";
   const featLine = s.features && s.features.length > 0 ? ` · feat. ${s.features.join(", ")}` : "";
   return {
     kind: "song",

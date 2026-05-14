@@ -31,7 +31,17 @@ export default async function RadioPage() {
     getEraReleaseMap(),
     getVideos(500),
   ]);
-  const { total, records } = crate;
+  const { total, records: rawRecords } = crate;
+  // Dedupe by Discogs release id — Nick owns multiple copies of certain
+  // records (50 of some), and we don't want the rotation to weight toward
+  // the heavily-collected ones. One spin per release, regardless of how
+  // many physical copies he has. Keep the first instance we see.
+  const seenReleaseIds = new Set<number>();
+  const records = rawRecords.filter((r) => {
+    if (seenReleaseIds.has(r.id)) return false;
+    seenReleaseIds.add(r.id);
+    return true;
+  });
   // Music videos = videos tagged "music-video" with a youtubeId.
   const musicVideos = allVideos.filter((v) => v.tags?.includes("music-video") && v.youtubeId);
 
