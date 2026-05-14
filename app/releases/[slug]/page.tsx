@@ -150,9 +150,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
   // De-dupe playlist against manual, then strip the hero video from the
   // WATCH playlist — it's already playing in the header embed, no reason
   // to show it twice.
-  const heroUrls = new Set([release.youtubeUrl, release.mainVideoUrl].filter(Boolean) as string[]);
+  const heroUrl = release.youtubeUrl;
   const allClips = [...manualClips, ...playlistClips.filter((c) => !seenUrls.has(c.url))]
-    .filter((c) => !heroUrls.has(c.url));
+    .filter((c) => !heroUrl || c.url !== heroUrl);
 
   // Packs that target this release (e.g. WYGD sample pack on the CC027 page).
   const releasePacks = await getPacksForRelease(slug);
