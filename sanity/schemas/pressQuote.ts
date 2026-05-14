@@ -145,6 +145,13 @@ export const pressQuote = defineType({
       initialValue: false,
       description: "Show on /nick-hook#press top-of-page wall. Only the strongest 6–8 quotes should be pinned.",
     }),
+    defineField({
+      name: "bestNew",
+      title: "Pitchfork Best New Music / Track",
+      type: "boolean",
+      initialValue: false,
+      description: "Surfaces a slime-green BEST NEW TRACK / BEST NEW MUSIC badge on the press card. Use only for verified Pitchfork BNM/BNT pieces.",
+    }),
   ],
   orderings: [
     { name: "dateDesc", title: "Date (newest first)", by: [{ field: "date", direction: "desc" }, { field: "year", direction: "desc" }] },

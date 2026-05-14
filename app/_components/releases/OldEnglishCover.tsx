@@ -152,7 +152,7 @@ export function OldEnglishCover({ className = "" }: { className?: string }) {
           Young Thug + Freddie Gibbs + A$AP Ferg
         </div>
         <div style={{ textTransform: "uppercase", marginTop: "0.5cqi", color: SLIME_DEEP }}>
-          DJ Spinn + Nick Hook Remix
+          DJ Spinn + Nick Hook + Scatta Remix
         </div>
       </div>
     </div>

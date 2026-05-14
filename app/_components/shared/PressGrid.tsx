@@ -69,22 +69,33 @@ export function PressGrid({
           // Image precedence:
           //   1. Manual Sanity upload (q.image) — curated wins
           //   2. OG-scraped URL (q.imageUrl) — hotlinked from the article
-          //   3. Linked release cover — fallback when neither exists
-          //   none → text-only card
+          //   none → text-only card. (We deliberately do NOT fall back to
+          //   the linked release cover — press cards should carry their own
+          //   editorial image, otherwise read as quote-only.)
           const heroImg = q.image
             ? urlFor(q.image).width(800).height(450).fit("crop").url()
             : q.imageUrl
               ? q.imageUrl
-              : q.release?.cover
-                ? urlFor(q.release.cover).width(800).height(800).fit("crop").url()
-                : null;
-          const heroFromRelease = !q.image && !q.imageUrl && !!q.release?.cover;
+              : null;
+          // Pitchfork BNM/BNT pieces get a slime-green badge that reads as
+          // an editorial seal — same energy as the original Pitchfork stamp.
+          const bnLabel = q.bestNew
+            ? (q.kind === "review" && /album|lp|ep/i.test(q.headline ?? "") ? "BEST NEW MUSIC" : "BEST NEW TRACK")
+            : null;
           const inner = (
             <>
+              {bnLabel && (
+                <div
+                  className="inline-block font-mono text-[9px] tracking-[.22em] uppercase px-2 py-1 mb-3 border border-ink"
+                  style={{ background: "#7AFB0D", color: "#0B0B0B" }}
+                >
+                  ★ {bnLabel}
+                </div>
+              )}
               {heroImg && (
                 <div
                   className={`relative overflow-hidden border ${borderClass}`}
-                  style={{ aspectRatio: heroFromRelease ? "1 / 1" : "16 / 9", marginBottom: "1rem" }}
+                  style={{ aspectRatio: "16 / 9", marginBottom: "1rem" }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -97,14 +108,6 @@ export function PressGrid({
                     // article's domain expects its OWN domain, not ours).
                     referrerPolicy="no-referrer"
                   />
-                  {heroFromRelease && (
-                    <div
-                      className="absolute top-2 left-2 font-mono text-[8px] tracking-[.18em] uppercase px-1.5 py-0.5 rounded-full"
-                      style={{ background: accent, color: "#0B0B0B" }}
-                    >
-                      ↪ release art
-                    </div>
-                  )}
                 </div>
               )}
               {headline && (

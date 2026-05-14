@@ -202,6 +202,9 @@ export type PressQuoteItem = {
    *  upload exists. Populated by scripts/scrape-press-og-images.ts. */
   imageUrl?: string;
   featured?: boolean;
+  /** Pitchfork Best New Music / Track flag — surfaces a slime-green badge
+   *  on the press card. */
+  bestNew?: boolean;
   /** Resolved era reference for press attached to MWC, CZ, etc. */
   era?: { name: string; slug: string };
   /** Resolved release if this piece reviews a specific record. Cover +
@@ -442,9 +445,13 @@ export async function getUpcomingReleases(): Promise<ReleaseListItem[]> {
   // Coalesce featured: GROQ sorts `null` before `true` on `featured desc`,
   // so an unset field would beat a pinned one. Coalescing to `false` puts
   // the manual pin (true) at the top reliably.
+  //
+  // Both `dropping` (active distro pitch) and `upcoming` (earlier-stage,
+  // known-about-but-not-yet-pitched) surface on the /calm-collect/upcoming
+  // page so the full pipeline is visible.
   return sanityFetch<ReleaseListItem[]>(groq`
-    *[_type == "release" && status == "dropping"]
-      | order(coalesce(featured, false) desc, catalogNumber asc) {
+    *[_type == "release" && status in ["dropping", "upcoming"]]
+      | order(coalesce(featured, false) desc, status asc, catalogNumber asc) {
       ${releaseListProjection}
     }
   `);
@@ -734,6 +741,19 @@ export async function getRosterArtists(): Promise<ArtistListItem[]> {
 }
 
 /**
+ * Full artist directory. Powers /artists — the public-facing alphabetical
+ * grid of every person/group with a doc in the system. Excludes artist
+ * docs explicitly marked hidden (or you can fold in other filters later).
+ */
+export async function getAllArtists(): Promise<ArtistListItem[]> {
+  return sanityFetch<ArtistListItem[]>(groq`
+    *[_type == "artist" && hidden != true] | order(name asc) {
+      ${artistListProjection}
+    }
+  `);
+}
+
+/**
  * The TSP crew/alumni list — every artist with tspCrew=true. Used to power
  * the /crew page. Sorted by year they came up (oldest residents first =
  * the OGs), with name as the tie-breaker. Also pulls the count of releases
@@ -795,7 +815,7 @@ export async function getArtistSlugs(): Promise<{ slug: string }[]> {
 // round-trip.
 const pressProjection = `
   _id, quote, source, url, year,
-  kind, headline, excerpt, outlet, author, date, image, imageUrl, featured,
+  kind, headline, excerpt, outlet, author, date, image, imageUrl, featured, bestNew,
   "era": relatedEra->{ name, "slug": slug.current },
   "release": relatedRelease->{ _id, title, "slug": slug.current, cover, coverColor }
 `;
@@ -871,7 +891,7 @@ export async function getPressByOutlet(outletName: string): Promise<PressQuoteIt
 export async function getPressForRelease(releaseSlug: string): Promise<PressQuoteItem[]> {
   return sanityFetch<PressQuoteItem[]>(groq`
     *[_type == "pressQuote" && relatedRelease->slug.current == $slug]
-      | order(coalesce(date, "0000") desc) {
+      | order(coalesce(bestNew, false) desc, coalesce(featured, false) desc, coalesce(date, "0000") desc) {
       ${pressProjection}
     }
   `, { slug: releaseSlug });

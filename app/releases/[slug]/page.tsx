@@ -12,8 +12,10 @@ import { TracklistAndCover } from "./TracklistAndCover";
 import { CoverPlayBadge } from "./CoverPlayBadge";
 import { Room } from "../../_components/shared/Room";
 import { PhotoGallery } from "../../_components/shared/PhotoGallery";
-import { getReleaseBySlug, getReleaseSlugs, getPacksForRelease, getVideosForRelease } from "../../_lib/sanity-queries";
+import { getReleaseBySlug, getReleaseSlugs, getPacksForRelease, getVideosForRelease, getPressForRelease } from "../../_lib/sanity-queries";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
+import { PressGrid } from "../../_components/shared/PressGrid";
+import { VideoPlaylist } from "../../_components/shared/VideoPlaylist";
 import { IntiCover06, IntiCover07 } from "../../_components/releases/IntiCover06";
 import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
@@ -26,8 +28,9 @@ import { buildMusicAlbumJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 // `coverComponent` field if this grows past a few entries.
 const LIVE_COVERS: Record<string, () => ReactElement> = {
   "cc029-kusa": () => <IntiCover06 />,
-  // old-english-spinn-hook-remix uses the uploaded recolored JPG (yellow
-  // bottle → slime green) instead of a generated React cover, per Nick.
+  // old-english-spinn-hook-remix uses the uploaded "A FINAL" yellow-bottle
+  // JPG (C+C version of the original 2014 Mass Appeal cover) — visual
+  // continuity with the original release's press archive.
 };
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
@@ -144,13 +147,22 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
     title: v.title,
   }));
   const seenUrls = new Set(manualClips.map((c) => c.url));
-  const allClips = [...manualClips, ...playlistClips.filter((c) => !seenUrls.has(c.url))];
+  // De-dupe playlist against manual, then strip the hero video from the
+  // WATCH playlist — it's already playing in the header embed, no reason
+  // to show it twice.
+  const heroUrls = new Set([release.youtubeUrl, release.mainVideoUrl].filter(Boolean) as string[]);
+  const allClips = [...manualClips, ...playlistClips.filter((c) => !seenUrls.has(c.url))]
+    .filter((c) => !heroUrls.has(c.url));
 
   // Packs that target this release (e.g. WYGD sample pack on the CC027 page).
   const releasePacks = await getPacksForRelease(slug);
 
   // Videos auto-attached to this release (set via /studio → video.relatedRelease).
   const releaseVideos = await getVideosForRelease(slug);
+
+  // Press attached to this release — historical write-ups, premieres, reviews.
+  // Renders as a slim "what they said" rail near the bottom of the page.
+  const releasePress = await getPressForRelease(slug);
 
   // ── SAMPLE PACK ROOM ─────────────────────────────────────────────────────
   // The pack section is the page's primary lead-gen surface — every visitor
@@ -235,7 +247,10 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: albumJsonLd }}
       />
       <TopNav current="label" />
-      <main className="flex-1 bg-paper text-ink">
+      <main
+        className="flex-1 text-ink"
+        style={{ background: release.coverColor ?? "var(--color-paper)" }}
+      >
         <article className="px-6 sm:px-8 py-12">
           <div className="max-w-[1180px] mx-auto">
             <Link
@@ -508,24 +523,30 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 `samplePackRoom` JSX, declared once below. */}
             {release.slug === "cc029-kusa" && samplePackRoom}
 
-            {/* === THE WATCH === music video grid lives near the top so it
-                lands cinematically right after the hero. */}
+            {/* === THE WATCH === music videos + reels + performance clips.
+                Renders as a hero player with a clickable thumbnail rail so
+                you can bounce between the official video, the audio rip,
+                and any vertical reel edits without leaving the page.
+                Falls back to a grid for releases with only one clip. */}
             {allClips.length > 0 && (
               <Room
                 number={leadVideoUrl ? "01" : "02"}
                 title="the watch"
-                kicker="every video"
+                kicker={allClips.length > 1 ? "the whole playlist" : "music video"}
               >
-                <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))" }}>
-                  {allClips.map((c, i) => (
-                    <div key={`${c.url}-${i}`}>
-                      <MediaEmbed url={c.url} title={c.title ?? release.title} />
-                      {c.title && (
-                        <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2 line-clamp-2">{c.title}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
+                {allClips.length > 1 ? (
+                  <VideoPlaylist
+                    items={allClips.map((c) => ({ url: c.url, title: c.title ?? undefined }))}
+                    accent={release.coverColor ?? "#F2B705"}
+                  />
+                ) : (
+                  <div>
+                    <MediaEmbed url={allClips[0].url} title={allClips[0].title ?? release.title} />
+                    {allClips[0].title && (
+                      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{allClips[0].title}</div>
+                    )}
+                  </div>
+                )}
               </Room>
             )}
 
@@ -588,38 +609,94 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </Room>
             )}
 
-            {/* === THE CREDITS === full credit list */}
-            {release.credits && release.credits.length > 0 && (
-              <Room
-                number="05"
-                title="the credits"
-                kicker="who played what"
-              >
-                <ul className="grid gap-1.5 max-w-[760px]">
-                  {release.credits.map((c, i) => (
-                    <li key={i} className="flex items-baseline gap-3 border-b border-ink/20 py-2">
-                      {c.role && (
-                        <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 shrink-0 w-[140px]">
-                          {c.role}
-                        </span>
-                      )}
-                      <span className="flex-1 font-display font-semibold text-[18px] uppercase tracking-[-0.005em] leading-tight">
-                        {c.person ? (
-                          <Link
-                            href={`/artists/${c.person.slug}`}
-                            className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+            {/* === THE CREDITS === Grouped by role, one line per role, names
+                joined with " + " (vinyl-jacket reading order, not a database
+                table). Order: Vocals → Produced by → Remix/co-prod → players →
+                Mixed by → Mastered by. Recording locations get pulled into a
+                centered block below. */}
+            {release.credits && release.credits.length > 0 && (() => {
+              const ROLE_ORDER = [
+                "Vocals",
+                "Backing vocals",
+                "Produced by",
+                "Co-produced by",
+                "Additional production",
+                "Remix by",
+                "Bass", "Guitar", "Drums", "Keys", "Synth", "Strings", "Programming", "Beats",
+                "Mixed by",
+                "Co-mixed by",
+                "Mastered by",
+              ];
+              const LOCATION_ROLES = new Set(["Recorded at", "Recorded by", "Tracking engineer", "Vocal engineer"]);
+
+              const byRole = new Map<string, typeof release.credits>();
+              for (const c of release.credits) {
+                const k = c.role ?? "—";
+                if (!byRole.has(k)) byRole.set(k, []);
+                byRole.get(k)!.push(c);
+              }
+              const sortRoles = (rs: string[]) => rs.sort((a, b) => {
+                const ai = ROLE_ORDER.indexOf(a);
+                const bi = ROLE_ORDER.indexOf(b);
+                if (ai === -1 && bi === -1) return a.localeCompare(b);
+                if (ai === -1) return 1;
+                if (bi === -1) return -1;
+                return ai - bi;
+              });
+              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !LOCATION_ROLES.has(r)));
+              const locationRoles = [...byRole.keys()].filter((r) => LOCATION_ROLES.has(r));
+
+              return (
+                <Room number="05" title="the credits" kicker="vinyl jacket">
+                  <div className="max-w-[720px] mx-auto">
+                    <ul className="grid gap-0">
+                      {peopleRoles.map((role) => {
+                        const cs = byRole.get(role)!;
+                        return (
+                          <li
+                            key={role}
+                            className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-ink/15 py-3.5"
                           >
-                            {c.person.name}
-                          </Link>
-                        ) : (
-                          c.name ?? "—"
-                        )}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </Room>
-            )}
+                            <span className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 shrink-0 w-[120px]">
+                              {role}
+                            </span>
+                            <span className="flex-1 font-display font-semibold text-[20px] uppercase tracking-[-0.005em] leading-tight">
+                              {cs.map((c, i) => (
+                                <span key={i}>
+                                  {c.person ? (
+                                    <Link
+                                      href={`/artists/${c.person.slug}`}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {c.person.name}
+                                    </Link>
+                                  ) : (
+                                    c.name ?? "—"
+                                  )}
+                                  {i < cs.length - 1 ? <span className="text-ink-3"> + </span> : null}
+                                </span>
+                              ))}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {locationRoles.length > 0 && (
+                      <div className="mt-8 pt-6 border-t border-ink/30 text-center">
+                        <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
+                          {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
+                        </div>
+                        <div className="font-display text-[18px] uppercase tracking-[-0.005em]">
+                          {locationRoles
+                            .flatMap((role) => byRole.get(role)!.map((c) => c.name ?? c.person?.name).filter(Boolean))
+                            .join("  ·  ")}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Room>
+              );
+            })()}
 
             {/* === THE PHYSICAL === liner notes scans + physical artifacts
                 (test pressings, vinyl jackets, J-cards, hand-written track
@@ -713,6 +790,21 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             {/* (RelatedVideos used to live here at the bottom — moved up to
                 just before the tracklist so visitors actually see it without
                 scrolling past 16 tracks + credits + gallery + session first.) */}
+
+            {/* === PRESS RAIL === outlets that covered the record. Lives near
+                the bottom because it's catalog flavor — visitors who care to
+                read what FADER / Stereogum / Pitchfork said scroll here. Accent
+                picks up the release's cover color when set (slime green for
+                Old English, etc.) and falls back to C+C red. */}
+            {releasePress.length > 0 && (
+              <PressGrid
+                items={releasePress}
+                accent={release.coverColor ?? "#E83A1C"}
+                eyebrow="WHAT THEY SAID"
+                heading="press"
+                variant="light"
+              />
+            )}
 
             {/* === KUSA · THE ALTERNATE === image-only at the bottom of the page.
                 No description — just the cover. The lead cover lives in the hero;

@@ -13,6 +13,8 @@ import { Footer } from "../_components/shared/Footer";
 import { FOOTER_LINKS } from "../_lib/social-links";
 import { STUDIO_CLIENTS } from "../_lib/studio-clients";
 import { resolveArtistSlugs } from "../_lib/sanity-queries";
+import { sanityFetch, urlFor } from "../_lib/sanity";
+import type { SanityImage } from "../_lib/sanity-queries";
 
 export const metadata = {
   title: "collabs — nick hook",
@@ -20,7 +22,7 @@ export const metadata = {
     "the deep collab worlds. RTJ. Men Women + Children. Cubic Zirconia. Gangsta Boo. Each one's a full chapter.",
 };
 
-const COLLABS: {
+type CollabChapter = {
   slug: string;
   title: string;
   subtitle: string;
@@ -28,7 +30,15 @@ const COLLABS: {
   blurb: string;
   accent: string;     // hex
   blockColor: string; // text color when on the accent
-}[] = [
+  /** Release slugs to render as a curated cover thumbnail strip on the tile.
+   *  Order matters — leftmost is the visual lead. */
+  featuredCovers: string[];
+  /** Substring match against artists[]->name used to count total releases
+   *  in this chapter for the live stat under the title. */
+  artistMatch: string;
+};
+
+const COLLABS: CollabChapter[] = [
   {
     slug: "run-the-jewels",
     title: "Run The Jewels",
@@ -37,6 +47,8 @@ const COLLABS: {
     blurb: "Every record, every show, every video. 4 LPs, the Cu4tro Mexico cumbia rework, a documentary, world tours.",
     accent: "#E83A1C",
     blockColor: "#F4EFE6",
+    featuredCovers: ["run-the-jewels-2013", "run-the-jewels-4-2020", "rtj-cu4tro-2023"],
+    artistMatch: "Run The Jewels",
   },
   {
     slug: "men-women-children",
@@ -46,6 +58,8 @@ const COLLABS: {
     blurb: "20-year anniversary in 2026. The whole press archive, the videos, the tour history — already documented.",
     accent: "#F2B705",
     blockColor: "#0B0B0B",
+    featuredCovers: ["men-women-children-self-titled", "dance-in-my-blood-us-dmd-maxi"],
+    artistMatch: "Men Women",
   },
   {
     slug: "cubic-zirconia",
@@ -55,6 +69,8 @@ const COLLABS: {
     blurb: "9 releases (FUCK WORK → Darko), 34 documented shows, club circuit. Sub-imprint with Lockhart Dynasty.",
     accent: "#4B2E83",
     blockColor: "#F2C84B",
+    featuredCovers: ["fuck-work", "ldcc001-josephine", "ldcc006-darko"],
+    artistMatch: "Cubic Zirconia",
   },
   {
     slug: "gangsta-boo",
@@ -64,14 +80,63 @@ const COLLABS: {
     blurb: "The whole Boo run — radio drops, unreleased takes, the Qoqeca remix dropping August 2026.",
     accent: "#FF6FB5",
     blockColor: "#0B0B0B",
+    featuredCovers: ["cc004-peephole", "cc007-im-fresh"],
+    artistMatch: "Gangsta Boo",
   },
 ];
+
+/** Fetch curated cover images + total release count per chapter. Runs once
+ *  per request because the page is a server component; revalidation is
+ *  handled by the framework's default RSC cache. */
+async function loadChapterData(): Promise<
+  Record<
+    string,
+    { covers: { slug: string; title: string; cover: SanityImage | null }[]; count: number }
+  >
+> {
+  const slugs = COLLABS.flatMap((c) => c.featuredCovers);
+  const matches = COLLABS.map((c) => c.artistMatch);
+  const data = await sanityFetch<{
+    covers: { slug: string; title: string; cover: SanityImage | null }[];
+    counts: { match: string; count: number }[];
+  }>(
+    `{
+      "covers": *[_type == "release" && slug.current in $slugs]{
+        title, "slug": slug.current, cover
+      },
+      "counts": [
+        ${matches
+          .map(
+            (m, i) =>
+              `{ "match": $m${i}, "count": count(*[_type == "release" && artists[]->name match ("*" + $m${i} + "*")]) }`,
+          )
+          .join(",")}
+      ]
+    }`,
+    {
+      slugs,
+      ...Object.fromEntries(matches.map((m, i) => [`m${i}`, m])),
+    },
+  );
+  const result: Record<string, { covers: typeof data.covers; count: number }> = {};
+  for (const c of COLLABS) {
+    const matchCount = data.counts.find((x) => x.match === c.artistMatch)?.count ?? 0;
+    const covers = c.featuredCovers
+      .map((s) => data.covers.find((x) => x.slug === s))
+      .filter((x): x is NonNullable<typeof x> => !!x);
+    result[c.slug] = { covers, count: matchCount };
+  }
+  return result;
+}
 
 export default async function CollabsIndex() {
   // Resolve which of the alphabetical roster names have artist docs in
   // Sanity so we can link them. Same source/query the homepage "IN THE
   // ROOM" wall uses — single source of truth for the collaborator list.
-  const artistLinks = await resolveArtistSlugs(STUDIO_CLIENTS);
+  const [artistLinks, chapterData] = await Promise.all([
+    resolveArtistSlugs(STUDIO_CLIENTS),
+    loadChapterData(),
+  ]);
   return (
     <>
       <TopNav current="nick" />
@@ -97,7 +162,9 @@ export default async function CollabsIndex() {
             className="grid gap-6 md:gap-8"
             style={{ gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))" }}
           >
-            {COLLABS.map((c) => (
+            {COLLABS.map((c) => {
+              const chap = chapterData[c.slug] ?? { covers: [], count: 0 };
+              return (
               <Link
                 key={c.slug}
                 href={`/collabs/${c.slug}`}
@@ -105,7 +172,7 @@ export default async function CollabsIndex() {
                 style={{
                   background: c.accent,
                   color: c.blockColor,
-                  minHeight: 320,
+                  minHeight: 380,
                   boxShadow: "0 0 0 transparent",
                 }}
               >
@@ -113,13 +180,19 @@ export default async function CollabsIndex() {
                   className="absolute inset-0 transition-shadow duration-150 group-hover:[box-shadow:6px_6px_0_var(--color-paper)]"
                   aria-hidden
                 />
-                <div className="relative p-7 flex flex-col h-full justify-between" style={{ minHeight: 320 }}>
+                <div className="relative p-7 flex flex-col h-full justify-between" style={{ minHeight: 380 }}>
                   <div>
                     <div
                       className="font-mono text-[10px] tracking-[.18em] uppercase mb-2"
                       style={{ opacity: 0.7 }}
                     >
                       {c.years}
+                      {chap.count > 0 && (
+                        <>
+                          {" · "}
+                          {chap.count} {chap.count === 1 ? "RECORD" : "RECORDS"}
+                        </>
+                      )}
                     </div>
                     <div
                       className="font-display font-bold uppercase leading-[0.95]"
@@ -138,6 +211,31 @@ export default async function CollabsIndex() {
                       {c.subtitle}
                     </div>
                   </div>
+
+                  {/* Curated cover thumbnails — visual hook so each chapter
+                      reads at a glance instead of being a wall of color. */}
+                  {chap.covers.length > 0 && (
+                    <div className="flex gap-2 mt-4" aria-hidden>
+                      {chap.covers.map((rel) => (
+                        <div
+                          key={rel.slug}
+                          className="aspect-square w-1/3 max-w-[110px] border-2 overflow-hidden"
+                          style={{ borderColor: c.blockColor, background: "rgba(0,0,0,0.15)" }}
+                        >
+                          {rel.cover && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={urlFor(rel.cover).width(220).height(220).fit("crop").url()}
+                              alt={rel.title}
+                              loading="lazy"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="font-serif italic text-[15px] mt-4 leading-snug" style={{ opacity: 0.95 }}>
                     {c.blurb}
                   </div>
@@ -148,7 +246,8 @@ export default async function CollabsIndex() {
                   </div>
                 </div>
               </Link>
-            ))}
+              );
+            })}
           </div>
 
           <p className="font-serif italic text-[15px] text-paper-2 mt-12 max-w-[640px]">
