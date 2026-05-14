@@ -18,6 +18,7 @@ import { IntiCover06, IntiCover07 } from "../../_components/releases/IntiCover06
 import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
 import { urlFor } from "../../_lib/sanity";
+import { buildMusicAlbumJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 
 // Per-release custom cover components — when a release has a fully
 // designed live cover (React handoffs from the design package), it slots in here in place
@@ -44,7 +45,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!release) return { title: "release not found" };
   const artistNames = release.artists.map((a) => a.name).join(", ");
   const title = `${release.title} — ${artistNames || "calm + collect"}`;
-  const description = release.tagline ?? `${release.title} (${release.year ?? ""}). on calm + collect.`;
+  // Keyword-rich description that helps long-tail Google searches find the
+  // page. Includes the format, label, year, and what's available — stems,
+  // sample pack, music video — when those are populated. Truncated to
+  // ~155 chars (Google's search-snippet cap) so nothing gets clipped.
+  const richBits: string[] = [];
+  if (release.format) richBits.push(release.format.toLowerCase());
+  if (release.year) richBits.push(String(release.year));
+  if (release.label && release.label !== "Other") richBits.push(release.label.toLowerCase());
+  const richMeta = richBits.length > 0 ? ` · ${richBits.join(" · ")}` : "";
+  const richDescBase = release.tagline ?? `${release.title} by ${artistNames || "nick hook"}${richMeta}.`;
+  const description = (richDescBase + " music video, stems, sample pack, full credits on thespacepit.").slice(0, 220);
   // Share-card image. Uses the release cover at 1200×1200 (square fits great
   // in iMessage / Discord / X large-card and Slack/IG previews). Falls back to
   // the default site OG (heptagon) when a release has no cover uploaded yet.
@@ -212,8 +223,17 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
     </Room>
   ) : null;
 
+  // Build MusicAlbum structured data — gives Google a rich snippet
+  // (album art, artist, label) when this release appears in search.
+  const albumJsonLd = jsonLdScript(buildMusicAlbumJsonLd(release, { coverUrl }));
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: albumJsonLd }}
+      />
       <TopNav current="label" />
       <main className="flex-1 bg-paper text-ink">
         <article className="px-6 sm:px-8 py-12">

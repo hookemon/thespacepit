@@ -5,6 +5,7 @@ import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
 import { getBrandBySlug, getBrandSlugs, getVideosForBrand, getGearForBrand, getPressByOutlet } from "../../_lib/sanity-queries";
+import { buildBrandJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
@@ -83,8 +84,25 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
 
   const hasClips = allClips.length > 0;
 
+  // Organization JSON-LD — tells Google the brand-partnership context so
+  // searches like "Nick Hook Ableton" surface the page with a clear org card.
+  const brandJsonLd = jsonLdScript(
+    buildBrandJsonLd({
+      name: brand.name,
+      slug,
+      tagline: brand.tagline,
+      websiteUrl: brand.websiteUrl,
+      logoUrl: logo,
+    }),
+  );
+
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: brandJsonLd }}
+      />
       <TopNav current="nick" />
       <main className="flex-1">
         {/* Hero — full-bleed bg photo with logo overlaid */}

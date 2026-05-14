@@ -6,6 +6,7 @@ import { PortableText } from "../../_components/shared/PortableText";
 import { getArtistBySlug, getArtistSlugs, getSessionsForArtist } from "../../_lib/sanity-queries";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
+import { buildArtistJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 
 export const revalidate = 60;
 
@@ -50,8 +51,17 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   })();
 
+  // MusicGroup JSON-LD for SEO — gives Google a rich snippet (artist name,
+  // image, social links, discography) when this page appears in search.
+  const artistJsonLd = jsonLdScript(buildArtistJsonLd(artist, { portraitUrl }));
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: artistJsonLd }}
+      />
       <TopNav current="label" />
       <main className="flex-1 bg-paper text-ink">
         <article className="px-6 sm:px-8 py-12">
