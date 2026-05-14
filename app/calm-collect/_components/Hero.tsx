@@ -32,17 +32,36 @@ export async function CCHero() {
             <span className="text-collect font-normal">+</span> collect
           </h1>
           <p
-            className="font-serif italic mt-5 max-w-[620px] leading-snug"
-            style={{ fontSize: "clamp(20px, 2.2vw, 26px)" }}
+            className="font-serif italic mt-5 max-w-[640px] leading-snug space-y-4"
+            style={{ fontSize: "clamp(17px, 1.5vw, 21px)" }}
           >
-            making records since 2013.
+            The main label. Launched 2013 by Nick Hook + Katie Longmyer, anchored by the
+            Nick Hook + Gareth Jones duo Spiritual Friendship. {allReleases.length}+ main-imprint
+            releases and counting — CC001 → CC029 (2025).
+          </p>
+          <p
+            className="font-serif italic mt-4 max-w-[640px] leading-snug"
+            style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}
+          >
+            Plus the <span className="not-italic font-mono text-[14px]">Calllm</span> ambient sub-label, the{" "}
+            <span className="not-italic font-mono text-[14px]">Lockhart Dynasty × C+C</span> imprint for the
+            Cubic Zirconia catalog, and the <span className="not-italic font-mono text-[14px]">Instrumental</span>{" "}
+            imprint for producer-driven cuts.
+          </p>
+          <p
+            className="font-serif italic mt-4 max-w-[640px] leading-snug"
+            style={{ fontSize: "clamp(15px, 1.3vw, 18px)" }}
+          >
+            Roster: Nick Hook, Spiritual Friendship, Quazzy, Geraldina, Sinister Dane, Superhero Killer,
+            Camo UFOs. Hip-hop, experimental, ambient — released with care, one after the other.
+            <span className="not-italic font-mono text-[13px] tracking-[.1em]"> Brooklyn → Medellín.</span>
           </p>
           <div className="mt-8 flex gap-5 flex-wrap font-mono text-[11px] tracking-[.1em] uppercase text-ink-3">
-            <span>releases</span>
+            <span>{allReleases.length} releases</span>
             <span>·</span>
-            <span>artists</span>
+            <span>{rosterArtists.length} artists</span>
             <span>·</span>
-            <span>sub-label · calllm</span>
+            <span>4 imprints</span>
           </div>
         </div>
 

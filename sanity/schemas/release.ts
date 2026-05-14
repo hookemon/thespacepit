@@ -374,6 +374,12 @@ export const release = defineType({
                   { title: "Sampled", value: "Sampled" },
                   { title: "Remix", value: "Remix" },
                   { title: "Featured artist", value: "Featured artist" },
+                  // Visual / artwork credits — surface in the credits room
+                  // AND as a small tag on the release page meta.
+                  { title: "Cover art", value: "Cover art" },
+                  { title: "Photography", value: "Photography" },
+                  { title: "Art direction", value: "Art direction" },
+                  { title: "Layout / design", value: "Layout / design" },
                   { title: "Guest appearance", value: "Guest appearance" },
                   // Visual / package
                   { title: "Cover art", value: "Cover art" },
