@@ -39,9 +39,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const release = await getReleaseBySlug(slug);
   if (!release) return { title: "release not found" };
   const artistNames = release.artists.map((a) => a.name).join(", ");
+  const title = `${release.title} — ${artistNames || "calm + collect"}`;
+  const description = release.tagline ?? `${release.title} (${release.year ?? ""}). on calm + collect.`;
+  // Share-card image. Uses the release cover at 1200×1200 (square fits great
+  // in iMessage / Discord / X large-card and Slack/IG previews). Falls back to
+  // the default site OG (heptagon) when a release has no cover uploaded yet.
+  const shareImage = release.cover
+    ? urlFor(release.cover).width(1200).height(1200).fit("crop").url()
+    : undefined;
   return {
-    title: `${release.title} — ${artistNames || "calm + collect"}`,
-    description: release.tagline ?? `${release.title} (${release.year ?? ""}). on calm + collect.`,
+    title,
+    description,
+    openGraph: shareImage
+      ? {
+          title,
+          description,
+          type: "music.song",
+          images: [{ url: shareImage, width: 1200, height: 1200, alt: release.title }],
+        }
+      : undefined,
+    twitter: shareImage
+      ? {
+          card: "summary_large_image",
+          title,
+          description,
+          images: [shareImage],
+        }
+      : undefined,
   };
 }
 

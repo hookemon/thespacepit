@@ -16,11 +16,24 @@ const LIVE_COVERS: Record<string, () => ReactElement> = {
 
 export const revalidate = 60;
 
+const SHARE_IMAGE_URL = "https://cdn.sanity.io/images/7vj6i0c4/production/479a23eb498fc365662475995aae4529d9fd6ebb-3000x3000.jpg?w=1200&h=1200&fit=crop";
+
 export const metadata = {
   title: "upcoming — calm + collect",
   description: "the 2026 calm + collect slate. distro pitch one-sheet — not for public release.",
   // Distro one-sheet — keep out of search engines until it goes public.
   robots: { index: false, follow: false },
+  openGraph: {
+    title: "upcoming — calm + collect 2026 slate",
+    description: "the 2026 calm + collect slate. distro pitch one-sheet.",
+    images: [{ url: SHARE_IMAGE_URL, width: 1200, height: 1200, alt: "KUSA — the lead 2026 release" }],
+  },
+  twitter: {
+    card: "summary_large_image" as const,
+    title: "upcoming — calm + collect 2026 slate",
+    description: "the 2026 calm + collect slate. distro pitch one-sheet.",
+    images: [SHARE_IMAGE_URL],
+  },
 };
 
 // Inline DROPPING stamp — mirrors the wax-stamp treatment on /releases/[slug].
