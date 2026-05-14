@@ -5,6 +5,7 @@ import type { ReactElement } from "react";
 import { getUpcomingReleases } from "../../_lib/sanity-queries";
 import { urlFor } from "../../_lib/sanity";
 import { IntiCover06 } from "../../_components/releases/IntiCover06";
+import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
 // Same registry idea as releases/[slug]/page.tsx: when a release has a live
@@ -12,6 +13,7 @@ import { FOOTER_LINKS } from "../../_lib/social-links";
 // and the per-release page in visual lockstep.
 const LIVE_COVERS: Record<string, () => ReactElement> = {
   "cc029-kusa": () => <IntiCover06 />,
+  "old-english-spinn-hook-remix": () => <OldEnglishCover />,
 };
 
 export const revalidate = 60;

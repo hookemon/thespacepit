@@ -15,6 +15,7 @@ import { PhotoGallery } from "../../_components/shared/PhotoGallery";
 import { getReleaseBySlug, getReleaseSlugs, getPacksForRelease, getVideosForRelease } from "../../_lib/sanity-queries";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { IntiCover06, IntiCover07 } from "../../_components/releases/IntiCover06";
+import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
 import { urlFor } from "../../_lib/sanity";
 
@@ -24,6 +25,7 @@ import { urlFor } from "../../_lib/sanity";
 // `coverComponent` field if this grows past a few entries.
 const LIVE_COVERS: Record<string, () => ReactElement> = {
   "cc029-kusa": () => <IntiCover06 />,
+  "old-english-spinn-hook-remix": () => <OldEnglishCover />,
 };
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";

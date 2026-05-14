@@ -11,6 +11,8 @@ import Link from "next/link";
 import { TopNav } from "../_components/shared/TopNav";
 import { Footer } from "../_components/shared/Footer";
 import { FOOTER_LINKS } from "../_lib/social-links";
+import { STUDIO_CLIENTS } from "../_lib/studio-clients";
+import { resolveArtistSlugs } from "../_lib/sanity-queries";
 
 export const metadata = {
   title: "collabs — nick hook",
@@ -65,7 +67,11 @@ const COLLABS: {
   },
 ];
 
-export default function CollabsIndex() {
+export default async function CollabsIndex() {
+  // Resolve which of the alphabetical roster names have artist docs in
+  // Sanity so we can link them. Same source/query the homepage "IN THE
+  // ROOM" wall uses — single source of truth for the collaborator list.
+  const artistLinks = await resolveArtistSlugs(STUDIO_CLIENTS);
   return (
     <>
       <TopNav current="nick" />
@@ -149,6 +155,54 @@ export default function CollabsIndex() {
             more chapters coming — Boys Noize · Drop The Lime · Spiritual Friendship · SPORTS · the Trouble & Bass run.
             email <a href="mailto:coleman@smooth-loop.com" className="text-paper underline">coleman@smooth-loop.com</a> if you want first look.
           </p>
+        </section>
+
+        {/* === THE WHOLE NETWORK · A → Z ===
+            Every artist Nick has worked with, produced for, played with, or
+            had in the room. Linked names get a portal to their /artists/[slug]
+            page; unlinked names render as plain text. Source: STUDIO_CLIENTS
+            (same list the homepage "IN THE ROOM" wall uses). */}
+        <section className="px-5 sm:px-8 py-16 border-t-2 border-paper">
+          <div className="font-mono text-[11px] tracking-[.18em] uppercase mb-2" style={{ color: "var(--color-slime)" }}>
+            THE WHOLE NETWORK · A → Z · {STUDIO_CLIENTS.length} NAMES
+          </div>
+          <h2
+            className="font-display font-bold uppercase m-0 mb-3 text-paper"
+            style={{ fontSize: "clamp(40px, 7vw, 88px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+          >
+            in the room
+          </h2>
+          <p className="font-serif italic text-[18px] text-paper-2 leading-snug max-w-[680px] mb-9">
+            every artist who&apos;s been in the room with Nick — performers, producers, MCs, vocalists, drummers,
+            DJs, friends-of-the-house. {artistLinks.size} of them have their own world on the site.
+            tap any name to enter.
+          </p>
+          <div
+            className="flex flex-wrap gap-x-5 gap-y-2 font-display uppercase font-semibold leading-none text-paper"
+            style={{ fontSize: "clamp(18px, 2.2vw, 30px)", letterSpacing: "-0.005em" }}
+          >
+            {STUDIO_CLIENTS.map((name, i) => {
+              const link = artistLinks.get(name);
+              return (
+                <span key={`${name}-${i}`} className="whitespace-nowrap">
+                  {link?.slug ? (
+                    <Link
+                      href={`/artists/${link.slug}`}
+                      className="text-paper no-underline hover:underline underline-offset-4 transition-colors hover:text-slime"
+                      style={{ color: "var(--color-paper)" }}
+                    >
+                      {name}
+                    </Link>
+                  ) : (
+                    <span className="text-paper-2">{name}</span>
+                  )}
+                </span>
+              );
+            })}
+          </div>
+          <div className="mt-10 font-mono text-[10px] tracking-[.14em] uppercase text-paper-2">
+            missing someone? email coleman@smooth-loop.com
+          </div>
         </section>
       </main>
       <Footer
