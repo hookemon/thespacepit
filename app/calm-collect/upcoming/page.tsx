@@ -13,7 +13,9 @@ import { FOOTER_LINKS } from "../../_lib/social-links";
 // and the per-release page in visual lockstep.
 const LIVE_COVERS: Record<string, () => ReactElement> = {
   "cc029-kusa": () => <IntiCover06 />,
-  "old-english-spinn-hook-remix": () => <OldEnglishCover />,
+  // old-english-spinn-hook-remix uses the uploaded recolored JPG (slime
+  // bottle on starry black) instead of a React render. Same pattern as
+  // most catalog releases.
 };
 
 export const revalidate = 60;

@@ -25,7 +25,8 @@ import { urlFor } from "../../_lib/sanity";
 // `coverComponent` field if this grows past a few entries.
 const LIVE_COVERS: Record<string, () => ReactElement> = {
   "cc029-kusa": () => <IntiCover06 />,
-  "old-english-spinn-hook-remix": () => <OldEnglishCover />,
+  // old-english-spinn-hook-remix uses the uploaded recolored JPG (yellow
+  // bottle → slime green) instead of a generated React cover, per Nick.
 };
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
