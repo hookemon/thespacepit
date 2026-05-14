@@ -7,6 +7,7 @@ import { PortableText } from "../../_components/shared/PortableText";
 import { BandcampEmbed } from "../../_components/shared/BandcampEmbed";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
 import { PadGrid } from "../../_components/shared/PadGrid";
+import { StemPlayer } from "../../_components/shared/StemPlayer";
 import { TracklistAndCover } from "./TracklistAndCover";
 import { CoverPlayBadge } from "./CoverPlayBadge";
 import { Room } from "../../_components/shared/Room";
@@ -509,9 +510,22 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 that isn't KUSA renders it here, after THE WATCH. */}
             {release.slug !== "cc029-kusa" && samplePackRoom}
 
-            {/* Pads-only room. Stems are intentionally pulled (Nick is reworking
-                the stem player for a unified treatment across all releases —
-                separate pass). Sample packs live in `samplePackRoom` above. */}
+            {/* === PLAY WITH IT === per-stem mixer + FX machine. Renders only
+                when stems are uploaded. Each channel has its own waveform,
+                mute/solo, gain, and four FX (filter · drive · delay · reverb)
+                that wire into the Web Audio chain live. Sample packs live in
+                `samplePackRoom` above. */}
+            {release.stems && release.stems.length > 0 && (
+              <Room number="02a" title="play with it" kicker="stems · live fx" accent="lamp">
+                <p className="font-serif italic text-[16px] text-ink-3 max-w-[640px] mb-5">
+                  every stem of the record, in your hands. mute or solo each part. turn the knobs
+                  — filter, drive, delay, reverb — they apply live to the channel you twist.
+                </p>
+                <StemPlayer stems={release.stems} trackTitle={release.stemsTrackTitle ?? release.title} />
+              </Room>
+            )}
+
+            {/* Pads-only room. Sample packs live in `samplePackRoom` above. */}
             {release.oneshots && release.oneshots.length > 0 && (
               <Room number="02b" title="pads" kicker="tap the rack" accent="lamp">
                 <p className="font-serif italic text-[16px] text-ink-3 max-w-[640px] mb-5">
