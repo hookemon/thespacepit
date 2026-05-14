@@ -56,6 +56,7 @@ export default async function PressPage() {
       eraName: p.era?.name,
       releaseSlug: p.release?.slug,
       releaseTitle: p.release?.title,
+      featured: p.featured === true,
     };
   });
 

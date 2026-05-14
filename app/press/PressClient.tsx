@@ -26,6 +26,10 @@ export type PressCard = {
   eraName?: string;
   releaseSlug?: string;
   releaseTitle?: string;
+  /** "Pin to top" toggle from Sanity. When any items have this set true,
+   *  the featured rail uses ONLY those (manual curation). Falls back to
+   *  the heuristic when nothing is marked. */
+  featured?: boolean;
 };
 
 const KIND_COLORS: Record<string, string> = {
@@ -123,15 +127,26 @@ export function PressClient({ items }: { items: PressCard[] }) {
     return [...buckets.entries()].sort((a, b) => b[0] - a[0]);
   }, [visible]);
 
-  // Featured rail — pieces that have BOTH a real headline AND an article
-  // image, no era filter applied. These are the big hits, shown blown-up at
-  // the top of the chronological list. Cap at 6 so it doesn't dominate.
+  // Featured rail — MANUALLY curated. We honor the `featured: true` flag on
+  // the press doc first; the heuristic (article image + real headline) only
+  // serves as a fallback for when no items are explicitly marked yet. Cap at
+  // 15 so it can be a real scrollable rail of marquee work, not just 6 tiles.
+  // To set: in Sanity Studio, open a press item and toggle "Pin to top".
   const featured = useMemo(() => {
     if (kindFilter !== "all" || eraFilter !== "all" || search.trim()) return [];
+    const manuallyMarked = visible.filter((i) => i.featured === true);
+    if (manuallyMarked.length > 0) {
+      // Sort marked items by date desc, cap at 15.
+      return manuallyMarked
+        .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
+        .slice(0, 15);
+    }
+    // Fallback heuristic — only kicks in if Nick hasn't marked anyone featured
+    // yet. Keeps the rail populated either way.
     return visible
       .filter((i) => i.imageKind === "article" && i.headline && i.headline.length > 8)
       .sort((a, b) => (b.year ?? 0) - (a.year ?? 0))
-      .slice(0, 6);
+      .slice(0, 15);
   }, [visible, kindFilter, eraFilter, search]);
 
   return (
