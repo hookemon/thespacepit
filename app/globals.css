@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Antonio:wght@400;500;600;700&family=Instrument+Serif:ital,wght@0,400;1,400&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=UnifrakturCook:wght@700&family=UnifrakturMaguntia&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -31,6 +31,12 @@
   --font-serif: 'Instrument Serif', 'Cormorant Garamond', Georgia, serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  --font-blackletter: 'UnifrakturCook', 'UnifrakturMaguntia', 'Old English Text MT', serif;
+
+  /* YSL slime green — Young Thug palette. Used on the upcoming / Old English
+     page treatment. Punchy, hi-vis, reads on both ink and paper backgrounds. */
+  --color-slime: #7AFB0D;
+  --color-slime-deep: #5BC908;
 }
 
 @layer base {
