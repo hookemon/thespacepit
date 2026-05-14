@@ -557,6 +557,53 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                 </ul>
               </section>
             )}
+
+            {/* === LISTEN BACK === audio archive. Auto-extracts SoundCloud and
+                Mixcloud URLs from the press list and renders them as embedded
+                players. Big visible upgrade for radio-station brands (Lot
+                Radio, Rinse, etc.) — the shows actually play inline. */}
+            {(() => {
+              const audioItems = allBrandPress
+                .filter((p) => p.url && /soundcloud\.com|mixcloud\.com/i.test(p.url));
+              if (audioItems.length === 0) return null;
+              return (
+                <section className="mt-16">
+                  <div className="flex items-baseline justify-between gap-3 border-b-2 border-paper pb-2 mb-6">
+                    <div>
+                      <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-1">
+                        LISTEN BACK · {brand.name.toUpperCase()}
+                      </div>
+                      <h2 className="font-display font-bold uppercase m-0" style={{ fontSize: "clamp(32px, 4vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}>
+                        every set, in the player
+                      </h2>
+                    </div>
+                    <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 shrink-0 tabular-nums">
+                      {audioItems.length} {audioItems.length === 1 ? "set" : "sets"}
+                    </div>
+                  </div>
+                  <div className="grid gap-5" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(420px, 1fr))" }}>
+                    {audioItems.map((p) => {
+                      const dateLabel = p.date
+                        ? new Date(p.date + "T00:00:00").toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
+                        : p.year ?? "—";
+                      return (
+                        <div key={`audio-${p._id}`}>
+                          <MediaEmbed url={p.url!} title={p.headline ?? p.quote} />
+                          <div className="mt-2 flex items-baseline justify-between gap-3">
+                            <div className="font-display font-semibold text-[15px] uppercase leading-tight tracking-[-0.005em] flex-1 line-clamp-2">
+                              {p.headline ?? p.quote.slice(0, 80)}
+                            </div>
+                            <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 shrink-0">
+                              {dateLabel}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })()}
           </div>
         </article>
       </main>

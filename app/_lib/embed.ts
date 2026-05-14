@@ -3,7 +3,7 @@
 // Returns iframe src + native aspect ratio so we can keep videos looking right
 // without forcing 16:9 on a vertical reel.
 
-export type EmbedKind = "youtube" | "instagram" | "vimeo" | "tiktok" | "unknown";
+export type EmbedKind = "youtube" | "instagram" | "vimeo" | "tiktok" | "soundcloud" | "mixcloud" | "unknown";
 
 export type Embed = {
   kind: EmbedKind;
@@ -54,6 +54,10 @@ const IG_RE = /instagram\.com\/(?:reel|reels|p|tv)\/([A-Za-z0-9_-]+)/;
 const VIMEO_RE = /vimeo\.com\/(?:video\/)?(\d+)/;
 // TikTok video URLs: tiktok.com/@user/video/{id}
 const TIKTOK_RE = /tiktok\.com\/@[^/]+\/video\/(\d+)/;
+// SoundCloud track or playlist URLs — username/track-slug structure.
+const SOUNDCLOUD_RE = /(?:^|\/\/)(?:www\.)?soundcloud\.com\/([^/?#]+\/(?:sets\/)?[^/?#]+)/;
+// Mixcloud show URLs — username/show-slug structure.
+const MIXCLOUD_RE = /(?:^|\/\/)(?:www\.)?mixcloud\.com\/([^/?#]+\/[^/?#]+)/;
 
 export function parseEmbed(url: string): Embed {
   const ytMatch = url.match(YT_RE);
@@ -108,6 +112,34 @@ export function parseEmbed(url: string): Embed {
     };
   }
 
+  // SoundCloud — uses the public player widget. Encode the original URL
+  // and pass it to w.soundcloud.com/player. Aspect ratio is wide+short
+  // (~5:1) because the standard player is a horizontal strip with cover
+  // art + waveform.
+  const scMatch = url.match(SOUNDCLOUD_RE);
+  if (scMatch) {
+    const enc = encodeURIComponent(`https://soundcloud.com/${scMatch[1]}`);
+    return {
+      kind: "soundcloud",
+      src: `https://w.soundcloud.com/player/?url=${enc}&color=%23F2B705&auto_play=false&hide_related=false&show_comments=false&show_user=true&show_reposts=false&visual=true`,
+      aspectRatio: 16 / 9,
+      rawUrl: url,
+    };
+  }
+
+  // Mixcloud — same pattern, different widget URL. Mixcloud's widget
+  // is naturally taller than SoundCloud's (~16:9 with the show art big).
+  const mxMatch = url.match(MIXCLOUD_RE);
+  if (mxMatch) {
+    const enc = encodeURIComponent(`/${mxMatch[1]}/`);
+    return {
+      kind: "mixcloud",
+      src: `https://player-widget.mixcloud.com/widget/iframe/?feed=${enc}&hide_cover=0&light=0`,
+      aspectRatio: 16 / 9,
+      rawUrl: url,
+    };
+  }
+
   return {
     kind: "unknown",
     src: url,
@@ -119,10 +151,12 @@ export function parseEmbed(url: string): Embed {
 /** Quick host label for chips ("youtube", "instagram", etc.) */
 export function embedLabel(kind: EmbedKind): string {
   switch (kind) {
-    case "youtube":   return "youtube";
-    case "instagram": return "instagram";
-    case "vimeo":     return "vimeo";
-    case "tiktok":    return "tiktok";
-    default:          return "link";
+    case "youtube":    return "youtube";
+    case "instagram":  return "instagram";
+    case "vimeo":      return "vimeo";
+    case "tiktok":     return "tiktok";
+    case "soundcloud": return "soundcloud";
+    case "mixcloud":   return "mixcloud";
+    default:           return "link";
   }
 }

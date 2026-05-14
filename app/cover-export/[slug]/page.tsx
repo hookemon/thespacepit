@@ -1,4 +1,4 @@
-import { IntiCover06, IntiCover06SamplePack, IntiKusaBanner } from "../../_components/releases/IntiCover06";
+import { IntiCover06, IntiCover06SamplePack, IntiKusaBanner, IntiKusaBannerStemPack } from "../../_components/releases/IntiCover06";
 
 /**
  * Headless-render route for cover art export. Renders ONE cover, full-bleed,
@@ -15,6 +15,7 @@ const COVERS: Record<string, () => React.ReactElement> = {
   kusa: () => <IntiCover06 />,
   "kusa-sample-pack": () => <IntiCover06SamplePack />,
   "kusa-banner": () => <IntiKusaBanner />,
+  "kusa-banner-stem-pack": () => <IntiKusaBannerStemPack />,
 };
 
 // Disable indexing — this route is internal tooling.

@@ -452,14 +452,89 @@ export function IntiKusaBanner({ className = "" }: { className?: string }) {
   );
 }
 
-// ---- Cover 06 / Sample Pack variant ----
+// ---- KUSA Banner / Stem Pack variant ----
+
+/**
+ * Wraps the regular Inti × KUSA banner with a wax-stamp overlay reading
+ * "STEM PACK · 12 LOOPS · 1 ONE-SHOT". Same paper-card + ink-border +
+ * hard offset shadow as the DROPPING stamp on the release page, so the
+ * banner reads as kin of the rest of the KUSA artifacts. Use this for
+ * Gumroad's hero strip on the stem-pack product page.
+ *
+ * Rendered via /cover-export/kusa-banner-stem-pack at 1920×600.
+ */
+export function IntiKusaBannerStemPack({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`relative ${className}`}
+      style={{
+        width: "100%",
+        aspectRatio: "1920 / 600",
+        containerType: "inline-size",
+      }}
+    >
+      <IntiKusaBanner />
+      {/* Stem-pack wax stamp — top-right corner, rotated like a sticker.
+          Paper card, ink border, lamp-yellow hard-offset shadow (matches
+          the DROPPING stamp's wax-seal feel). Sized via cqi so it scales
+          with the banner if displayed smaller. */}
+      <div
+        style={{
+          position: "absolute",
+          top: "3cqi",
+          right: "3cqi",
+          transform: "rotate(-6deg)",
+          zIndex: 30,
+          background: "#F4EFE6",
+          border: "0.2cqi solid #0B0B0B",
+          padding: "1cqi 1.8cqi",
+          boxShadow: "0.4cqi 0.4cqi 0 #F2B705",
+          textAlign: "center",
+        }}
+      >
+        <div
+          style={{
+            fontFamily: "Antonio, sans-serif",
+            fontWeight: 700,
+            fontSize: "4cqi",
+            lineHeight: 0.9,
+            letterSpacing: "-0.02em",
+            color: "#0B0B0B",
+            textTransform: "uppercase",
+          }}
+        >
+          Stem Pack
+        </div>
+        <div
+          style={{
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: "1.1cqi",
+            letterSpacing: "0.18em",
+            color: "#3A362E",
+            marginTop: "0.4cqi",
+            textTransform: "uppercase",
+            fontWeight: 700,
+          }}
+        >
+          12 loops · 1 one-shot
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---- Cover 06 / Stem Pack variant ----
 
 /**
  * Same Cover 06 composition (matches the release artwork), with a
- * "SAMPLE PACK" wax-stamp overlay top-right. Use this for the Gumroad
- * sample pack product cover so the pack reads as a clear kin of the
+ * "STEM PACK" wax-stamp overlay top-right. Use this for the Gumroad
+ * stem-pack product cover so the pack reads as a clear kin of the
  * release — same world, different deliverable. Rendered via
  * /cover-export/kusa-sample-pack at 3000×3000 for upload.
+ *
+ * Naming note: the function is still IntiCover06SamplePack to avoid
+ * breaking the cover-export slug, but the visible text + the product
+ * positioning are now "STEM PACK" (Nick's rename — stems > samples).
  */
 export function IntiCover06SamplePack({ className = "" }: { className?: string }) {
   return (
@@ -493,7 +568,7 @@ export function IntiCover06SamplePack({ className = "" }: { className?: string }
             textTransform: "uppercase",
           }}
         >
-          Sample Pack
+          Stem Pack
         </div>
         <div
           style={{
