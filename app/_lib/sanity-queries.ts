@@ -847,6 +847,27 @@ export async function getAllPress(): Promise<PressQuoteItem[]> {
   `);
 }
 
+/**
+ * Every press piece from a given outlet. Used on the brand/partner pages
+ * (/partners/[slug]) to auto-render an "every piece they wrote about me"
+ * section — so the brand page becomes a one-stop hub for everything
+ * connecting Nick to that outlet (their marquee article + every other
+ * mention).
+ *
+ * Matches the brand name case-insensitively against the press doc's
+ * `outlet` field. Falls back to matching `source` (legacy field) too.
+ */
+export async function getPressByOutlet(outletName: string): Promise<PressQuoteItem[]> {
+  return sanityFetch<PressQuoteItem[]>(groq`
+    *[_type == "pressQuote" && (
+      lower(outlet) == lower($name) ||
+      lower(source) == lower($name)
+    )] | order(coalesce(date, year + "-01-01", "0000") desc) {
+      ${pressProjection}
+    }
+  `, { name: outletName });
+}
+
 export async function getPressForRelease(releaseSlug: string): Promise<PressQuoteItem[]> {
   return sanityFetch<PressQuoteItem[]>(groq`
     *[_type == "pressQuote" && relatedRelease->slug.current == $slug]

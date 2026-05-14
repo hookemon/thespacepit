@@ -4,7 +4,7 @@ import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
-import { getBrandBySlug, getBrandSlugs, getVideosForBrand, getGearForBrand } from "../../_lib/sanity-queries";
+import { getBrandBySlug, getBrandSlugs, getVideosForBrand, getGearForBrand, getPressByOutlet } from "../../_lib/sanity-queries";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
 import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
@@ -38,6 +38,12 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
   // re-listing in productsUsed[] — for brands like Teenage Engineering with
   // 14+ pieces this is way better than hand-curating.
   const fullRack = await getGearForBrand(brand.name);
+  // Pull every press piece by this brand (their outlet name = brand name).
+  // Excludes the marquee article (brand.articleUrl) which is already
+  // rendered up top, so this section is the "every other thing they
+  // wrote" — Push at Sónar, sample-flip roundups, NAMM features, etc.
+  const allBrandPress = await getPressByOutlet(brand.name);
+  const otherPress = allBrandPress.filter((p) => p.url && p.url !== brand.articleUrl);
 
   const logo = brand.logo ? urlFor(brand.logo).width(900).height(900).fit("max").url() : null;
   // Hero background: prefer explicit backgroundImage, fall back to the
@@ -498,6 +504,59 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
             )}
 
             <RelatedVideos videos={brandVideos} eyebrow={`FROM THE CHANNEL · ${brandVideos.length}`} title="every video tagged here" theme="dark" />
+
+            {/* === EVERY OTHER PRESS PIECE FROM THIS OUTLET === auto-pulled
+                via outlet name match. Excludes the marquee article shown up
+                top. So Ableton gets: Push at Sónar, Rhythm Roundup, NAMM
+                Showcase, etc. Empty when nothing else exists. Same auto-
+                pull works for every brand. */}
+            {otherPress.length > 0 && (
+              <section className="mt-16">
+                <div className="flex items-baseline justify-between gap-3 border-b-2 border-paper pb-2 mb-6">
+                  <div>
+                    <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-1">
+                      MORE FROM {brand.name.toUpperCase()}
+                    </div>
+                    <h2 className="font-display font-bold uppercase m-0" style={{ fontSize: "clamp(32px, 4vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}>
+                      everything they ran
+                    </h2>
+                  </div>
+                  <div className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 shrink-0 tabular-nums">
+                    {otherPress.length} {otherPress.length === 1 ? "piece" : "pieces"}
+                  </div>
+                </div>
+                <ul className="grid gap-3">
+                  {otherPress.map((p) => {
+                    const dateLabel = p.date
+                      ? new Date(p.date + "T00:00:00").toLocaleDateString("en-US", { year: "numeric", month: "short" })
+                      : p.year ?? "—";
+                    return (
+                      <li key={p._id}>
+                        <a
+                          href={p.url ?? "#"}
+                          target={p.url ? "_blank" : undefined}
+                          rel={p.url ? "noopener noreferrer" : undefined}
+                          className="group flex items-baseline gap-4 py-3 border-b border-paper/15 hover:bg-paper/5 transition-colors no-underline text-paper px-2 -mx-2"
+                        >
+                          <span className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 shrink-0 w-20 tabular-nums">
+                            {dateLabel}
+                          </span>
+                          <span className="font-mono text-[9px] tracking-[.18em] uppercase text-redline/80 shrink-0 w-24">
+                            {p.kind ?? "mention"}
+                          </span>
+                          <span className="flex-1 font-display font-semibold text-[18px] uppercase leading-tight tracking-[-0.005em] group-hover:underline underline-offset-4">
+                            {p.headline ?? p.quote.slice(0, 80)}
+                          </span>
+                          <span className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2 shrink-0 opacity-50 group-hover:opacity-100">
+                            ↗
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
           </div>
         </article>
       </main>
