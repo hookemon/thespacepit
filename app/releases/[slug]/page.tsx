@@ -278,6 +278,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                   artist={artistNames}
                   isPrivate={isDropping}
                   compact
+                  altSrc={release.promoAudioAlt}
+                  altLabel={release.promoAudioAltLabel ?? "instrumental"}
                 />
               )}
 

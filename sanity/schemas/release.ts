@@ -97,6 +97,27 @@ export const release = defineType({
       description: "Fallback if the MP3 lives on an external CDN (Dropbox direct link, Drive direct, etc.) instead of being uploaded to Sanity.",
     }),
     defineField({
+      name: "promoAudioAlt",
+      title: "Promo audio · alternate (instrumental, dub, etc.)",
+      type: "file",
+      description:
+        "Optional second track in the player — typically the instrumental. Renders a tiny toggle between this and the main promoAudio.",
+      options: { accept: "audio/mp3,audio/mpeg,audio/wav,audio/mp4" },
+    }),
+    defineField({
+      name: "promoAudioAltUrl",
+      title: "Promo audio · alternate URL (external)",
+      type: "url",
+      description: "External-CDN fallback for the alternate track.",
+    }),
+    defineField({
+      name: "promoAudioAltLabel",
+      title: "Alternate track label",
+      type: "string",
+      description: 'Default "instrumental" — could be "dub", "radio edit", "acapella", etc.',
+      initialValue: "instrumental",
+    }),
+    defineField({
       name: "coverColor",
       title: "Fallback cover color (if no art yet)",
       type: "string",

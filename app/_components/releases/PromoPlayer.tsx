@@ -18,6 +18,11 @@ import { useEffect, useRef, useState } from "react";
  * interactive thing after the art. Mobile-first: big tap target on the play
  * button (44px+), scrubber stays touchable.
  */
+export interface PromoTrack {
+  src: string;
+  label: string;
+}
+
 export function PromoPlayer({
   src,
   title,
@@ -25,6 +30,8 @@ export function PromoPlayer({
   isPrivate = false,
   accent = "#F2B705",
   compact = false,
+  altSrc,
+  altLabel = "instrumental",
 }: {
   src: string;
   title: string;
@@ -35,13 +42,39 @@ export function PromoPlayer({
    *  button, no artist line (cover already shows it). Use when the player
    *  lives inside a narrow column. */
   compact?: boolean;
+  /** Optional alternate track. When set, renders a toggle between MAIN and
+   *  ALT (typically the instrumental). Swapping pauses + resets the
+   *  current playback. */
+  altSrc?: string;
+  altLabel?: string;
 }) {
+  // Which track is currently loaded — index into [main, alt].
+  const [trackIdx, setTrackIdx] = useState<0 | 1>(0);
+  const tracks: PromoTrack[] = altSrc
+    ? [{ src, label: "main" }, { src: altSrc, label: altLabel }]
+    : [{ src, label: "main" }];
+  const currentSrc = tracks[trackIdx].src;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState(false);
   const [progress, setProgress] = useState(0); // 0..1
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [bufferProgress, setBufferProgress] = useState(0);
+
+  // Switching tracks pauses + resets — keeps the UX honest (you don't want
+  // the play position to mysteriously carry over between versions).
+  const switchTrack = (idx: 0 | 1) => {
+    if (idx === trackIdx) return;
+    const a = audioRef.current;
+    if (a) {
+      a.pause();
+      a.currentTime = 0;
+    }
+    setTrackIdx(idx);
+    setProgress(0);
+    setCurrentTime(0);
+    setPlaying(false);
+  };
 
   // Wire <audio> events → state. Cleanup on unmount.
   useEffect(() => {
@@ -105,8 +138,33 @@ export function PromoPlayer({
   };
 
   return (
-    <div className={`border-2 border-ink bg-paper flex items-center ${compact ? "p-3 gap-3" : "p-4 sm:p-5 gap-4 sm:gap-5 max-w-[760px]"}`}>
-      <audio ref={audioRef} src={src} preload="metadata" />
+    <div className={`border-2 border-ink bg-paper ${compact ? "p-3" : "p-4 sm:p-5 max-w-[760px]"}`}>
+      <audio ref={audioRef} src={currentSrc} preload="metadata" />
+      {/* Track toggle — only renders when a second track is provided.
+          Sits above the main player row so the binary choice is clear
+          before they hit play. */}
+      {tracks.length > 1 && (
+        <div className="flex items-center gap-1 mb-3">
+          {tracks.map((t, i) => {
+            const active = i === trackIdx;
+            return (
+              <button
+                key={t.label}
+                type="button"
+                onClick={() => switchTrack(i as 0 | 1)}
+                className="font-mono text-[9px] tracking-[.18em] uppercase px-2.5 py-1 border-2 border-ink transition-colors"
+                style={{
+                  background: active ? "#0B0B0B" : "transparent",
+                  color: active ? accent : "#0B0B0B",
+                }}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <div className={`flex items-center ${compact ? "gap-3" : "gap-4 sm:gap-5"}`}>
       {/* Play / pause button — big tap target, brand-color background when paused, ink when playing */}
       <button
         type="button"
@@ -195,6 +253,7 @@ export function PromoPlayer({
           </div>
         )}
       </div>
+      </div>{/* end inner player row */}
     </div>
   );
 }

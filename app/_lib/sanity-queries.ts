@@ -114,6 +114,11 @@ export type ReleaseDetail = ReleaseListItem & {
    *  external promoAudioUrl fallback. Set by the page projection. Powers
    *  the in-house PromoPlayer that sits right below the cover. */
   promoAudio?: string;
+  /** Optional second track (typically the instrumental). Same coalesce
+   *  pattern as `promoAudio`. When present the player renders a toggle. */
+  promoAudioAlt?: string;
+  /** Label for the alternate track in the toggle UI. */
+  promoAudioAltLabel?: string;
   relatedSession?: { title: string; slug: string; date: string; gallery?: SanityImage[] };
 };
 
@@ -604,6 +609,8 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
       // OR fall back to the external promoAudioUrl. Page reads "promoAudio"
       // regardless of source.
       "promoAudio": coalesce(promoAudio.asset->url, promoAudioUrl),
+      "promoAudioAlt": coalesce(promoAudioAlt.asset->url, promoAudioAltUrl),
+      promoAudioAltLabel,
       // Bulk lookup: every artist doc's name → slug. Keyed by LOWERCASED
       // name in JS land so we can resolve feature strings (which are
       // free-text, not refs) to slugs without N round-trips. GROQ's
