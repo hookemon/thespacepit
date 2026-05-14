@@ -12,6 +12,7 @@ import { sanityFetch, urlFor } from "../../_lib/sanity";
 import type { ReleaseListItem } from "../../_lib/sanity-queries";
 import { getPressForEra } from "../../_lib/sanity-queries";
 import { PressGrid } from "../../_components/shared/PressGrid";
+import { CollectionJsonLd } from "../../_components/shared/CollectionJsonLd";
 import { SHOWS } from "../../_lib/shows";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { groq } from "next-sanity";
@@ -55,6 +56,12 @@ export default async function MWCWorldPage() {
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
+      <CollectionJsonLd
+        path="/collabs/men-women-children"
+        name="Men Women & Children — Nick Hook's first band"
+        description="Reprise / Warner Bros. 2004–2008. Press archive, videos, tour history. 20-year anniversary in 2026."
+        items={releases.map((r) => ({ slug: r.slug, title: r.title }))}
+      />
       <TopNav current="nick" />
       <main className="flex-1">
         {/* === HERO === */}

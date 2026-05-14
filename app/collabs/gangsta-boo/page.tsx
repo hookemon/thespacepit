@@ -15,6 +15,7 @@ import { urlFor } from "../../_lib/sanity";
 import type { ReleaseListItem } from "../../_lib/sanity-queries";
 import { getPressForEra } from "../../_lib/sanity-queries";
 import { PressGrid } from "../../_components/shared/PressGrid";
+import { CollectionJsonLd } from "../../_components/shared/CollectionJsonLd";
 import { SHOWS } from "../../_lib/shows";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { groq } from "next-sanity";
@@ -177,6 +178,12 @@ export default async function BooHookPage() {
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
+      <CollectionJsonLd
+        path="/collabs/gangsta-boo"
+        name="Gangsta Boo + Nick Hook — the world"
+        description="Three 6 → Brooklyn. Studio sessions, radio drops, unreleased takes. The QOQEQA hyper-merengue remix dropping August 2026."
+        items={releases.map((r) => ({ slug: r.slug, title: r.title }))}
+      />
       <TopNav current="nick" />
       <main className="flex-1">
         {/* === HERO === big BOO logo on the ink ground, dedication subtitle */}

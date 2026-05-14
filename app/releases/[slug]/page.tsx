@@ -681,18 +681,54 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                         );
                       })}
                     </ul>
-                    {locationRoles.length > 0 && (
-                      <div className="mt-8 pt-6 border-t border-ink/30 text-center">
-                        <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
-                          {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
+                    {locationRoles.length > 0 && (() => {
+                      // Flatten all location credits into a single ordered list,
+                      // each becoming a clickable studio link when matched.
+                      const locs = locationRoles.flatMap((role) => byRole.get(role)!);
+                      return (
+                        <div className="mt-8 pt-6 border-t border-ink/30 text-center">
+                          <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
+                            {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
+                          </div>
+                          <div className="font-display text-[18px] uppercase tracking-[-0.005em] flex flex-wrap justify-center items-baseline gap-x-2 gap-y-1">
+                            {locs.map((c, i) => {
+                              const display = c.name ?? c.person?.name ?? "—";
+                              const city = c.instrument;
+                              const linkHref = c.studio?.slug
+                                ? `/studios/${c.studio.slug}`
+                                : null;
+                              const label = (
+                                <>
+                                  {linkHref ? (
+                                    <Link
+                                      href={linkHref}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {display}
+                                    </Link>
+                                  ) : (
+                                    display
+                                  )}
+                                  {city && (
+                                    <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 ml-1.5">
+                                      · {city}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                              return (
+                                <span key={i} className="inline-flex items-baseline">
+                                  {label}
+                                  {i < locs.length - 1 && (
+                                    <span className="text-ink-3 mx-2">·</span>
+                                  )}
+                                </span>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="font-display text-[18px] uppercase tracking-[-0.005em]">
-                          {locationRoles
-                            .flatMap((role) => byRole.get(role)!.map((c) => c.name ?? c.person?.name).filter(Boolean))
-                            .join("  ·  ")}
-                        </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 </Room>
               );

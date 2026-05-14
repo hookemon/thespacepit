@@ -70,7 +70,12 @@ export type ReleaseCredit = {
   name?: string;
   /** Resolved person doc (when the credit was wired up via reference). */
   person?: { name: string; slug: string; portrait?: SanityImage };
-  /** Optional instrument / detail (e.g. "vintage Wurlitzer", "DW Collector's"). */
+  /** Resolved studio doc — only set for "Recorded at" credits when the
+   *  free-text `name` matches an existing studio's name (case-insensitive).
+   *  Drives the clickable link on the release page. */
+  studio?: { name: string; slug: string };
+  /** Optional instrument / detail (e.g. "vintage Wurlitzer", "DW Collector's").
+   *  For location credits ("Recorded at"), this carries the city. */
   instrument?: string;
   /** Optional per-track scope. When set, this credit applies ONLY to those
    *  track titles. Empty/undefined = album-wide. Used by the per-song
@@ -103,6 +108,10 @@ export type ReleaseDetail = ReleaseListItem & {
   bandcampAlbumId?: string;
   youtubeUrl?: string;
   soundcloudUrl?: string;
+  /** Single hero music video URL — slotted into the release page's HERO
+   *  player when set. Distinct from `videos[]` (the secondary grid) and
+   *  `youtubePlaylistId` (the auto-fetched playlist). */
+  mainVideoUrl?: string;
   youtubePlaylistId?: string;
   videos?: { title?: string; youtubeUrl: string }[];
   tracklist?: Track[];
@@ -600,7 +609,11 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
         name,
         instrument,
         tracks,
-        "person": person->{ name, "slug": slug.current, portrait }
+        "person": person->{ name, "slug": slug.current, portrait },
+        "studio": *[_type == "studio" && name == ^.name][0]{
+          name,
+          "slug": slug.current
+        }
       },
       gallery,
       linerNotes,
@@ -886,6 +899,26 @@ export async function getPressByOutlet(outletName: string): Promise<PressQuoteIt
       ${pressProjection}
     }
   `, { name: outletName });
+}
+
+/**
+ * Press attached to a brand via the explicit `relatedBrand` reference,
+ * OR by case-insensitive outlet name match. Used on /partners/[slug]
+ * pages so brands surface every piece we have for that outlet.
+ *
+ * Combining ref + name match means pieces written before we added the
+ * brand doc (or before the auto-linker ran) still show up.
+ */
+export async function getPressForBrand(brandSlug: string, brandName: string): Promise<PressQuoteItem[]> {
+  return sanityFetch<PressQuoteItem[]>(groq`
+    *[_type == "pressQuote" && (
+      relatedBrand->slug.current == $slug ||
+      lower(outlet) == lower($name) ||
+      lower(source) == lower($name)
+    )] | order(coalesce(date, year + "-01-01", "0000") desc) {
+      ${pressProjection}
+    }
+  `, { slug: brandSlug, name: brandName });
 }
 
 export async function getPressForRelease(releaseSlug: string): Promise<PressQuoteItem[]> {

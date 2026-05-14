@@ -139,6 +139,15 @@ export const pressQuote = defineType({
       fieldset: "relations",
     }),
     defineField({
+      name: "relatedBrand",
+      title: "Related brand / outlet",
+      type: "reference",
+      to: [{ type: "brand" }],
+      fieldset: "relations",
+      description:
+        "If we have a brand doc for the outlet (FADER, RBMA, Lot Radio, Sound on Sound), link it. Surfaces this piece on the brand's /partners page. Distinct from the free-text `outlet` field above — keep both so the display string can stay verbatim while the link drives discovery.",
+    }),
+    defineField({
       name: "featured",
       title: "Pin to the press wall",
       type: "boolean",

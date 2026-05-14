@@ -15,6 +15,7 @@ import { sanityFetch, urlFor } from "../../_lib/sanity";
 import type { ReleaseListItem } from "../../_lib/sanity-queries";
 import { getPressForEra } from "../../_lib/sanity-queries";
 import { PressGrid } from "../../_components/shared/PressGrid";
+import { CollectionJsonLd } from "../../_components/shared/CollectionJsonLd";
 import { SHOWS } from "../../_lib/shows";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { groq } from "next-sanity";
@@ -60,6 +61,12 @@ export default async function RtjWorldPage() {
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
+      <CollectionJsonLd
+        path="/collabs/run-the-jewels"
+        name="Run The Jewels + Nick Hook — the world"
+        description="Every record, every show, every video. 8 releases · 37 documented performances · 57 videos. 2013 → today."
+        items={releases.map((r) => ({ slug: r.slug, title: r.title }))}
+      />
       <TopNav current="nick" />
       <main className="flex-1">
         {/* === HERO === */}

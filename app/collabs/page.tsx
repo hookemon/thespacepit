@@ -15,6 +15,7 @@ import { STUDIO_CLIENTS } from "../_lib/studio-clients";
 import { resolveArtistSlugs } from "../_lib/sanity-queries";
 import { sanityFetch, urlFor } from "../_lib/sanity";
 import type { SanityImage } from "../_lib/sanity-queries";
+import { buildCollectionJsonLd, jsonLdScript } from "../_lib/schema-jsonld";
 
 export const metadata = {
   title: "collabs — nick hook",
@@ -137,8 +138,27 @@ export default async function CollabsIndex() {
     resolveArtistSlugs(STUDIO_CLIENTS),
     loadChapterData(),
   ]);
+
+  // CollectionPage JSON-LD — tells Google this is an editorial collection
+  // of multiple collaboration worlds. ItemList carries the 4 chapter slugs
+  // so Google can build a carousel-style rich result.
+  const jsonLd = buildCollectionJsonLd({
+    url: "https://thespacepit.com/collabs",
+    name: "collabs — nick hook",
+    description:
+      "the deep collab worlds. RTJ. Men Women + Children. Cubic Zirconia. Gangsta Boo. Each one's a full chapter.",
+    items: COLLABS.map((c) => ({
+      url: `https://thespacepit.com/collabs/${c.slug}`,
+      name: c.title,
+    })),
+  });
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
       <TopNav current="nick" />
       <main className="flex-1 bg-ink text-paper">
         <header className="px-5 sm:px-8 pt-16 pb-10 border-b-2 border-paper">

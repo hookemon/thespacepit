@@ -11,6 +11,7 @@ import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { sanityFetch, urlFor } from "../../_lib/sanity";
 import type { ReleaseListItem } from "../../_lib/sanity-queries";
+import { CollectionJsonLd } from "../../_components/shared/CollectionJsonLd";
 import { getPressForEra } from "../../_lib/sanity-queries";
 import { PressGrid } from "../../_components/shared/PressGrid";
 import { SHOWS } from "../../_lib/shows";
@@ -57,6 +58,12 @@ export default async function CubicZirconiaWorldPage() {
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
+      <CollectionJsonLd
+        path="/collabs/cubic-zirconia"
+        name="Cubic Zirconia — Tiombe Lockhart × Nick Hook"
+        description="Brooklyn 2009–2012. 9 releases (FUCK WORK → Darko), 34 documented shows, the Lockhart Dynasty × Calm + Collect sub-imprint."
+        items={releases.map((r) => ({ slug: r.slug, title: r.title }))}
+      />
       <TopNav current="nick" />
       <main className="flex-1">
         {/* === HERO === */}

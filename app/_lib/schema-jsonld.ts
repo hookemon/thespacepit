@@ -149,6 +149,46 @@ export function buildPackJsonLd(pack: {
   };
 }
 
+// ── collection (collabs chapter / index) → CollectionPage ──────────────────
+
+/**
+ * CollectionPage schema for /collabs/<slug> subworld hubs. These pages
+ * group every record from a given collaboration era (RTJ, MWC, CZ, Boo).
+ * Tells Google "this is an editorial collection of multiple works."
+ *
+ * `items` is the list of release URLs in the collection — Google uses
+ * this to render carousel-style rich results when available.
+ */
+export function buildCollectionJsonLd(opts: {
+  url: string;
+  name: string;
+  description?: string;
+  items?: Array<{ url: string; name: string }>;
+}): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": opts.url,
+    name: opts.name,
+    url: opts.url,
+    ...(opts.description ? { description: opts.description } : {}),
+    ...(opts.items && opts.items.length > 0
+      ? {
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: opts.items.length,
+            itemListElement: opts.items.map((it, i) => ({
+              "@type": "ListItem",
+              position: i + 1,
+              url: it.url,
+              name: it.name,
+            })),
+          },
+        }
+      : {}),
+  };
+}
+
 // ── brand → Organization ───────────────────────────────────────────────────
 
 export function buildBrandJsonLd(brand: {
