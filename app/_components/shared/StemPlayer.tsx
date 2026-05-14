@@ -10,9 +10,14 @@ const PALETTE = ["#F2B705", "#E83A1C", "#7BD3A8", "#C9B9E8", "#FF6FB5", "#65C7F7
 // Soft-clip distortion curve for the WaveShaper node. `amount` 0..1 — at 0
 // the curve is essentially linear (clean), at 1 it's a heavy soft saturation
 // reminiscent of a Rat through a tape stage.
-function makeDistortionCurve(amount: number): Float32Array {
+// Web Audio's WaveShaperNode.curve setter expects Float32Array<ArrayBuffer>
+// specifically — not Float32Array<ArrayBufferLike>. Node 24's stricter TS
+// lib distinguishes the two; constructing the Float32Array from an explicit
+// ArrayBuffer locks the generic so Next 16's build-time tsc accepts it.
+function makeDistortionCurve(amount: number): Float32Array<ArrayBuffer> {
   const n = 256;
-  const curve = new Float32Array(n);
+  const buf = new ArrayBuffer(n * Float32Array.BYTES_PER_ELEMENT);
+  const curve = new Float32Array(buf);
   const k = Math.max(0, amount) * 60;
   for (let i = 0; i < n; i += 1) {
     const x = (i * 2) / n - 1;
