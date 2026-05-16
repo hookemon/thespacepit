@@ -31,12 +31,18 @@ export function NewsletterForm({
     const form = e.currentTarget;
     const data = new FormData(form);
     const email = (data.get("email") ?? "").toString();
+    // Honeypot — a hidden field bots tend to fill. If non-empty, we still
+    // surface a fake "success" UI without hitting the API.
+    const website = (data.get("website") ?? "").toString();
+    // Capture the page the user signed up from. Used as source fallback
+    // when no explicit source prop was passed.
+    const pathname = typeof window !== "undefined" ? window.location.pathname : undefined;
 
     try {
       const res = await fetch("/api/newsletter", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, audienceId, source }),
+        body: JSON.stringify({ email, audienceId, source, website, pathname }),
       });
       const payload = await res.json().catch(() => ({}));
       if (!res.ok) {
@@ -69,6 +75,21 @@ export function NewsletterForm({
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3 max-w-[560px]">
+      {/* Honeypot — visually hidden + flagged off-screen + aria-hidden. Bots
+          tend to fill every <input> on a form, so a non-empty value here
+          tells us this isn't a real human. Don't use display:none — many
+          bots skip those. */}
+      <div aria-hidden className="absolute opacity-0 pointer-events-none" style={{ left: "-9999px", height: 0, width: 0 }}>
+        <label>
+          your website (leave blank)
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </label>
+      </div>
       <label className="flex-1 block">
         <span className="sr-only">email</span>
         <input
