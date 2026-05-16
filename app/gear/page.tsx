@@ -4,7 +4,7 @@ import { getGear } from "../_lib/sanity-queries";
 import { FOOTER_LINKS } from "../_lib/social-links";
 import { GearClient } from "./GearClient";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = {
   title: "gear — thespacepit",

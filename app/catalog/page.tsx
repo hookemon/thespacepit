@@ -5,7 +5,7 @@ import { getCatalogForArtist, getProjectBySlug } from "../_lib/sanity-queries";
 import { FOOTER_LINKS } from "../_lib/social-links";
 import { CatalogClient } from "./CatalogClient";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export const metadata = {
   title: "the catalog — nick hook",

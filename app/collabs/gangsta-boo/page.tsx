@@ -16,6 +16,7 @@ import type { ReleaseListItem } from "../../_lib/sanity-queries";
 import { getPressForEra } from "../../_lib/sanity-queries";
 import { PressGrid } from "../../_components/shared/PressGrid";
 import { CollectionJsonLd } from "../../_components/shared/CollectionJsonLd";
+import { BooWall } from "./_components/BooWall";
 import { SHOWS } from "../../_lib/shows";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { groq } from "next-sanity";
@@ -186,20 +187,12 @@ export default async function BooHookPage() {
       />
       <TopNav current="nick" />
       <main className="flex-1">
-        {/* === HERO === big BOO logo on the ink ground, dedication subtitle */}
-        <section className="relative overflow-hidden">
-          {/* Soft halloween-flyer wash, very low opacity, just for texture */}
-          <div
-            className="absolute inset-0 opacity-[0.08]"
-            style={{
-              backgroundImage: "url(/boo/halloween-flyer.jpg)",
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              filter: "blur(8px) saturate(1.3)",
-            }}
-            aria-hidden
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-ink/40 via-ink/85 to-ink" aria-hidden />
+        {/* === HERO === big BOO logo on the ink ground, dedication subtitle.
+            Background: the full BOO VAULT photo wall — every image we
+            have from the relationship, tiled as a textured backdrop with
+            ink fade + yellow radial wash on top. */}
+        <section className="relative overflow-hidden isolate">
+          <BooWall variant="hero" />
 
           <div className="relative px-5 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28 max-w-[1180px] mx-auto">
             <Link

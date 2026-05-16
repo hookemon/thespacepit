@@ -9,7 +9,7 @@ import { urlFor } from "../../_lib/sanity";
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getStudioSlugs();

@@ -10,7 +10,7 @@ import { FOOTER_LINKS } from "../../_lib/social-links";
 import { HorizontalJourney } from "./HorizontalJourney";
 import { CollageEra } from "./CollageEra";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getProjectSlugs();

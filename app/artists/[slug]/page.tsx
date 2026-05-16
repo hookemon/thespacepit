@@ -8,7 +8,7 @@ import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 import { buildArtistJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getArtistSlugs();

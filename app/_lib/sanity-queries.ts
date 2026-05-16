@@ -14,6 +14,10 @@ export type ReleaseListItem = {
   format?: string;
   tagline?: string;
   cover?: SanityImage;
+  /** Optional full-bleed background image for the release page. Heavily
+   *  darkened + tinted so it reads as TEXTURE behind the content (think:
+   *  the Boo signature on the Glove page). */
+  pageBackgroundImage?: SanityImage;
   coverColor?: string;
   artists: { name: string; slug: string }[];
   bandcampUrl?: string;
@@ -392,6 +396,7 @@ const releaseListProjection = `
   format,
   tagline,
   cover,
+  pageBackgroundImage,
   coverColor,
   bandcampUrl,
   spotifyUrl,

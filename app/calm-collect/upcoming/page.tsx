@@ -18,7 +18,7 @@ const LIVE_COVERS: Record<string, () => ReactElement> = {
   // most catalog releases.
 };
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 const SHARE_IMAGE_URL = "https://cdn.sanity.io/images/7vj6i0c4/production/479a23eb498fc365662475995aae4529d9fd6ebb-3000x3000.jpg?w=1200&h=1200&fit=crop";
 

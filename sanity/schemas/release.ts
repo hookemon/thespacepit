@@ -83,6 +83,14 @@ export const release = defineType({
     }),
     defineField({ name: "cover", title: "Cover art", type: "image", options: { hotspot: true } }),
     defineField({
+      name: "pageBackgroundImage",
+      title: "Release page background image",
+      type: "image",
+      options: { hotspot: true },
+      description:
+        "Optional. When set, renders as a fixed full-bleed wash behind the entire release page. Heavily darkened + tinted with `coverColor` so it sits as TEXTURE behind the content, not foreground. Use for releases where you have a strong contextual photo (a wall scrawl, a studio shot, a courtroom screenshot, etc.) that frames the record's world.",
+    }),
+    defineField({
       name: "promoAudio",
       title: "Promo audio (private MP3)",
       type: "file",

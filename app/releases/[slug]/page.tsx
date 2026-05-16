@@ -19,7 +19,7 @@ import { VideoPlaylist } from "../../_components/shared/VideoPlaylist";
 import { IntiCover06, IntiCover07 } from "../../_components/releases/IntiCover06";
 import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
-import { urlFor } from "../../_lib/sanity";
+import { urlFor, sanityFetch } from "../../_lib/sanity";
 import { buildMusicAlbumJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
 
 // Per-release custom cover components — when a release has a fully
@@ -35,7 +35,7 @@ const LIVE_COVERS: Record<string, () => ReactElement> = {
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const slugs = await getReleaseSlugs();
@@ -160,6 +160,49 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
   // Videos auto-attached to this release (set via /studio → video.relatedRelease).
   const releaseVideos = await getVideosForRelease(slug);
 
+  // "Lil clickables" — for each primary artist on THIS release, surface up
+  // to 2 OTHER releases they're on (either as primary or via credits[]).
+  // Renders as small chips under the artist's name in the hero. Lets you
+  // jump cross-catalogue without going through the full artist page —
+  // e.g. seeing Pawmps on RTJ CU4TRO right next to her name on Glove.
+  //
+  // We pass the current release's _id as a parameter (instead of the GROQ
+  // ancestor `^.^._id`) so the self-exclusion is reliable.
+  const crosslinksRaw = await sanityFetch<
+    Array<{
+      artistSlug: string;
+      others: Array<{ title: string; slug: string; year?: number }>;
+    }>
+  >(
+    `*[_type == "release" && slug.current == $slug][0].artists[]->{
+      "artistSlug": slug.current,
+      "others": *[
+        _type == "release"
+        && withdrawn != true
+        && _id != $releaseId
+        && (references(^._id) || ^._id in credits[].person._ref)
+      ] | order(coalesce(year, 0) desc) [0...2]
+        { title, "slug": slug.current, year }
+    }`,
+    { slug, releaseId: release._id },
+  );
+  // Dedupe per-artist across the two queries (same release could appear in
+  // both branches if the artist is both primary AND credited).
+  const artistCrosslinks: Record<
+    string,
+    Array<{ title: string; slug: string; year?: number }>
+  > = {};
+  for (const row of crosslinksRaw) {
+    const seen = new Set<string>();
+    artistCrosslinks[row.artistSlug] = row.others
+      .filter((o: { title: string; slug: string; year?: number }) => {
+        if (seen.has(o.slug)) return false;
+        seen.add(o.slug);
+        return true;
+      })
+      .slice(0, 2);
+  }
+
   // Press attached to this release — historical write-ups, premieres, reviews.
   // Renders as a slim "what they said" rail near the bottom of the page.
   const releasePress = await getPressForRelease(slug);
@@ -247,11 +290,42 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
         dangerouslySetInnerHTML={{ __html: albumJsonLd }}
       />
       <TopNav current="label" />
-      <main
-        className="flex-1 text-ink"
-        style={{ background: release.coverColor ?? "var(--color-paper)" }}
-      >
-        <article className="px-6 sm:px-8 py-12">
+      <main className="relative flex-1 text-ink overflow-hidden">
+        {/* Layered page background:
+             1. Solid coverColor (or paper) as the back wash
+             2. Optional pageBackgroundImage tile, overlaid at ~50% opacity
+                so the photo's wall + scrawl actually read
+             3. Cover-color tint on top so the photo gets pulled into the
+                release's palette
+            All three stack as absolutely-positioned siblings BEFORE the
+            <article> so we don't fight CSS's "negative z-index goes
+            behind the parent's background" rule. */}
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{ background: release.coverColor ?? "var(--color-paper)" }}
+          aria-hidden
+        />
+        {release.pageBackgroundImage && (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={urlFor(release.pageBackgroundImage).width(2400).fit("max").url()}
+              alt=""
+              aria-hidden
+              className="pointer-events-none absolute inset-0 w-full h-full object-cover"
+              style={{ opacity: 0.55 }}
+            />
+            <div
+              className="pointer-events-none absolute inset-0"
+              style={{
+                background: release.coverColor ?? "transparent",
+                opacity: 0.4,
+              }}
+              aria-hidden
+            />
+          </>
+        )}
+        <article className="relative px-6 sm:px-8 py-12">
           <div className="max-w-[1180px] mx-auto">
             <Link
               href="/calm-collect#releases"
@@ -365,6 +439,35 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                         {i < release.artists.length - 1 ? " · " : ""}
                       </span>
                     ))}
+                  </div>
+                )}
+
+                {/* Per-artist crosslinks — small clickable chips that show
+                    each artist's other notable appearances. Click a chip to
+                    jump straight to that other release. */}
+                {Object.keys(artistCrosslinks).some((k) => artistCrosslinks[k].length > 0) && (
+                  <div className="mt-3 space-y-1.5">
+                    {release.artists.map((a) => {
+                      const links = artistCrosslinks[a.slug] ?? [];
+                      if (links.length === 0) return null;
+                      return (
+                        <div key={a.slug} className="flex flex-wrap items-baseline gap-1.5 text-[11px]">
+                          <span className="font-mono uppercase tracking-[.14em] text-ink-3 mr-1">
+                            {a.name} also on
+                          </span>
+                          {links.map((l) => (
+                            <Link
+                              key={l.slug}
+                              href={`/releases/${l.slug}`}
+                              className="font-mono uppercase tracking-[.1em] px-2 py-0.5 border border-ink rounded-full hover:bg-ink hover:text-paper transition-colors no-underline text-ink"
+                            >
+                              ↗ {l.title}
+                              {l.year ? ` (${l.year})` : ""}
+                            </Link>
+                          ))}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
@@ -487,6 +590,131 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
 
+            {/* === THE CREDITS === Grouped by role, one line per role, names
+                joined with " + " (vinyl-jacket reading order, not a database
+                table). Sits RIGHT AFTER the bio per Nick — vinyl-jacket
+                reading order = words first, then who played what, THEN you
+                hit play. Recording locations roll into a centered block. */}
+            {release.credits && release.credits.length > 0 && (() => {
+              const ROLE_ORDER = [
+                "Vocals",
+                "Backing vocals",
+                "Produced by",
+                "Co-produced by",
+                "Additional production",
+                "Remix by",
+                "Bass", "Guitar", "Drums", "Keys", "Synth", "Strings", "Programming", "Beats",
+                "Mixed by",
+                "Co-mixed by",
+                "Mastered by",
+              ];
+              const LOCATION_ROLES = new Set(["Recorded at", "Recorded by", "Tracking engineer", "Vocal engineer"]);
+
+              const byRole = new Map<string, typeof release.credits>();
+              for (const c of release.credits) {
+                const k = c.role ?? "—";
+                if (!byRole.has(k)) byRole.set(k, []);
+                byRole.get(k)!.push(c);
+              }
+              const sortRoles = (rs: string[]) => rs.sort((a, b) => {
+                const ai = ROLE_ORDER.indexOf(a);
+                const bi = ROLE_ORDER.indexOf(b);
+                if (ai === -1 && bi === -1) return a.localeCompare(b);
+                if (ai === -1) return 1;
+                if (bi === -1) return -1;
+                return ai - bi;
+              });
+              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !LOCATION_ROLES.has(r)));
+              const locationRoles = [...byRole.keys()].filter((r) => LOCATION_ROLES.has(r));
+
+              return (
+                <Room number="01a" title="the credits" kicker="vinyl jacket">
+                  <div className="max-w-[720px] mx-auto">
+                    <ul className="grid gap-0">
+                      {peopleRoles.map((role) => {
+                        const cs = byRole.get(role)!;
+                        return (
+                          <li
+                            key={role}
+                            className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-ink/15 py-3.5"
+                          >
+                            <span className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 shrink-0 w-[120px]">
+                              {role}
+                            </span>
+                            <span className="flex-1 font-display font-semibold text-[20px] uppercase tracking-[-0.005em] leading-tight">
+                              {cs.map((c, i) => (
+                                <span key={i}>
+                                  {c.person ? (
+                                    <Link
+                                      href={`/artists/${c.person.slug}`}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {c.person.name}
+                                    </Link>
+                                  ) : (
+                                    c.name ?? "—"
+                                  )}
+                                  {i < cs.length - 1 ? <span className="text-ink-3"> + </span> : null}
+                                </span>
+                              ))}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {locationRoles.length > 0 && (() => {
+                      // Flatten all location credits into a single ordered list,
+                      // each becoming a clickable studio link when matched.
+                      const locs = locationRoles.flatMap((role) => byRole.get(role)!);
+                      return (
+                        <div className="mt-8 pt-6 border-t border-ink/30 text-center">
+                          <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
+                            {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
+                          </div>
+                          <div className="font-display text-[18px] uppercase tracking-[-0.005em] flex flex-wrap justify-center items-baseline gap-x-2 gap-y-1">
+                            {locs.map((c, i) => {
+                              const display = c.name ?? c.person?.name ?? "—";
+                              const city = c.instrument;
+                              const linkHref = c.studio?.slug
+                                ? `/studios/${c.studio.slug}`
+                                : null;
+                              const label = (
+                                <>
+                                  {linkHref ? (
+                                    <Link
+                                      href={linkHref}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {display}
+                                    </Link>
+                                  ) : (
+                                    display
+                                  )}
+                                  {city && (
+                                    <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 ml-1.5">
+                                      · {city}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                              return (
+                                <span key={i} className="inline-flex items-baseline">
+                                  {label}
+                                  {i < locs.length - 1 && (
+                                    <span className="text-ink-3 mx-2">·</span>
+                                  )}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </Room>
+              );
+            })()}
+
             {/* === THE AUDIO === Bandcamp player. Shown only when there's NO
                 promoAudio (so it doesn't double-up with the in-house player
                 that sits right under the hero). When you've uploaded an MP3
@@ -522,6 +750,62 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 THE WATCH (see further down). Both positions render the same
                 `samplePackRoom` JSX, declared once below. */}
             {release.slug === "cc029-kusa" && samplePackRoom}
+
+            {/* === THE PHYSICAL === vinyl jackets, test pressings, J-cards,
+                liner-note scans. Hoisted up here (between the bio/audio and
+                the watch room) per Nick's call — the jacket is the artifact
+                you want to see when you're DECIDING to listen, not buried
+                past 16 tracks of credits. Goes unrendered when both arrays
+                are empty. */}
+            {(() => {
+              const liners = release.linerNotes ?? [];
+              const artifacts = release.physicalArtifacts ?? [];
+              if (liners.length === 0 && artifacts.length === 0) return null;
+              const linerPhotos = liners.map((p) => ({
+                src: urlFor(p.image).width(2000).url(),
+                alt: p.caption ?? "",
+              }));
+              return (
+                <Room
+                  number="01b"
+                  title="the physical"
+                  kicker={[
+                    artifacts.length > 0 ? `${artifacts.length} artifact${artifacts.length === 1 ? "" : "s"}` : null,
+                    liners.length > 0 ? `${liners.length} liner page${liners.length === 1 ? "" : "s"}` : null,
+                  ].filter(Boolean).join(" · ")}
+                >
+                  {artifacts.length > 0 && (
+                    <div className={liners.length > 0 ? "mb-8" : ""}>
+                      <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-3">ARTIFACTS</div>
+                      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+                        {artifacts.map((a, i) => {
+                          const src = urlFor(a.image).width(800).fit("max").url();
+                          return (
+                            <figure key={i} className="border border-ink p-3">
+                              <div className="aspect-square overflow-hidden bg-ink-2 mb-2">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={src} alt={a.title ?? ""} loading="lazy" className="w-full h-full object-cover" />
+                              </div>
+                              <figcaption>
+                                {a.kind && <div className="font-mono text-[9px] tracking-[.14em] uppercase text-ink-3">{a.kind.replace(/-/g, " ")}</div>}
+                                {a.title && <div className="font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight mt-0.5">{a.title}</div>}
+                                {a.note && <div className="font-serif italic text-[13px] text-ink-3 mt-1 leading-snug">{a.note}</div>}
+                              </figcaption>
+                            </figure>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                  {liners.length > 0 && (
+                    <div>
+                      <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-3">LINER NOTES</div>
+                      <PhotoGallery photos={linerPhotos} />
+                    </div>
+                  )}
+                </Room>
+              );
+            })()}
 
             {/* === THE WATCH === music videos + reels + performance clips.
                 Renders as a hero player with a clickable thumbnail rail so
@@ -609,185 +893,15 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </Room>
             )}
 
-            {/* === THE CREDITS === Grouped by role, one line per role, names
-                joined with " + " (vinyl-jacket reading order, not a database
-                table). Order: Vocals → Produced by → Remix/co-prod → players →
-                Mixed by → Mastered by. Recording locations get pulled into a
-                centered block below. */}
-            {release.credits && release.credits.length > 0 && (() => {
-              const ROLE_ORDER = [
-                "Vocals",
-                "Backing vocals",
-                "Produced by",
-                "Co-produced by",
-                "Additional production",
-                "Remix by",
-                "Bass", "Guitar", "Drums", "Keys", "Synth", "Strings", "Programming", "Beats",
-                "Mixed by",
-                "Co-mixed by",
-                "Mastered by",
-              ];
-              const LOCATION_ROLES = new Set(["Recorded at", "Recorded by", "Tracking engineer", "Vocal engineer"]);
+            {/* (The credits room used to live here at room 05 but got
+                hoisted up to room 01a — sits right after the bio per Nick.
+                Vinyl-jacket reading order: words → who played what → then
+                you hit play.) */}
 
-              const byRole = new Map<string, typeof release.credits>();
-              for (const c of release.credits) {
-                const k = c.role ?? "—";
-                if (!byRole.has(k)) byRole.set(k, []);
-                byRole.get(k)!.push(c);
-              }
-              const sortRoles = (rs: string[]) => rs.sort((a, b) => {
-                const ai = ROLE_ORDER.indexOf(a);
-                const bi = ROLE_ORDER.indexOf(b);
-                if (ai === -1 && bi === -1) return a.localeCompare(b);
-                if (ai === -1) return 1;
-                if (bi === -1) return -1;
-                return ai - bi;
-              });
-              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !LOCATION_ROLES.has(r)));
-              const locationRoles = [...byRole.keys()].filter((r) => LOCATION_ROLES.has(r));
-
-              return (
-                <Room number="05" title="the credits" kicker="vinyl jacket">
-                  <div className="max-w-[720px] mx-auto">
-                    <ul className="grid gap-0">
-                      {peopleRoles.map((role) => {
-                        const cs = byRole.get(role)!;
-                        return (
-                          <li
-                            key={role}
-                            className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-ink/15 py-3.5"
-                          >
-                            <span className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 shrink-0 w-[120px]">
-                              {role}
-                            </span>
-                            <span className="flex-1 font-display font-semibold text-[20px] uppercase tracking-[-0.005em] leading-tight">
-                              {cs.map((c, i) => (
-                                <span key={i}>
-                                  {c.person ? (
-                                    <Link
-                                      href={`/artists/${c.person.slug}`}
-                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                                    >
-                                      {c.person.name}
-                                    </Link>
-                                  ) : (
-                                    c.name ?? "—"
-                                  )}
-                                  {i < cs.length - 1 ? <span className="text-ink-3"> + </span> : null}
-                                </span>
-                              ))}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {locationRoles.length > 0 && (() => {
-                      // Flatten all location credits into a single ordered list,
-                      // each becoming a clickable studio link when matched.
-                      const locs = locationRoles.flatMap((role) => byRole.get(role)!);
-                      return (
-                        <div className="mt-8 pt-6 border-t border-ink/30 text-center">
-                          <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
-                            {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
-                          </div>
-                          <div className="font-display text-[18px] uppercase tracking-[-0.005em] flex flex-wrap justify-center items-baseline gap-x-2 gap-y-1">
-                            {locs.map((c, i) => {
-                              const display = c.name ?? c.person?.name ?? "—";
-                              const city = c.instrument;
-                              const linkHref = c.studio?.slug
-                                ? `/studios/${c.studio.slug}`
-                                : null;
-                              const label = (
-                                <>
-                                  {linkHref ? (
-                                    <Link
-                                      href={linkHref}
-                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                                    >
-                                      {display}
-                                    </Link>
-                                  ) : (
-                                    display
-                                  )}
-                                  {city && (
-                                    <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 ml-1.5">
-                                      · {city}
-                                    </span>
-                                  )}
-                                </>
-                              );
-                              return (
-                                <span key={i} className="inline-flex items-baseline">
-                                  {label}
-                                  {i < locs.length - 1 && (
-                                    <span className="text-ink-3 mx-2">·</span>
-                                  )}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </Room>
-              );
-            })()}
-
-            {/* === THE PHYSICAL === liner notes scans + physical artifacts
-                (test pressings, vinyl jackets, J-cards, hand-written track
-                notes, RIAA plaques, etc.). Goes unrendered when both arrays
-                are empty — populates progressively as Nick shoots stuff for
-                the PIT-PHYSICAL workflow. */}
-            {(() => {
-              const liners = release.linerNotes ?? [];
-              const artifacts = release.physicalArtifacts ?? [];
-              if (liners.length === 0 && artifacts.length === 0) return null;
-              const linerPhotos = liners.map((p) => ({
-                src: urlFor(p.image).width(2000).url(),
-                alt: p.caption ?? "",
-              }));
-              return (
-                <Room
-                  number="05b"
-                  title="the physical"
-                  kicker={[
-                    liners.length > 0 ? `${liners.length} liner page${liners.length === 1 ? "" : "s"}` : null,
-                    artifacts.length > 0 ? `${artifacts.length} artifact${artifacts.length === 1 ? "" : "s"}` : null,
-                  ].filter(Boolean).join(" · ")}
-                >
-                  {liners.length > 0 && (
-                    <div className="mb-8">
-                      <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-3">LINER NOTES</div>
-                      <PhotoGallery photos={linerPhotos} />
-                    </div>
-                  )}
-                  {artifacts.length > 0 && (
-                    <div>
-                      <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-3">ARTIFACTS</div>
-                      <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
-                        {artifacts.map((a, i) => {
-                          const src = urlFor(a.image).width(800).fit("max").url();
-                          return (
-                            <figure key={i} className="border border-ink p-3">
-                              <div className="aspect-square overflow-hidden bg-ink-2 mb-2">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img src={src} alt={a.title ?? ""} loading="lazy" className="w-full h-full object-cover" />
-                              </div>
-                              <figcaption>
-                                {a.kind && <div className="font-mono text-[9px] tracking-[.14em] uppercase text-ink-3">{a.kind.replace(/-/g, " ")}</div>}
-                                {a.title && <div className="font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight mt-0.5">{a.title}</div>}
-                                {a.note && <div className="font-serif italic text-[13px] text-ink-3 mt-1 leading-snug">{a.note}</div>}
-                              </figcaption>
-                            </figure>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
-                </Room>
-              );
-            })()}
+            {/* (The physical / vinyl-jackets room used to live here at 05b
+                but got hoisted up to room 01b — sits between the bio and
+                the watch room now so the jacket reads at decision-time, not
+                buried past 16 tracks of credits.) */}
 
             {/* === THE GALLERY === cinematic photo gallery w/ lightbox */}
             {(() => {

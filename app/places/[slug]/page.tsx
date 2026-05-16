@@ -7,7 +7,7 @@ import { getPlaceBySlug, getPlaces, type PlaceKind } from "../../_lib/sanity-que
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
-export const revalidate = 60;
+export const revalidate = 3600;
 
 export async function generateStaticParams() {
   const places = await getPlaces();
