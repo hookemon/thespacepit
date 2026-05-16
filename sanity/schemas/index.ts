@@ -16,5 +16,6 @@ import { photo } from "./photo";
 import { flyer } from "./flyer";
 import { vaultDrop } from "./vaultDrop";
 import { highlight } from "./highlight";
+import { subscriber } from "./subscriber";
 
-export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack, video, photo, flyer, vaultDrop, highlight];
+export const schemaTypes = [release, artist, pressQuote, liveDate, studioSession, show, mix, project, brand, studio, place, gear, pack, video, photo, flyer, vaultDrop, highlight, subscriber];
