@@ -25,7 +25,7 @@ const client = createClient({
 
 const RELEASE_ID = "release-old-english-spinn-hook-remix";
 const COVER_PATH =
-  "/Users/nickhook/Library/CloudStorage/Dropbox/Jakub/Nick Hook Ft. Inti, Pawkarmayta, Mikongo-Kusa/old-english-cover-slime-3000.jpg";
+  "/Users/nickhook/Library/CloudStorage/Dropbox/Jakub/Nick Hook Ft. Inti, Pawkarmayta, Mikongo-Kusa/old-english-cover-slime-vip-3000.jpg";
 
 async function main() {
   const buf = readFileSync(COVER_PATH);

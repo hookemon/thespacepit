@@ -318,51 +318,13 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
               </section>
             )}
 
-            {artist.appearsOn && artist.appearsOn.length > 0 && (
-              <section className="mt-16">
-                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
-                  APPEARS ON
-                </div>
-                <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
-                  {artist.appearsOn.map((a) => {
-                    const r = a.release;
-                    const cover = r.cover ? urlFor(r.cover).width(440).height(440).fit("crop").url() : null;
-                    const roles = (a.roles ?? []).filter(Boolean).join(" · ");
-                    return (
-                      <Link
-                        key={r._id}
-                        href={`/releases/${r.slug}`}
-                        className="group border border-ink p-3.5 transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#0E4B3A] no-underline text-ink"
-                      >
-                        <div
-                          className="aspect-square border border-ink mb-3 flex items-center justify-center relative overflow-hidden"
-                          style={{ background: r.coverColor ?? "#1C1A17" }}
-                        >
-                          {cover ? (
-                            <img src={cover} alt={r.title} className="absolute inset-0 w-full h-full object-cover" />
-                          ) : (
-                            <span
-                              className="font-display font-bold uppercase text-center px-3 text-paper"
-                              style={{ fontSize: 22, transform: "rotate(-4deg)", letterSpacing: "-0.02em", color: r.coverColor ? "#0B0B0B" : "#F4EFE6" }}
-                            >
-                              {r.title}
-                            </span>
-                          )}
-                        </div>
-                        <div className="font-display font-bold text-[18px] uppercase leading-none">{r.title}</div>
-                        {roles && (
-                          <div className="font-mono text-[10px] tracking-[.1em] uppercase text-collect mt-2">{roles}</div>
-                        )}
-                        <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-1">
-                          {r.artists.map((x) => x.name).join(" · ")}
-                          {r.year && <> · {r.year}</>}
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </section>
-            )}
+            {/* (The APPEARS ON section used to live here — a grid of all
+                releases this artist contributed to via credits[]. Removed
+                per Nick's call to strip "also on..." surfaces site-wide.
+                The data still resolves in the artist query, so the
+                section can come back as a different treatment later if
+                we want it. For now: primary releases only on artist
+                pages.) */}
 
             {artist.gallery && artist.gallery.length > 0 && (
               <section className="mt-16">

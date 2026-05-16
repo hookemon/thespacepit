@@ -160,48 +160,10 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
   // Videos auto-attached to this release (set via /studio → video.relatedRelease).
   const releaseVideos = await getVideosForRelease(slug);
 
-  // "Lil clickables" — for each primary artist on THIS release, surface up
-  // to 2 OTHER releases they're on (either as primary or via credits[]).
-  // Renders as small chips under the artist's name in the hero. Lets you
-  // jump cross-catalogue without going through the full artist page —
-  // e.g. seeing Pawmps on RTJ CU4TRO right next to her name on Glove.
-  //
-  // We pass the current release's _id as a parameter (instead of the GROQ
-  // ancestor `^.^._id`) so the self-exclusion is reliable.
-  const crosslinksRaw = await sanityFetch<
-    Array<{
-      artistSlug: string;
-      others: Array<{ title: string; slug: string; year?: number }>;
-    }>
-  >(
-    `*[_type == "release" && slug.current == $slug][0].artists[]->{
-      "artistSlug": slug.current,
-      "others": *[
-        _type == "release"
-        && withdrawn != true
-        && _id != $releaseId
-        && (references(^._id) || ^._id in credits[].person._ref)
-      ] | order(coalesce(year, 0) desc) [0...2]
-        { title, "slug": slug.current, year }
-    }`,
-    { slug, releaseId: release._id },
-  );
-  // Dedupe per-artist across the two queries (same release could appear in
-  // both branches if the artist is both primary AND credited).
-  const artistCrosslinks: Record<
-    string,
-    Array<{ title: string; slug: string; year?: number }>
-  > = {};
-  for (const row of crosslinksRaw) {
-    const seen = new Set<string>();
-    artistCrosslinks[row.artistSlug] = row.others
-      .filter((o: { title: string; slug: string; year?: number }) => {
-        if (seen.has(o.slug)) return false;
-        seen.add(o.slug);
-        return true;
-      })
-      .slice(0, 2);
-  }
+  // (The per-artist crosslink chips used to live here — "Nick Hook also on
+  // Just Nico", "Pawmps also on CU4TRO", etc. Removed per Nick's call:
+  // those connections live in the BIO/liner-notes now, narratively, not
+  // as decontextualized chips. Bios tell the story; chips were noise.)
 
   // Press attached to this release — historical write-ups, premieres, reviews.
   // Renders as a slim "what they said" rail near the bottom of the page.
@@ -439,35 +401,6 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                         {i < release.artists.length - 1 ? " · " : ""}
                       </span>
                     ))}
-                  </div>
-                )}
-
-                {/* Per-artist crosslinks — small clickable chips that show
-                    each artist's other notable appearances. Click a chip to
-                    jump straight to that other release. */}
-                {Object.keys(artistCrosslinks).some((k) => artistCrosslinks[k].length > 0) && (
-                  <div className="mt-3 space-y-1.5">
-                    {release.artists.map((a) => {
-                      const links = artistCrosslinks[a.slug] ?? [];
-                      if (links.length === 0) return null;
-                      return (
-                        <div key={a.slug} className="flex flex-wrap items-baseline gap-1.5 text-[11px]">
-                          <span className="font-mono uppercase tracking-[.14em] text-ink-3 mr-1">
-                            {a.name} also on
-                          </span>
-                          {links.map((l) => (
-                            <Link
-                              key={l.slug}
-                              href={`/releases/${l.slug}`}
-                              className="font-mono uppercase tracking-[.1em] px-2 py-0.5 border border-ink rounded-full hover:bg-ink hover:text-paper transition-colors no-underline text-ink"
-                            >
-                              ↗ {l.title}
-                              {l.year ? ` (${l.year})` : ""}
-                            </Link>
-                          ))}
-                        </div>
-                      );
-                    })}
                   </div>
                 )}
 
@@ -843,7 +776,13 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 mute/solo, gain, and four FX (filter · drive · delay · reverb)
                 that wire into the Web Audio chain live. Sample packs live in
                 `samplePackRoom` above. */}
-            {release.stems && release.stems.length > 0 && (
+            {/* Stem player + FX room. Hidden on KUSA per Nick — we'll
+                bring it back when the moment's right. Add the slug to
+                STEMS_HIDDEN if you want to silence the player on a
+                release without clearing its uploaded stems[] data. */}
+            {release.stems &&
+              release.stems.length > 0 &&
+              !["cc029-kusa"].includes(release.slug) && (
               <Room number="02a" title="play with it" kicker="stems · live fx" accent="lamp">
                 <p className="font-serif italic text-[16px] text-ink-3 max-w-[640px] mb-5">
                   every stem of the record, in your hands. mute or solo each part. turn the knobs

@@ -75,7 +75,6 @@ const CRED_TAGS = [
   "YOUNG THUG",
   "GANGSTA BOO",
   "FLATBUSH ZOMBIES",
-  "JPEGMAFIA",
   "TE MENTOR",
 ];
 
@@ -218,7 +217,7 @@ export default function SessionsPage() {
               style={{ fontSize: 20, lineHeight: 1.4 }}
             >
               own band on warner. production for run the jewels, action bronson, big boi, young
-              thug, gangsta boo, flatbush zombies, jpegmafia and more. mentor at teenage
+              thug, gangsta boo, flatbush zombies and more. mentor at teenage
               engineering. two studios — thespacepit (brooklyn) + la burbuja (medellín).
             </p>
             <div className="mt-6 flex flex-wrap gap-2 font-mono text-[10px] sm:text-[11px] tracking-[.14em] uppercase">

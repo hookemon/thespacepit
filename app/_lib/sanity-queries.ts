@@ -437,8 +437,18 @@ export async function getReleases(limit = 60): Promise<ReleaseListItem[]> {
   // reclaimed catalog (Bandcamp re-upload dates won the scrape), so sort by
   // catalog # as primary. Label priority groups the imprints (C+C → CC INST
   // → CALLLM → Hookemon → LDCC).
+  //
+  // Filter: `withdrawn != true` drops delisted records, AND we exclude
+  // status in ("dropping","upcoming") so pre-release pitch records stay
+  // off the public catalogue listing. They're still reachable by direct
+  // URL (Sanity Studio + the gated /calm-collect/upcoming page) — just
+  // not advertised on the public surface.
   return sanityFetch<ReleaseListItem[]>(groq`
-    *[_type == "release" && (withdrawn != true) && label != "Other"]
+    *[_type == "release"
+      && (withdrawn != true)
+      && label != "Other"
+      && !(coalesce(status, "out") in ["dropping", "upcoming"])
+    ]
       | order(featured desc, ${LABEL_PRIORITY} asc, catalogNumber desc) [0...$limit] {
       ${releaseListProjection}
     }

@@ -66,8 +66,28 @@ function DroppingStamp({ date }: { date: string }) {
   );
 }
 
+// Manual pitch order for the slate. Records not in this list fall to the
+// bottom of the page (alphabetical / catalog default). Update this when
+// Nick wants to reorder.
+const PITCH_ORDER: string[] = [
+  "cc029-kusa", // INTI
+  "old-english-spinn-hook-remix", // YOUNG THUG
+  "nick-hook-boo-pawmps-glove", // BOO
+  "calm-collect-remix-compilation",
+  "calm-collect-compilation",
+];
+
 export default async function UpcomingPage() {
-  const releases = await getUpcomingReleases();
+  const all = await getUpcomingReleases();
+  // Sort: PITCH_ORDER positions first, then everything else in original order.
+  const releases = [...all].sort((a, b) => {
+    const ai = PITCH_ORDER.indexOf(a.slug);
+    const bi = PITCH_ORDER.indexOf(b.slug);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1; // a not in order → after b
+    if (bi === -1) return -1; // b not in order → after a
+    return ai - bi;
+  });
 
   return (
     <>

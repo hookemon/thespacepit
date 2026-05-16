@@ -140,9 +140,12 @@ async function main() {
   // ── slime-green C+C mark in the corner ───────────────────────────────────
   // ~11% of cover edge, anchored bottom-right with a ~3% margin. Recolored
   // to slime green so the mark lives inside the bottle's color story.
-  const markSize = Math.round(SIZE * 0.11);
-  const markX = SIZE - markSize - Math.round(SIZE * 0.03);
-  const markY = SIZE - markSize - Math.round(SIZE * 0.03);
+  // Standard C+C heptagon spec across the catalog: 7% size, 4% margin
+  // from the bottom + right edges. Matches Just Nico / Glove / Comp /
+  // Remix Comp covers.
+  const markSize = Math.round(SIZE * 0.07);
+  const markX = SIZE - markSize - Math.round(SIZE * 0.04);
+  const markY = SIZE - markSize - Math.round(SIZE * 0.04);
 
   // Compose all layers ──────────────────────────────────────────────────────
   const creditSvg = buildLeftCreditSvg(SIZE);
