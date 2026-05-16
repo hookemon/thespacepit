@@ -39,6 +39,7 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
     { href: "/#clients", label: "in the room" },
     { href: "/crew", label: "crew" },
     { href: "/press", label: "press" },
+    { href: "/pop-up", label: "pop-up" },
     { href: "/#discord", label: "discord" },
     { href: "/support", label: "support" },
     { href: "/contact", label: "contact" },
