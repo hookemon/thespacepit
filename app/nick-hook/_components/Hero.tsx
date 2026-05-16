@@ -39,7 +39,7 @@ export async function NHHero() {
             <a href="/catalog" className="font-display font-semibold text-[15px] tracking-[.04em] uppercase px-5 py-3 border border-paper bg-redline text-paper cursor-pointer rounded-none hover:bg-paper hover:text-ink transition-colors no-underline">
               see the catalogue →
             </a>
-            <a href="/" className="font-display font-semibold text-[15px] tracking-[.04em] uppercase px-5 py-3 border border-paper bg-transparent text-paper cursor-pointer rounded-none hover:bg-paper hover:text-ink transition-colors no-underline">
+            <a href="/the-pit" className="font-display font-semibold text-[15px] tracking-[.04em] uppercase px-5 py-3 border border-paper bg-transparent text-paper cursor-pointer rounded-none hover:bg-paper hover:text-ink transition-colors no-underline">
               pull up to the pit
             </a>
           </div>

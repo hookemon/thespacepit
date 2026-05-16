@@ -99,8 +99,9 @@ export default async function FloorPlanPage() {
       copy: "one site, three doors in. nick · the spacepit · calm + collect.",
       doors: [
         { href: "/nick-hook",    label: "/nick-hook",    sub: "the artist hub · bio · press wall" },
-        { href: "/",             label: "/",             sub: "thespacepit (home)" },
+        { href: "/the-pit",      label: "/the-pit",      sub: "thespacepit (home)" },
         { href: "/calm-collect", label: "/calm-collect", sub: "the label · roster · calllm" },
+        { href: "/",             label: "/",             sub: "pop-up landing (campaign mode)" },
       ],
     },
     {

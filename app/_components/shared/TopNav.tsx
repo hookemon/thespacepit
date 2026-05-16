@@ -2,9 +2,13 @@ import Link from "next/link";
 
 type Site = "nick" | "spacepit" | "label";
 
+// Routing note: / is the pop-up campaign landing during May 2026. The full
+// spacepit world home lives at /the-pit while the campaign runs. When the
+// pop-up wraps, /the-pit's content can move back to / and the toggle below
+// reverts to "/".
 const ROUTES: Record<Site, string> = {
   nick: "/nick-hook",
-  spacepit: "/",
+  spacepit: "/the-pit",
   label: "/calm-collect",
 };
 
@@ -36,11 +40,11 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
     { href: "/map", label: "map" },
     { href: "/studios", label: "studios" },
     { href: "/gear", label: "gear" },
-    { href: "/#clients", label: "in the room" },
+    { href: "/the-pit#clients", label: "in the room" },
     { href: "/crew", label: "crew" },
     { href: "/press", label: "press" },
-    { href: "/pop-up", label: "pop-up" },
-    { href: "/#discord", label: "discord" },
+    { href: "/", label: "pop-up" },
+    { href: "/the-pit#discord", label: "discord" },
     { href: "/support", label: "support" },
     { href: "/contact", label: "contact" },
   ],
