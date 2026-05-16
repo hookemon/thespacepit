@@ -23,27 +23,27 @@ const ORIGIN = "https://thespacepit.com";
 // dynamic segment (handled below) or is intentionally excluded (e.g. the
 // upcoming/distro-pitch URL).
 const STATIC_ROUTES: { path: string; priority: number; changeFreq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
-  { path: "/",              priority: 1.0,  changeFreq: "weekly" },
+  { path: "/",              priority: 1.0,  changeFreq: "daily" },   // pop-up campaign — bump freq while live
+  { path: "/the-pit",       priority: 0.95, changeFreq: "weekly" },  // spacepit world home (was /)
   { path: "/nick-hook",     priority: 0.9,  changeFreq: "weekly" },
   { path: "/calm-collect",  priority: 0.9,  changeFreq: "weekly" },
   { path: "/releases",      priority: 0.9,  changeFreq: "weekly" },
   { path: "/artists",       priority: 0.7,  changeFreq: "weekly" },
   { path: "/collabs",       priority: 0.8,  changeFreq: "monthly" },
   { path: "/press",         priority: 0.7,  changeFreq: "weekly" },
+  { path: "/sessions",      priority: 0.85, changeFreq: "weekly" },  // bumped — active offer
+  { path: "/packs",         priority: 0.8,  changeFreq: "weekly" },
   { path: "/watch",         priority: 0.6,  changeFreq: "weekly" },
   { path: "/tv",            priority: 0.5,  changeFreq: "weekly" },
   { path: "/radio",         priority: 0.6,  changeFreq: "weekly" },
   { path: "/mixes",         priority: 0.5,  changeFreq: "monthly" },
   { path: "/listening",     priority: 0.4,  changeFreq: "monthly" },
-  { path: "/packs",         priority: 0.8,  changeFreq: "weekly" },
   { path: "/vault",         priority: 0.5,  changeFreq: "weekly" },
   { path: "/map",           priority: 0.4,  changeFreq: "monthly" },
   { path: "/studios",       priority: 0.5,  changeFreq: "monthly" },
   { path: "/gear",          priority: 0.6,  changeFreq: "monthly" },
   { path: "/crew",          priority: 0.4,  changeFreq: "monthly" },
-  { path: "/press",         priority: 0.7,  changeFreq: "weekly" },
   { path: "/partners",      priority: 0.6,  changeFreq: "monthly" },
-  { path: "/sessions",      priority: 0.7,  changeFreq: "monthly" },
   { path: "/shows",         priority: 0.5,  changeFreq: "monthly" },
   { path: "/eras",          priority: 0.5,  changeFreq: "monthly" },
   { path: "/contact",       priority: 0.3,  changeFreq: "yearly" },
