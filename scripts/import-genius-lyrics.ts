@@ -58,6 +58,7 @@ function extractLyrics(html: string): string {
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
     .replace(/\n{3,}/g, "\n\n")
+    .replace(/^[^\[]*?(?=\[)/, "") // strip Genius "N Contributors / Song Lyrics" preamble before first verse marker
     .trim();
 }
 
