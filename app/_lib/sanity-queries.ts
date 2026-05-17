@@ -724,6 +724,122 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
   return { ...rest, ...(tracklist ? { tracklist } : {}) };
 }
 
+/**
+ * PRIVATE structured writer credit — what `writerCredits[]` on a track
+ * stores. Stays back-end: never projected by `getReleaseBySlug`. Used by
+ * the dossier + splits-sheet exports only.
+ */
+export type WriterCredit = {
+  name: string;
+  share?: number;
+  pro?: string;
+  ipiCae?: string;
+  publisher?: string;
+  publisherPro?: string;
+  publisherIpiCae?: string;
+};
+
+export type DossierTrack = Track & { writerCredits?: WriterCredit[] };
+
+/**
+ * The full back-end view of a release — public fields + private publishing
+ * payload (writerCredits per track, internalNotes, copyright lines, UPC,
+ * genre, language). Used by `/releases/[slug]/dossier` and the
+ * splits-sheet export. NEVER project this onto a public page.
+ */
+export type ReleaseDossier = ReleaseDetail & {
+  upc?: string;
+  genre?: string;
+  subgenre?: string;
+  language?: string;
+  pCopyright?: string;
+  cCopyright?: string;
+  internalNotes?: string;
+  tracklist?: DossierTrack[];
+};
+
+/**
+ * Dossier query — every public field PLUS the private publishing payload.
+ * Mirrors `getReleaseBySlug` but adds writerCredits + the release-level
+ * admin fields. Server-side use only; never expose this in a client
+ * bundle or a public page.
+ */
+export async function getReleaseDossier(slug: string): Promise<ReleaseDossier | null> {
+  const raw = await sanityFetch<(ReleaseDossier & { artistDirectory?: { name: string; slug: string }[] }) | null>(groq`
+    *[_type == "release" && slug.current == $slug][0] {
+      ${releaseListProjection},
+      notes,
+      "credits": credits[]{
+        role,
+        name,
+        instrument,
+        tracks,
+        "person": person->{ name, "slug": slug.current, portrait },
+        "studio": *[_type == "studio" && name == ^.name][0]{ name, "slug": slug.current }
+      },
+      gallery,
+      linerNotes,
+      physicalArtifacts,
+      bandcampAlbumId,
+      bandcampTrackId,
+      youtubeUrl,
+      soundcloudUrl,
+      youtubePlaylistId,
+      videos,
+      // FULL tracklist — includes writerCredits (PRIVATE — for the
+      // splits-sheet pull). Don't project this onto a public page.
+      "tracklist": tracklist[]{
+        title,
+        duration,
+        feature,
+        features,
+        remixer,
+        isrc,
+        writers,
+        note,
+        lyrics,
+        videoUrl,
+        audioPreviewUrl,
+        bpm,
+        explicit,
+        writerCredits
+      },
+      "promoAudio": coalesce(promoAudio.asset->url, promoAudioUrl),
+      "promoAudioAlt": coalesce(promoAudioAlt.asset->url, promoAudioAltUrl),
+      promoAudioAltLabel,
+      // Private release-level admin fields.
+      upc,
+      genre,
+      subgenre,
+      language,
+      pCopyright,
+      cCopyright,
+      internalNotes,
+      "artistDirectory": *[_type == "artist" && defined(slug.current)]{ name, "slug": slug.current },
+      stemsTrackTitle,
+      "stems": stems[]{ label, color, muteByDefault, "audioUrl": audio.asset->url },
+      "oneshots": oneshots[]{ label, color, "audioUrl": audio.asset->url },
+      "relatedSession": relatedSession->{ title, "slug": slug.current, date, gallery }
+    }
+  `, { slug });
+
+  if (!raw) return null;
+
+  const directory = new Map<string, string>();
+  for (const a of raw.artistDirectory ?? []) {
+    if (a?.name && a?.slug) directory.set(a.name.toLowerCase().trim(), a.slug);
+  }
+  const tracklist = raw.tracklist?.map((t) => {
+    const featureLinks: FeatureLink[] = (t.features ?? []).map((name) => ({
+      name,
+      slug: directory.get(name.toLowerCase().trim()),
+    }));
+    return { ...t, featureLinks };
+  });
+  const { artistDirectory: _stripped, ...rest } = raw;
+  return { ...rest, ...(tracklist ? { tracklist } : {}) };
+}
+
 export async function getReleaseSlugs(): Promise<{ slug: string }[]> {
   return sanityFetch<{ slug: string }[]>(groq`
     *[_type == "release" && defined(slug.current)] { "slug": slug.current }
