@@ -295,11 +295,58 @@ export const release = defineType({
             },
             {
               name: "writers",
-              title: "Writers / songwriters",
+              title: "Writers / songwriters (public — names only)",
               type: "array",
               of: [{ type: "string" }],
               options: { layout: "tags" },
-              description: 'Songwriting credits per track. e.g. for CZ "Follow Your Heart" tracks: ["Daud Sturdivant", "Tiombe Lockhart", "Nicholas Conceller"]. Order in the array reflects the BMI-registered order.',
+              description: 'PUBLIC list of writer names — renders on the release page. e.g. for CZ "Follow Your Heart" tracks: ["Daud Sturdivant", "Tiombe Lockhart", "Nicholas Conceller"]. For the structured splits info (PRO, IPI/CAE, share %, publisher) use `writerCredits` below — that stays private.',
+            },
+            {
+              name: "writerCredits",
+              title: "Writer credits + splits (PRIVATE — back-end only)",
+              type: "array",
+              description: "Structured songwriting credits for the publishing splits sheet. NEVER renders on the public release page — used by the splits-sheet CSV export sent to your publisher. Share % across all writers should sum to 100.",
+              of: [
+                {
+                  type: "object",
+                  name: "writerCredit",
+                  fields: [
+                    { name: "name", type: "string", title: "Writer name", validation: (r) => r.required() },
+                    { name: "share", type: "number", title: "Share % (0–100)", description: "Writer's % of the composition. All writers on the track should sum to 100." },
+                    {
+                      name: "pro",
+                      type: "string",
+                      title: "PRO",
+                      options: { list: ["ASCAP", "BMI", "SESAC", "SOCAN", "GMR", "PRS", "GEMA", "SACEM", "JASRAC", "Other"] },
+                      description: "Performing rights organization.",
+                    },
+                    { name: "ipiCae", type: "string", title: "IPI / CAE #", description: "Writer's PRO identifier number." },
+                    { name: "publisher", type: "string", title: "Publisher", description: "Publishing company. e.g. 'Sony/ATV', or self-pub designee like 'Nick Hook Publishing Designee'." },
+                    { name: "publisherPro", type: "string", title: "Publisher PRO" },
+                    { name: "publisherIpiCae", type: "string", title: "Publisher IPI / CAE #" },
+                  ],
+                  preview: {
+                    select: { title: "name", share: "share", pro: "pro" },
+                    prepare({ title, share, pro }) {
+                      const sub = [share != null ? `${share}%` : null, pro].filter(Boolean).join(" · ");
+                      return { title: title || "?", subtitle: sub };
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: "bpm",
+              title: "BPM (tempo)",
+              type: "number",
+              description: "Beats per minute. Public — DSPs and sync agents use it for matching.",
+            },
+            {
+              name: "explicit",
+              title: "Explicit / parental advisory",
+              type: "boolean",
+              initialValue: false,
+              description: "True if the track contains explicit content. Required by all DSPs.",
             },
             { name: "note", type: "string", title: "Note (optional)" },
             {
@@ -506,6 +553,50 @@ export const release = defineType({
       type: "reference",
       to: [{ type: "studioSession" }],
       description: "If this release came out of a specific session, link it here.",
+    }),
+    defineField({
+      name: "upc",
+      title: "UPC (album barcode)",
+      type: "string",
+      description: "Universal Product Code — the album's global identifier. Required by distributors. Usually assigned by your label or distributor.",
+    }),
+    defineField({
+      name: "genre",
+      title: "Genre (primary)",
+      type: "string",
+      description: "Primary genre for distribution. e.g. 'Hip-Hop/Rap', 'Electronic', 'R&B/Soul'. Required by all DSPs.",
+    }),
+    defineField({
+      name: "subgenre",
+      title: "Subgenre (optional)",
+      type: "string",
+      description: "Optional secondary genre. e.g. 'Trap', 'House', 'Boom Bap'.",
+    }),
+    defineField({
+      name: "language",
+      title: "Language",
+      type: "string",
+      initialValue: "English",
+      description: "Primary language of the release. Required by distributors.",
+    }),
+    defineField({
+      name: "pCopyright",
+      title: "℗ recording copyright",
+      type: "string",
+      description: "Phonographic copyright — owner of the master recordings. Format: '℗ 2026 Calm + Collect'. Required for distribution.",
+    }),
+    defineField({
+      name: "cCopyright",
+      title: "© composition copyright",
+      type: "string",
+      description: "Composition copyright — owner of the songwriting. Format: '© 2026 [publisher designee]'. Required for distribution.",
+    }),
+    defineField({
+      name: "internalNotes",
+      title: "Internal notes (PRIVATE — never public)",
+      type: "text",
+      rows: 6,
+      description: "Nick's private deal terms, splits negotiations, mastering revisions, manager threads, etc. Stays in Sanity Studio only — never rendered on any public page or in exports shared outside the org.",
     }),
     defineField({ name: "featured", type: "boolean", initialValue: false, description: "Pin this release to the top of grids." }),
   ],

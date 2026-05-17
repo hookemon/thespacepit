@@ -116,7 +116,7 @@ export const brand = defineType({
       of: [
         {
           type: "object",
-          name: "block",
+          name: "articleBlock",
           fields: [
             {
               name: "kind",

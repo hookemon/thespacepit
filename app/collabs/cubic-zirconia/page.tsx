@@ -178,66 +178,7 @@ export default async function CubicZirconiaWorldPage() {
           </section>
         )}
 
-        {/* === EVERY SHOW · BY YEAR === xlsx-sourced, no fabrication */}
-        {shows.length > 0 && (
-          <section className="px-5 sm:px-8 py-12 border-t border-paper/15 max-w-[1180px] mx-auto">
-            <div
-              className="font-mono text-[11px] tracking-[.18em] uppercase mb-3"
-              style={{ color: CZ_GOLD }}
-            >
-              EVERY DOCUMENTED SHOW · {shows.length}
-            </div>
-            <h2
-              className="font-display font-bold uppercase m-0 mb-3"
-              style={{ fontSize: "clamp(32px, 5vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
-            >
-              on the road
-            </h2>
-            <p className="font-serif italic text-[15px] text-paper-2 mb-10 max-w-[640px]">
-              pulled from your xlsx master. every entry sourced (gmail / artist / web). no invented gigs.
-            </p>
-            {years.map((y) => {
-              const list = byYear.get(y)!;
-              return (
-                <section key={y} className="mb-10">
-                  <h3
-                    className="font-display font-bold uppercase m-0 mb-3 pb-2 border-b-2"
-                    style={{ fontSize: "clamp(28px, 4vw, 40px)", letterSpacing: "-0.02em", borderColor: CZ_ACCENT }}
-                  >
-                    {y > 0 ? y : "—"}  ·  <span className="text-paper-2 font-mono text-[14px] tracking-[.14em] tabular-nums">{list.length} shows</span>
-                  </h3>
-                  <ol className="list-none p-0 m-0 grid gap-0">
-                    {list.map((sh, i) => (
-                      <li key={`${sh.date}-${sh.venue}-${i}`}>
-                        <div className="grid grid-cols-[100px_1fr] sm:grid-cols-[140px_1fr] items-baseline gap-3 sm:gap-5 py-2.5 border-b border-paper/10">
-                          <div className="font-mono text-[10px] sm:text-[11px] tracking-[.06em] text-paper-2 tabular-nums shrink-0">
-                            {sh.date ?? "—"}
-                          </div>
-                          <div className="min-w-0">
-                            <div className="font-display font-semibold text-[15px] sm:text-[17px] uppercase tracking-[-0.005em] leading-tight">
-                              {sh.city}{sh.country ? `, ${sh.country.replace(/, USA$/, "")}` : ""}
-                            </div>
-                            <div className="font-mono text-[10px] sm:text-[11px] tracking-[.04em] text-paper-2 mt-0.5 line-clamp-1">
-                              {sh.venue ?? "—"}
-                              {sh.support && <span className="text-paper-2/70"> · with {sh.support}</span>}
-                            </div>
-                            {sh.notes && (
-                              <div className="font-serif italic text-[12px] text-paper-2 mt-1 leading-snug max-w-[560px] opacity-80">
-                                {sh.notes}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </li>
-                    ))}
-                  </ol>
-                </section>
-              );
-            })}
-          </section>
-        )}
-
-        {/* === THE CHANNEL === pointers, no embedded video clutter */}
+        {/* === THE VIDEOS === pointers, no embedded video clutter */}
         <section className="px-5 sm:px-8 py-12 border-t border-paper/15 max-w-[1180px] mx-auto">
           <div
             className="font-mono text-[11px] tracking-[.18em] uppercase mb-3"
@@ -329,28 +270,8 @@ export default async function CubicZirconiaWorldPage() {
           </div>
         </section>
 
-        {/* === LUCID IN THE SKY · THE SCION TVC === licensed for a Toyota
-            Scion TV ad campaign. The brand-money moment. */}
-        <section className="px-5 sm:px-8 py-12 border-t border-paper/15 max-w-[1180px] mx-auto">
-          <div
-            className="font-mono text-[11px] tracking-[.18em] uppercase mb-3"
-            style={{ color: CZ_GOLD }}
-          >
-            THE SYNC · LUCID IN THE SKY · 2011
-          </div>
-          <h2
-            className="font-display font-bold uppercase m-0 mb-3"
-            style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
-          >
-            cubic zirconia on toyota scion TVCs
-          </h2>
-          <p className="font-serif italic text-[16px] text-paper-2 max-w-[680px] leading-snug">
-            <strong className="font-bold not-italic" style={{ color: CZ_GOLD }}>Lucid In The Sky</strong> licensed to Beyond Marketing Group on behalf of Toyota Motor Sales USA &mdash; 6-month TV synch for the Scion marque. The record paid for itself + the band ate.
-          </p>
-          <p className="font-mono text-[10px] tracking-[.14em] uppercase text-paper-2/70 mt-4">
-            source: Music Rights Agreement on file, 4 pages signed.
-          </p>
-        </section>
+        {/* (Sync section removed — Lucid In The Sky / Toyota Scion TVC
+            content moved out per Nick's call.) */}
 
         {/* === THE GALLERY === real tour photos from the dropbox folder.
             12 hand-picked from the 67-photo "Cubic Zirconia Tour" archive. */}
@@ -387,13 +308,87 @@ export default async function CubicZirconiaWorldPage() {
           </p>
         </section>
 
+        {/* === ON THE ROAD === horizontal show chips per year so years
+            occupy 1-2 lines each instead of N rows. Drastically less
+            vertical scroll than the old layout while still surfacing
+            every documented gig. */}
+        {shows.length > 0 && (
+          <section className="px-5 sm:px-8 py-12 border-t border-paper/15 max-w-[1180px] mx-auto">
+            <div
+              className="font-mono text-[11px] tracking-[.18em] uppercase mb-3"
+              style={{ color: CZ_GOLD }}
+            >
+              EVERY DOCUMENTED SHOW · {shows.length}
+            </div>
+            <h2
+              className="font-display font-bold uppercase m-0 mb-3"
+              style={{ fontSize: "clamp(32px, 5vw, 56px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+            >
+              on the road
+            </h2>
+            <p className="font-serif italic text-[15px] text-paper-2 mb-10 max-w-[640px]">
+              pulled from your xlsx master. every entry sourced (gmail / artist / web). no invented gigs.
+            </p>
+            {years.map((y) => {
+              const list = byYear.get(y)!;
+              return (
+                <section key={y} className="mb-7">
+                  <h3
+                    className="font-display font-bold uppercase m-0 mb-3 pb-1.5 border-b"
+                    style={{ fontSize: "clamp(22px, 2.6vw, 30px)", letterSpacing: "-0.015em", borderColor: `${CZ_ACCENT}66` }}
+                  >
+                    {y > 0 ? y : "—"}
+                    <span className="text-paper-2 font-mono text-[12px] tracking-[.14em] tabular-nums ml-3">
+                      {list.length} {list.length === 1 ? "show" : "shows"}
+                    </span>
+                  </h3>
+                  {/* Horizontal flow — chips wrap to new lines on overflow.
+                      Each chip: date · city · venue (one line). */}
+                  <div className="flex flex-wrap gap-1.5">
+                    {list.map((sh, i) => {
+                      const where = sh.city
+                        ? `${sh.city}${sh.country ? `, ${sh.country.replace(/, USA$/, "")}` : ""}`
+                        : sh.venue ?? "—";
+                      const date = sh.date ?? "—";
+                      // Pretty short date like "Mar 14" if it parses, else raw
+                      const prettyDate = (() => {
+                        if (!date || date === "—") return "—";
+                        const d = new Date(date);
+                        if (isNaN(d.getTime())) return date;
+                        return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+                      })();
+                      return (
+                        <span
+                          key={`${date}-${sh.venue ?? "?"}-${i}`}
+                          className="inline-flex items-baseline gap-2 px-2.5 py-1 border border-paper/30 rounded-full font-mono text-[11px] tracking-[.04em]"
+                          title={sh.notes ? `${sh.venue ?? ""}${sh.support ? ` · with ${sh.support}` : ""}${sh.notes ? ` · ${sh.notes}` : ""}` : `${sh.venue ?? ""}${sh.support ? ` · with ${sh.support}` : ""}`}
+                        >
+                          <span className="tabular-nums text-paper-2 shrink-0">{prettyDate}</span>
+                          <span className="text-paper truncate">{where}</span>
+                          {sh.venue && (
+                            <span className="text-paper-2/70 hidden sm:inline truncate max-w-[180px]">· {sh.venue}</span>
+                          )}
+                        </span>
+                      );
+                    })}
+                  </div>
+                </section>
+              );
+            })}
+          </section>
+        )}
+
         {/* === PRESS — what they wrote about CZ === */}
         <PressGrid
-          items={press}
+          items={press.slice(0, 12)}
           accent={CZ_GOLD}
-          eyebrow="PRESS · WHAT THEY WROTE"
+          eyebrow={`PRESS · ${press.length} ${press.length === 1 ? "PIECE" : "PIECES"}`}
           heading="press"
-          subhead="every review, premiere, and feature on cubic zirconia. click any card to read it."
+          subhead={
+            press.length > 12
+              ? `the top 12 reviews, premieres, and features on cubic zirconia. ${press.length - 12} more in the vault.`
+              : "every review, premiere, and feature on cubic zirconia. click any card to read it."
+          }
         />
       </main>
       <Footer

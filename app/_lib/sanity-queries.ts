@@ -62,6 +62,9 @@ export type Track = {
   featureLinks?: FeatureLink[];
   remixer?: string;
   isrc?: string;
+  /** Public writer names (display-only). Structured splits info
+   *  (`writerCredits` on the schema — name + share % + PRO + IPI/CAE +
+   *  publisher) is PRIVATE and intentionally not projected here. */
   writers?: string[];
   note?: string;
   videoUrl?: string;
@@ -69,6 +72,10 @@ export type Track = {
   /** Plain-text lyrics. Verse markers ([Verse 1], [Chorus], etc.) are
    *  rendered bold by the tracklist UI. */
   lyrics?: string;
+  /** BPM — public, used by sync agents and DSP matching. */
+  bpm?: number;
+  /** Parental advisory flag — required by DSPs. */
+  explicit?: boolean;
 };
 
 export type ReleaseCredit = {
@@ -642,7 +649,25 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
       soundcloudUrl,
       youtubePlaylistId,
       videos,
-      tracklist,
+      // Explicit per-track projection. NEW PRIVATE FIELDS (writerCredits)
+      // are intentionally OMITTED here — they live on the schema but never
+      // ship to the public release page. Server-side dossier / splits-sheet
+      // exports use their own queries to read those.
+      "tracklist": tracklist[]{
+        title,
+        duration,
+        feature,
+        features,
+        remixer,
+        isrc,
+        writers,
+        note,
+        lyrics,
+        videoUrl,
+        audioPreviewUrl,
+        bpm,
+        explicit
+      },
       // Coalesce the uploaded Sanity file asset (CDN URL via asset deref)
       // OR fall back to the external promoAudioUrl. Page reads "promoAudio"
       // regardless of source.
@@ -1659,11 +1684,17 @@ export async function getCatalogForArtist(slug: string): Promise<CatalogItem[]> 
   // Skip any release with a blank/garbage title (single chars, only symbols, etc).
   const titleGuard = "&& defined(title) && length(title) >= 2";
 
+  // Filter: hide dropping/upcoming records from the public catalog. They
+  // stay reachable via direct URL + the gated /calm-collect/upcoming page
+  // but don't surface on /catalog browsing.
+  const statusGuard = `&& !(coalesce(status, "out") in ["dropping", "upcoming"])`;
+
   const primary = await sanityFetch<ReleaseListItem[]>(groq`
     *[
       _type == "release"
       && (withdrawn != true)
       ${titleGuard}
+      ${statusGuard}
       && $slug in artists[]->slug.current
     ] | order(year desc, releaseDate desc, catalogNumber desc) {
       ${releaseListProjection}
@@ -1674,6 +1705,7 @@ export async function getCatalogForArtist(slug: string): Promise<CatalogItem[]> 
     *[
       _type == "release"
       && (withdrawn != true)
+      ${statusGuard}
       ${titleGuard}
       && !($slug in artists[]->slug.current)
       && count(credits[person->slug.current == $slug]) > 0
