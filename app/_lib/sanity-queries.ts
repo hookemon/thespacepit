@@ -729,15 +729,28 @@ export async function getExternalCreditsForArtist(slug: string): Promise<Externa
 // Fully fresh per request — Sanity fetcher uses revalidate: 0 in dev so this
 // genuinely rotates on every page load.
 export async function getFeaturedRelease(): Promise<ReleaseListItem | null> {
+  // Excludes dropping / upcoming so the C+C hero never surfaces a pitch
+  // record (Just Nico, Glove, the comps, etc.) on the public label page.
+  // Matches getReleases()'s public-catalog filter exactly.
   const featured = await sanityFetch<ReleaseListItem[]>(groq`
-    *[_type == "release" && featured == true && (withdrawn != true) && label != "Other"] {
+    *[_type == "release"
+      && featured == true
+      && (withdrawn != true)
+      && label != "Other"
+      && !(coalesce(status, "out") in ["dropping", "upcoming"])
+    ] {
       ${releaseListProjection}
     }
   `);
   let pool = featured;
   if (pool.length === 0) {
     pool = await sanityFetch<ReleaseListItem[]>(groq`
-      *[_type == "release" && (withdrawn != true) && label != "Other" && defined(cover)] {
+      *[_type == "release"
+        && (withdrawn != true)
+        && label != "Other"
+        && defined(cover)
+        && !(coalesce(status, "out") in ["dropping", "upcoming"])
+      ] {
         ${releaseListProjection}
       }
     `);
