@@ -66,6 +66,9 @@ export type Track = {
   note?: string;
   videoUrl?: string;
   audioPreviewUrl?: string;
+  /** Plain-text lyrics. Verse markers ([Verse 1], [Chorus], etc.) are
+   *  rendered bold by the tracklist UI. */
+  lyrics?: string;
 };
 
 export type ReleaseCredit = {

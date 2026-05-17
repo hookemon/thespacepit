@@ -43,6 +43,9 @@ export function TracklistAndCover({
    *  into tracklist[]. Multi-select so you can compare two songs side-by-
    *  side without one closing the other. */
   const [openRows, setOpenRows] = useState<Set<number>>(new Set());
+  // Separate state for lyrics expansion — opening lyrics shouldn't open
+  // the credits cast panel on the same row (and vice versa).
+  const [openLyrics, setOpenLyrics] = useState<Set<number>>(new Set());
 
   // Index album credits by lowercased + normalized track title so each row
   // can do a quick `creditsByTrack.get(normalize(title)) ?? []` lookup.
@@ -282,12 +285,68 @@ export function TracklistAndCover({
                   <span>cast · {trackCredits.length}</span>
                 </button>
               )}
+              {/* Lyrics toggle — renders only when this track has lyrics.
+                  Independent state from the cast toggle so opening one
+                  doesn't close the other. */}
+              {t.lyrics && t.lyrics.trim().length > 0 && (() => {
+                const lyricsOpen = openLyrics.has(i);
+                return (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenLyrics((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(i)) next.delete(i);
+                        else next.add(i);
+                        return next;
+                      })
+                    }
+                    className="font-mono text-[10px] tracking-[.14em] uppercase px-2.5 py-1 border border-ink rounded-full hover:bg-ink hover:text-paper transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+                    aria-expanded={lyricsOpen}
+                    aria-label={`${lyricsOpen ? "Hide" : "Show"} lyrics for ${t.title}`}
+                    title={`${lyricsOpen ? "Hide" : "Show"} lyrics`}
+                  >
+                    <span aria-hidden>{lyricsOpen ? "▴" : "▾"}</span>
+                    <span>lyrics</span>
+                  </button>
+                );
+              })()}
               {t.duration && (
                 <span className="font-mono text-[12px] tabular-nums text-ink-3 shrink-0 w-12 text-right">
                   {t.duration}
                 </span>
               )}
             </div>
+
+            {/* Lyrics pop-out — visible when the lyrics toggle is on.
+                Plain pre-wrapped text in serif, indented to align with
+                the title column. Verse markers like [Verse 1] / [Chorus]
+                / [Hook] / [Bridge] auto-render bold so the structure
+                reads at a glance. */}
+            {t.lyrics && openLyrics.has(i) && (
+              <div className="pl-12 pr-2 pb-5 -mt-1 max-w-[760px]">
+                <div className="border-l-2 border-ink/30 pl-4">
+                  <div className="font-mono text-[10px] tracking-[.16em] uppercase text-ink-3 mb-2">
+                    lyrics
+                  </div>
+                  <div className="font-serif text-[15px] leading-[1.65] text-ink whitespace-pre-wrap">
+                    {t.lyrics.split("\n").map((line, idx) => {
+                      // Bold verse markers — anything in [brackets] is a
+                      // structural label.
+                      const m = line.match(/^\s*\[([^\]]+)\]\s*$/);
+                      if (m) {
+                        return (
+                          <div key={idx} className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mt-3 mb-1">
+                            {m[1]}
+                          </div>
+                        );
+                      }
+                      return <div key={idx}>{line || " "}</div>;
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Per-track credit pop-out — visible when the toggle is on.
                 Rendered as a left-indented panel that aligns with the title

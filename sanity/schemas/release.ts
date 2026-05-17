@@ -303,6 +303,14 @@ export const release = defineType({
             },
             { name: "note", type: "string", title: "Note (optional)" },
             {
+              name: "lyrics",
+              type: "text",
+              title: "Lyrics",
+              rows: 12,
+              description:
+                "Drop the full lyrics here, line by line. Verse / chorus markers like [Verse 1] / [Chorus] / [Hook] / [Bridge] render bold automatically. The release page shows a 'show lyrics' toggle under each track row — visitors click to expand.",
+            },
+            {
               name: "videoUrl",
               type: "url",
               title: "Music video URL (YouTube · Vimeo · IG reel · TikTok)",
