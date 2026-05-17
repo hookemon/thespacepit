@@ -58,8 +58,10 @@ export function rankRole(role: string): number {
   if (/(sample|program|sequenc|drum machine|beat\b)/.test(r)) return 46;
   if (/(turntabl|scratch|dj cut)/.test(r)) return 47;
 
-  // 5. MIX
-  if (/^mix|mix(ed|ing)\s+by\b|^co-?mix/.test(r)) return 50;
+  // 5. MIX — lead engineer first, then co-mix, then assistant
+  if (/(mix|mastering).*assist|assist.*(mix|engineer)/.test(r)) return 52;
+  if (/^co-?mix/.test(r)) return 51;
+  if (/^mix|mix(ed|ing)\s+by\b/.test(r)) return 50;
 
   // 6. MASTER
   if (/^master|master(ed|ing)\s+by\b/.test(r)) return 60;
