@@ -312,7 +312,8 @@ export const release = defineType({
                   name: "writerCredit",
                   fields: [
                     { name: "name", type: "string", title: "Writer name", validation: (r) => r.required() },
-                    { name: "share", type: "number", title: "Share % (0–100)", description: "Writer's % of the composition. All writers on the track should sum to 100." },
+                    { name: "writerShare", type: "number", title: "Writer share % (0–100)", description: "This writer's % of the WRITER royalty. All writers on the track should sum to 100." },
+                    { name: "publisherShare", type: "number", title: "Publisher share % (0–100)", description: "This publisher's % of the PUBLISHER royalty. All publishers on the track should sum to 100. Often mirrors writerShare for self-pub setups but can differ — capture what your PRO has on file." },
                     {
                       name: "pro",
                       type: "string",
@@ -326,10 +327,13 @@ export const release = defineType({
                     { name: "publisherIpiCae", type: "string", title: "Publisher IPI / CAE #" },
                   ],
                   preview: {
-                    select: { title: "name", share: "share", pro: "pro" },
-                    prepare({ title, share, pro }) {
-                      const sub = [share != null ? `${share}%` : null, pro].filter(Boolean).join(" · ");
-                      return { title: title || "?", subtitle: sub };
+                    select: { title: "name", writerShare: "writerShare", publisherShare: "publisherShare", pro: "pro" },
+                    prepare({ title, writerShare, publisherShare, pro }) {
+                      const bits: string[] = [];
+                      if (writerShare != null) bits.push(`W ${writerShare}%`);
+                      if (publisherShare != null && publisherShare !== writerShare) bits.push(`P ${publisherShare}%`);
+                      if (pro) bits.push(pro);
+                      return { title: title || "?", subtitle: bits.join(" · ") };
                     },
                   },
                 },

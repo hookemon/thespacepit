@@ -731,7 +731,11 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
  */
 export type WriterCredit = {
   name: string;
-  share?: number;
+  /** This writer's % of the WRITER royalty. Sum across writers on a track = 100. */
+  writerShare?: number;
+  /** This publisher's % of the PUBLISHER royalty. Sum across publishers on a track = 100.
+   *  Often mirrors writerShare for self-pub setups but can differ — capture what the PRO has on file. */
+  publisherShare?: number;
   pro?: string;
   ipiCae?: string;
   publisher?: string;

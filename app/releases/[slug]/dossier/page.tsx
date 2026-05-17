@@ -20,8 +20,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function DossierPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function DossierPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ key?: string | string[] }>;
+}) {
   const { slug } = await params;
+  const { key } = await searchParams;
+
+  // Token gate. Requires DOSSIER_ACCESS_KEY env var set; if unset, the
+  // dossier is locked down (404) so a misconfigured deploy never leaks.
+  // Share URLs as: /releases/<slug>/dossier?key=<the-key>
+  const expectedKey = process.env.DOSSIER_ACCESS_KEY;
+  const providedKey = Array.isArray(key) ? key[0] : key;
+  if (!expectedKey || providedKey !== expectedKey) {
+    notFound();
+  }
+
   const r = await getReleaseDossier(slug);
   if (!r) notFound();
 
@@ -39,16 +56,17 @@ export default async function DossierPage({ params }: { params: Promise<{ slug: 
   ].filter((d) => d.url);
 
   // Album-wide writer split summary — sum writerCredits across every
-  // track for at-a-glance distribution. Mostly useful for catalog-level
-  // splits checks.
-  const writerTotals = new Map<string, { share: number; pro?: string; ipiCae?: string; publisher?: string }>();
+  // track for at-a-glance distribution. Tracks both writer share and
+  // publisher share since they can differ per row.
+  const writerTotals = new Map<string, { writerShare: number; publisherShare: number; pro?: string; ipiCae?: string; publisher?: string }>();
   let tracksWithSplits = 0;
   for (const t of r.tracklist ?? []) {
     if (!t.writerCredits || t.writerCredits.length === 0) continue;
     tracksWithSplits += 1;
     for (const wc of t.writerCredits) {
-      const cur = writerTotals.get(wc.name) ?? { share: 0, pro: wc.pro, ipiCae: wc.ipiCae, publisher: wc.publisher };
-      cur.share += wc.share ?? 0;
+      const cur = writerTotals.get(wc.name) ?? { writerShare: 0, publisherShare: 0, pro: wc.pro, ipiCae: wc.ipiCae, publisher: wc.publisher };
+      cur.writerShare += wc.writerShare ?? 0;
+      cur.publisherShare += wc.publisherShare ?? 0;
       writerTotals.set(wc.name, cur);
     }
   }
@@ -174,19 +192,21 @@ export default async function DossierPage({ params }: { params: Promise<{ slug: 
                     <th className="text-left py-1">PRO</th>
                     <th className="text-left py-1">IPI/CAE</th>
                     <th className="text-left py-1">Publisher</th>
-                    <th className="text-right py-1">Sum share</th>
+                    <th className="text-right py-1">Σ Writer</th>
+                    <th className="text-right py-1">Σ Publisher</th>
                   </tr>
                 </thead>
                 <tbody>
                   {Array.from(writerTotals.entries())
-                    .sort((a, b) => b[1].share - a[1].share)
+                    .sort((a, b) => b[1].writerShare - a[1].writerShare)
                     .map(([name, info]) => (
                       <tr key={name} className="border-b border-[#d4cfc4]">
                         <td className="py-1">{name}</td>
                         <td className="py-1">{info.pro ?? "—"}</td>
                         <td className="py-1">{info.ipiCae ?? "—"}</td>
                         <td className="py-1">{info.publisher ?? "—"}</td>
-                        <td className="py-1 text-right">{info.share}%</td>
+                        <td className="py-1 text-right">{info.writerShare}%</td>
+                        <td className="py-1 text-right">{info.publisherShare}%</td>
                       </tr>
                     ))}
                 </tbody>
@@ -283,10 +303,11 @@ function TrackBlock({ idx, track }: { idx: number; track: DossierTrack }) {
                 <th className="text-left py-1 pr-2">Writer</th>
                 <th className="text-left py-1 pr-2">PRO</th>
                 <th className="text-left py-1 pr-2">IPI/CAE</th>
-                <th className="text-left py-1 pr-2">Publisher</th>
+                <th className="text-right py-1 pr-2">Writer %</th>
+                <th className="text-left py-1 pr-2 pl-3 border-l border-[#d4cfc4]">Publisher</th>
                 <th className="text-left py-1 pr-2">Pub PRO</th>
                 <th className="text-left py-1 pr-2">Pub IPI</th>
-                <th className="text-right py-1">Share</th>
+                <th className="text-right py-1">Pub %</th>
               </tr>
             </thead>
             <tbody>
@@ -295,18 +316,23 @@ function TrackBlock({ idx, track }: { idx: number; track: DossierTrack }) {
                   <td className="py-1 pr-2">{wc.name}</td>
                   <td className="py-1 pr-2">{wc.pro ?? "—"}</td>
                   <td className="py-1 pr-2">{wc.ipiCae ?? "—"}</td>
-                  <td className="py-1 pr-2">{wc.publisher ?? "—"}</td>
+                  <td className="py-1 pr-2 text-right">{wc.writerShare != null ? `${wc.writerShare}%` : "—"}</td>
+                  <td className="py-1 pr-2 pl-3 border-l border-[#d4cfc4]">{wc.publisher ?? "—"}</td>
                   <td className="py-1 pr-2">{wc.publisherPro ?? "—"}</td>
                   <td className="py-1 pr-2">{wc.publisherIpiCae ?? "—"}</td>
-                  <td className="py-1 text-right">{wc.share != null ? `${wc.share}%` : "—"}</td>
+                  <td className="py-1 text-right">{wc.publisherShare != null ? `${wc.publisherShare}%` : "—"}</td>
                 </tr>
               ))}
             </tbody>
             <tfoot>
               <tr className="border-t border-[#0B0B0B]">
-                <td colSpan={6} className="py-1 text-right uppercase text-[#5a5a5a]">Total</td>
+                <td colSpan={3} className="py-1 text-right uppercase text-[#5a5a5a]">Total</td>
                 <td className="py-1 text-right font-bold">
-                  {track.writerCredits.reduce((s: number, wc: WriterCredit) => s + (wc.share ?? 0), 0)}%
+                  {track.writerCredits.reduce((s: number, wc: WriterCredit) => s + (wc.writerShare ?? 0), 0)}%
+                </td>
+                <td colSpan={3} className="py-1 text-right uppercase text-[#5a5a5a] pl-3 border-l border-[#d4cfc4]">Total</td>
+                <td className="py-1 text-right font-bold">
+                  {track.writerCredits.reduce((s: number, wc: WriterCredit) => s + (wc.publisherShare ?? 0), 0)}%
                 </td>
               </tr>
             </tfoot>
