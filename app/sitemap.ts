@@ -23,10 +23,14 @@ const ORIGIN = "https://thespacepit.com";
 // dynamic segment (handled below) or is intentionally excluded (e.g. the
 // upcoming/distro-pitch URL).
 const STATIC_ROUTES: { path: string; priority: number; changeFreq: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
-  { path: "/",              priority: 1.0,  changeFreq: "daily" },   // pop-up campaign — bump freq while live
-  { path: "/the-pit",       priority: 0.95, changeFreq: "weekly" },  // spacepit world home (was /)
-  { path: "/nick-hook",     priority: 0.9,  changeFreq: "weekly" },
-  { path: "/calm-collect",  priority: 0.9,  changeFreq: "weekly" },
+  // The root is a random-world router (server redirect). Listed mostly so
+  // Google sees the canonical domain; the three world homes below carry
+  // the priority weight.
+  { path: "/",              priority: 0.5,  changeFreq: "weekly" },
+  { path: "/the-pit",       priority: 1.0,  changeFreq: "weekly" },  // spacepit world home
+  { path: "/nick-hook",     priority: 1.0,  changeFreq: "weekly" },  // nick world home
+  { path: "/calm-collect",  priority: 1.0,  changeFreq: "weekly" },  // label world home
+  { path: "/pop-up",        priority: 0.85, changeFreq: "daily" },   // active campaign — date drop
   { path: "/releases",      priority: 0.9,  changeFreq: "weekly" },
   { path: "/artists",       priority: 0.7,  changeFreq: "weekly" },
   { path: "/collabs",       priority: 0.8,  changeFreq: "monthly" },
