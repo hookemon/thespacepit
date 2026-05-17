@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { Track, ReleaseCredit } from "../../_lib/sanity-queries";
 import { VideoModal } from "../../_components/shared/VideoModal";
 import { useListening, type ListeningTrack } from "../../_components/listening/ListeningProvider";
+import { sortByRoleOrder } from "../../_lib/credit-order";
 
 /**
  * Tracklist where EVERY track is clickable, with a smart play fallback chain:
@@ -44,7 +45,7 @@ export function TracklistAndCover({
    *  side without one closing the other. */
   const [openRows, setOpenRows] = useState<Set<number>>(new Set());
   // Separate state for lyrics expansion — opening lyrics shouldn't open
-  // the credits cast panel on the same row (and vice versa).
+  // the credits panel on the same row (and vice versa).
   const [openLyrics, setOpenLyrics] = useState<Set<number>>(new Set());
 
   // Index album credits by lowercased + normalized track title so each row
@@ -271,7 +272,7 @@ export function TracklistAndCover({
                 </button>
               )}
               {/* Per-song credits toggle — only renders when this track has
-                  credit rows scoped to it. Click to pop out the cast panel. */}
+                  credit rows scoped to it. Click to pop out the credits panel. */}
               {trackCredits.length > 0 && (
                 <button
                   type="button"
@@ -279,14 +280,14 @@ export function TracklistAndCover({
                   className="font-mono text-[10px] tracking-[.14em] uppercase px-2.5 py-1 border border-ink rounded-full hover:bg-ink hover:text-paper transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
                   aria-expanded={isOpen}
                   aria-label={`${isOpen ? "Hide" : "Show"} per-track credits for ${t.title}`}
-                  title={`${isOpen ? "Hide" : "Show"} cast`}
+                  title={`${isOpen ? "Hide" : "Show"} credits`}
                 >
                   <span aria-hidden>{isOpen ? "▴" : "▾"}</span>
-                  <span>cast · {trackCredits.length}</span>
+                  <span>credits · {trackCredits.length}</span>
                 </button>
               )}
               {/* Lyrics toggle — renders only when this track has lyrics.
-                  Independent state from the cast toggle so opening one
+                  Independent state from the credits toggle so opening one
                   doesn't close the other. */}
               {t.lyrics && t.lyrics.trim().length > 0 && (() => {
                 const lyricsOpen = openLyrics.has(i);
@@ -350,54 +351,38 @@ export function TracklistAndCover({
 
             {/* Per-track credit pop-out — visible when the toggle is on.
                 Rendered as a left-indented panel that aligns with the title
-                column (past the play-button gutter). Credits are grouped by
-                role-family (Production / Engineering / Performance / Other)
-                so the cast reads cleanly even on a song with 8 contributors. */}
+                column (past the play-button gutter). Credits sort by the
+                canonical vinyl-jacket order (Vocals → Produced by →
+                Co-prod/Remix → Instrumentalists → Mixed → Mastered →
+                Recorded by/at) so the same role ordering reads consistently
+                across album-wide credits AND per-track popouts. */}
             {isOpen && trackCredits.length > 0 && (
               <div className="pl-12 pr-2 pb-4 -mt-1 max-w-[760px]">
                 <div className="border-l-2 border-ink/30 pl-4">
                   <div className="font-mono text-[10px] tracking-[.16em] uppercase text-ink-3 mb-2">
                     on this song
                   </div>
-                  {(() => {
-                    type Family = "Production" | "Engineering" | "Performance" | "Other";
-                    const familyOf = (role: string): Family => {
-                      const r = role.toLowerCase();
-                      if (/produc|exec/.test(r)) return "Production";
-                      if (/mix|master|record|engineer|track/.test(r)) return "Engineering";
-                      if (/vocal|backing|bass|guitar|drum|key|synth|string|programming|beat|percuss|sax|horn|brass/.test(r)) return "Performance";
-                      return "Other";
-                    };
-                    const groups = new Map<Family, ReleaseCredit[]>([
-                      ["Production", []], ["Engineering", []], ["Performance", []], ["Other", []],
-                    ]);
-                    for (const cr of trackCredits) groups.get(familyOf(cr.role))!.push(cr);
-                    return (
-                      <ul className="grid gap-1.5">
-                        {[...groups.entries()].flatMap(([family, list]) =>
-                          list.length === 0 ? [] : list.map((cr, idx) => (
-                            <li key={`${family}-${idx}`} className="flex items-baseline gap-3">
-                              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 shrink-0 w-[140px]">
-                                {cr.role}{cr.instrument ? ` · ${cr.instrument}` : ""}
-                              </span>
-                              <span className="flex-1 font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight">
-                                {cr.person ? (
-                                  <Link
-                                    href={`/artists/${cr.person.slug}`}
-                                    className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                                  >
-                                    {cr.person.name}
-                                  </Link>
-                                ) : (
-                                  cr.name ?? "—"
-                                )}
-                              </span>
-                            </li>
-                          ))
-                        )}
-                      </ul>
-                    );
-                  })()}
+                  <ul className="grid gap-1.5">
+                    {sortByRoleOrder(trackCredits).map((cr, idx) => (
+                      <li key={idx} className="flex items-baseline gap-3">
+                        <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 shrink-0 w-[140px]">
+                          {cr.role}{cr.instrument ? ` · ${cr.instrument}` : ""}
+                        </span>
+                        <span className="flex-1 font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight">
+                          {cr.person ? (
+                            <Link
+                              href={`/artists/${cr.person.slug}`}
+                              className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                            >
+                              {cr.person.name}
+                            </Link>
+                          ) : (
+                            cr.name ?? "—"
+                          )}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             )}

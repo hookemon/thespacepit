@@ -21,6 +21,7 @@ import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
 import { urlFor, sanityFetch } from "../../_lib/sanity";
 import { buildMusicAlbumJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
+import { rankRole, isLocationRole } from "../../_lib/credit-order";
 
 // Per-release custom cover components — when a release has a fully
 // designed live cover (React handoffs from the design package), it slots in here in place
@@ -527,38 +528,25 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 joined with " + " (vinyl-jacket reading order, not a database
                 table). Sits RIGHT AFTER the bio per Nick — vinyl-jacket
                 reading order = words first, then who played what, THEN you
-                hit play. Recording locations roll into a centered block. */}
+                hit play. Recording locations roll into a centered block.
+                Ordering is the canonical convention from
+                `_lib/credit-order.ts`: Vocals → Produced by → Co-prod/Remix
+                → Instrumentalists → Mixed → Mastered. "Recorded at"
+                splits out into the location footer below. */}
             {release.credits && release.credits.length > 0 && (() => {
-              const ROLE_ORDER = [
-                "Vocals",
-                "Backing vocals",
-                "Produced by",
-                "Co-produced by",
-                "Additional production",
-                "Remix by",
-                "Bass", "Guitar", "Drums", "Keys", "Synth", "Strings", "Programming", "Beats",
-                "Mixed by",
-                "Co-mixed by",
-                "Mastered by",
-              ];
-              const LOCATION_ROLES = new Set(["Recorded at", "Recorded by", "Tracking engineer", "Vocal engineer"]);
-
               const byRole = new Map<string, typeof release.credits>();
               for (const c of release.credits) {
                 const k = c.role ?? "—";
                 if (!byRole.has(k)) byRole.set(k, []);
                 byRole.get(k)!.push(c);
               }
-              const sortRoles = (rs: string[]) => rs.sort((a, b) => {
-                const ai = ROLE_ORDER.indexOf(a);
-                const bi = ROLE_ORDER.indexOf(b);
-                if (ai === -1 && bi === -1) return a.localeCompare(b);
-                if (ai === -1) return 1;
-                if (bi === -1) return -1;
-                return ai - bi;
-              });
-              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !LOCATION_ROLES.has(r)));
-              const locationRoles = [...byRole.keys()].filter((r) => LOCATION_ROLES.has(r));
+              const sortRoles = (rs: string[]) =>
+                rs.sort((a, b) => {
+                  const d = rankRole(a) - rankRole(b);
+                  return d !== 0 ? d : a.localeCompare(b);
+                });
+              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !isLocationRole(r)));
+              const locationRoles = [...byRole.keys()].filter((r) => isLocationRole(r));
 
               return (
                 <Room number="01a" title="the credits" kicker="vinyl jacket">
