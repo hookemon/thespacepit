@@ -9,7 +9,7 @@ import { sortByRoleOrder } from "../../_lib/credit-order";
 
 /**
  * Tracklist where EVERY track is clickable, with a smart play fallback chain:
- *   1. If track has audioPreviewUrl → play 30s Bandcamp preview
+ *   1. If track has audioUrl → play full track (Sanity-hosted) or fallback preview
  *   2. Else if track has videoUrl → open music video modal
  *   3. Else → search YouTube on-demand for "$artist $title", open in modal
  *
@@ -92,7 +92,7 @@ export function TracklistAndCover({
     title: t.title,
     artist: t.feature ? `${releaseArtistText ?? ""} · feat. ${t.feature}`.trim() : releaseArtistText,
     coverUrl: releaseCoverUrl ?? null,
-    audioUrl: t.audioPreviewUrl!,
+    audioUrl: t.audioUrl!,
     releaseSlug,
     releaseTrackNumber: i + 1,
     duration: t.duration,
@@ -100,11 +100,11 @@ export function TracklistAndCover({
 
   const playTrack = useCallback((idx: number) => {
     const t = tracklist[idx];
-    if (!t?.audioPreviewUrl) return;
+    if (!t?.audioUrl) return;
     // If THIS row is what's already playing, toggle pause; else queue + play
     // the whole release from this index so "next" advances through the album.
     if (playingIdx === idx) { toggle(); return; }
-    const playable = tracklist.filter((tt) => tt.audioPreviewUrl);
+    const playable = tracklist.filter((tt) => tt.audioUrl);
     if (playable.length === tracklist.length) {
       // Every track has audio — queue the full album, start at idx.
       playQueue(tracklist.map((tt, i) => toListening(i, tt)), idx);
@@ -123,7 +123,7 @@ export function TracklistAndCover({
   // Smart play: try preview audio → try song's videoUrl → fall back to a
   // YouTube search for "$artist $title" → open in modal.
   const smartPlay = useCallback(async (idx: number, t: Track) => {
-    if (t.audioPreviewUrl) { playTrack(idx); return; }
+    if (t.audioUrl) { playTrack(idx); return; }
     if (t.videoUrl) { openVideo(t.videoUrl, `${t.title} — music video`); return; }
     setSearchingIdx(idx);
     try {
@@ -150,7 +150,7 @@ export function TracklistAndCover({
       <ol className="list-none p-0 m-0 border-t border-ink">
         {tracklist.map((t, i) => {
           const hasVideo = !!t.videoUrl;
-          const hasPreview = !!t.audioPreviewUrl;
+          const hasPreview = !!t.audioUrl;
           // "playing" = this row is the global current AND audio is running.
           // We show the morphing pause icon only while actually playing; while
           // paused the number/▶ comes back so it's obvious you can resume.
@@ -191,7 +191,7 @@ export function TracklistAndCover({
                 const label = isSearching ? "…" : isPlaying ? "❚❚" : "▶";
                 const num = String(i + 1).padStart(2, "0");
                 const title = hasPreview
-                  ? (isPlaying ? "Pause" : "30s preview")
+                  ? (isPlaying ? "Pause" : "Play")
                   : hasVideo
                   ? "Play music video"
                   : "Find on YouTube";

@@ -42,7 +42,12 @@ type ReleaseRow = {
   spotifyUrl?: string;
   appleMusicUrl?: string;
   youtubeUrl?: string;
+  youtubeMusicUrl?: string;
   bandcampUrl?: string;
+  tidalUrl?: string;
+  amazonMusicUrl?: string;
+  deezerUrl?: string;
+  soundcloudUrl?: string;
 };
 
 type ITunesResult = {
@@ -153,14 +158,17 @@ async function main() {
   const slugFilter = ONLY_SLUG ? `&& slug.current == "${ONLY_SLUG}"` : "";
   const missing = FORCE
     ? ""
-    : "&& (!defined(spotifyUrl) || !defined(appleMusicUrl) || !defined(youtubeUrl))";
+    : `&& (!defined(spotifyUrl) || !defined(appleMusicUrl) || !defined(youtubeUrl)
+          || !defined(youtubeMusicUrl) || !defined(tidalUrl) || !defined(amazonMusicUrl)
+          || !defined(deezerUrl) || !defined(soundcloudUrl))`;
 
   const rows = await client.fetch<ReleaseRow[]>(`
     *[_type == "release" && (withdrawn != true) ${labelFilter} ${slugFilter} ${missing}]
       | order(year desc) {
       _id, title, "slug": slug.current, year, label,
       "artistNames": artists[]->name,
-      spotifyUrl, appleMusicUrl, youtubeUrl, bandcampUrl
+      spotifyUrl, appleMusicUrl, youtubeUrl, youtubeMusicUrl, bandcampUrl,
+      tidalUrl, amazonMusicUrl, deezerUrl, soundcloudUrl
     }
   `);
 
@@ -199,10 +207,13 @@ async function main() {
     const patch: Record<string, string> = {};
     if (!r.spotifyUrl && links.spotify?.url) patch.spotifyUrl = links.spotify.url;
     if (!r.appleMusicUrl && links.appleMusic?.url) patch.appleMusicUrl = links.appleMusic.url;
-    if (!r.youtubeUrl && (links.youtube?.url || links.youtubeMusic?.url)) {
-      patch.youtubeUrl = links.youtube?.url ?? links.youtubeMusic!.url;
-    }
+    if (!r.youtubeUrl && links.youtube?.url) patch.youtubeUrl = links.youtube.url;
+    if (!r.youtubeMusicUrl && links.youtubeMusic?.url) patch.youtubeMusicUrl = links.youtubeMusic.url;
     if (!r.bandcampUrl && links.bandcamp?.url) patch.bandcampUrl = links.bandcamp.url;
+    if (!r.tidalUrl && links.tidal?.url) patch.tidalUrl = links.tidal.url;
+    if (!r.amazonMusicUrl && links.amazonMusic?.url) patch.amazonMusicUrl = links.amazonMusic.url;
+    if (!r.deezerUrl && links.deezer?.url) patch.deezerUrl = links.deezer.url;
+    if (!r.soundcloudUrl && links.soundcloud?.url) patch.soundcloudUrl = links.soundcloud.url;
 
     const fields = Object.keys(patch);
     if (fields.length === 0) {

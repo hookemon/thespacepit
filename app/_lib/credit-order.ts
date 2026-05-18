@@ -1,17 +1,23 @@
 /**
  * Vinyl-jacket credit ordering — canonical convention across thespacepit.
  *
- *   Vocals → Produced by → Co-prod/Remix → Instrumentalists → Mixed → Mastered
- *   then "Recorded at <studio>" below in a separate location block.
+ * Per Nick's 2026-05-17 update, the order is:
  *
- * Per Nick's memory note `feedback_credit_ordering.md` — one line per role,
- * read like a 12" jacket, not a database table. Used by:
+ *   Produced by → Additional Production by → Written by → Performed by
+ *   → Vocals → Guitar / Bass / Strings / Horns / Turntables
+ *   → Mixed → Mastered → Engineering → "Recorded at <studio>" footer
+ *
+ * Filtered out entirely (don't render on the page):
+ *   - Programming / Sequencing / Drum machine / Sample / Beat
+ *   - Keys / Piano / Rhodes / Wurlitzer / Moog / Organ / Synth
+ *   - "Recorded by" (engineer label too generic — fact-check per release)
+ *
+ * Used by:
  *   - app/releases/[slug]/page.tsx (album-wide credits room)
  *   - app/releases/[slug]/TracklistAndCover.tsx (per-track credits popout)
  *
- * The matching is intentionally permissive (substring, case-insensitive)
- * so legacy data still sorts correctly even when role strings drift
- * ("Producer" vs "Produced by", "Bass guitar" vs "Bass", etc.).
+ * Matching is intentionally permissive (substring, case-insensitive) so
+ * legacy data still sorts correctly even when role strings drift.
  */
 
 /** Lower = sorts earlier. Gaps left for in-bucket nuance. */
@@ -19,84 +25,102 @@ export function rankRole(role: string): number {
   const r = (role ?? "").toLowerCase().trim();
   if (!r) return 999;
 
-  // 0. WRITTEN BY — anchors the top of the jacket on real records
-  //    ("All songs written by X. Produced by Y. …"). Public credit only —
-  //    actual splits live in writerCredits[] (PRIVATE) on each track.
-  if (/^written by$|songwriter|^lyrics by$/.test(r)) return 5;
-
-  // 1. VOCALS — lead first, then features/guests, then backing.
-  if (/lead vocal/.test(r)) return 10;
-  if (/^vocals?$/.test(r) || /^vox\b/.test(r)) return 11;
-  if (/featur|^ft\.?\b|guest/.test(r)) return 12;
-  if (/^rap\b/.test(r) || /\brap by\b/.test(r) || /\bverse\b/.test(r)) return 13;
-  if (/back(ing|ground)?\s*vocal/.test(r)) return 14;
-  if (/(harmon|ad-?lib|hook|chorus)/.test(r)) return 15;
-
-  // 2. PRODUCED BY — anything that reads as "this person produced it".
-  //    Match "Producer", "Produced by", "Production", but EXCLUDE
-  //    "Co-produced", "Additional production" (those are bucket 3).
+  // 1. PRODUCED BY — anchors the top of the credits block.
+  //    Exclude "Co-produced" and "Additional production" — they're in
+  //    bucket 2 below.
   if (/\b(co-?produc|additional\s*production)/.test(r)) {
-    // fall through to bucket 3 below
+    // fall through to bucket 2
   } else if (/^produc(ed by|er|tion)\b/.test(r) || /\bproduced by\b/.test(r)) {
-    return 20;
+    return 10;
   }
 
-  // 3. CO-PROD / ADDITIONAL PROD / REMIX
-  if (/co-?produc/.test(r)) return 30;
-  if (/additional\s*production/.test(r)) return 31;
-  if (/remix|re-?edit|edit by/.test(r)) return 32;
+  // 2. ADDITIONAL PRODUCTION / CO-PROD / REMIX
+  if (/additional\s*production/.test(r)) return 20;
+  if (/co-?produc/.test(r)) return 21;
+  if (/remix|re-?edit|edit by/.test(r)) return 22;
 
-  // 4. INSTRUMENTALISTS — order by stage-billing tradition
-  //    (drums + bass = rhythm section first, then guitars, then keys, then
-  //    strings/horns, then programming/samples last).
-  if (/drum|percuss|kit\b/.test(r)) return 40;
-  if (/bass\b/.test(r)) return 41;
-  if (/guitar/.test(r)) return 42;
-  if (/(keys|piano|rhodes|wurlitzer|moog|organ|synth)/.test(r)) return 43;
-  if (/(string|violin|viola|cello|orchestr)/.test(r)) return 44;
-  if (/(horn|brass|trumpet|trombone|saxophone|sax\b|flute|woodwind)/.test(r)) return 45;
-  if (/(sample|program|sequenc|drum machine|beat\b)/.test(r)) return 46;
-  if (/(turntabl|scratch|dj cut)/.test(r)) return 47;
+  // 3. WRITTEN BY
+  if (/^written by$|songwriter|^lyrics by$|\bwriter\b/.test(r)) return 30;
 
-  // 5. MIX — lead engineer first, then co-mix, then assistant
-  if (/(mix|mastering).*assist|assist.*(mix|engineer)/.test(r)) return 52;
-  if (/^co-?mix/.test(r)) return 51;
-  if (/^mix|mix(ed|ing)\s+by\b/.test(r)) return 50;
+  // 4. PERFORMED BY — collective performer line.
+  if (/^performed by\b|\bperformer\b/.test(r)) return 40;
 
-  // 6. MASTER
-  if (/^master|master(ed|ing)\s+by\b/.test(r)) return 60;
+  // 5. VOCALS — lead first, then features/guests, then backing.
+  if (/lead vocal/.test(r)) return 50;
+  if (/^vocals?$|^vox\b/.test(r)) return 51;
+  if (/featur|^ft\.?\b|guest/.test(r)) return 52;
+  if (/^rap\b|\brap by\b|\bverse\b/.test(r)) return 53;
+  if (/back(ing|ground)?\s*vocal/.test(r)) return 54;
+  if (/(harmon|ad-?lib|hook|chorus)/.test(r)) return 55;
 
-  // 7. RECORDING / ENGINEERING (separate from "Recorded at" studio block)
-  if (/(record|track)(ed|ing)\s+(by|engineer)|^engineer|engineered by/.test(r)) return 70;
+  // 6. INSTRUMENTALISTS — stage-billing order. Programming + keys are
+  //    intentionally absent (filtered via isFilteredRole below).
+  if (/drum|percuss|kit\b/.test(r)) return 60;
+  if (/bass\b/.test(r)) return 61;
+  if (/guitar/.test(r)) return 62;
+  if (/(string|violin|viola|cello|orchestr)/.test(r)) return 63;
+  if (/(horn|brass|trumpet|trombone|saxophone|sax\b|flute|woodwind)/.test(r)) return 64;
+  if (/(turntabl|scratch|dj cut)/.test(r)) return 65;
 
-  // 8. STUDIO / LOCATION (renders in its own footer block on the album view)
-  if (/recorded at|recording studio|cut at|studio$/.test(r)) return 80;
+  // 7. MIX — lead engineer first, then co-mix, then assistant.
+  if (/(mix|mastering).*assist|assist.*(mix|engineer)/.test(r)) return 72;
+  if (/^co-?mix/.test(r)) return 71;
+  if (/^mix|mix(ed|ing)\s+by\b/.test(r)) return 70;
 
-  // 9. Other / catch-all (artwork, photography, mgmt, etc.) — written-by
-  //    has already been hoisted to rank 5 above.
-  if (/(artwork|cover|design|photo|illustration|layout|sleeve)/.test(r)) return 91;
-  if (/(a&r|management|exec|publishing|label)/.test(r)) return 92;
+  // 8. MASTER
+  if (/^master|master(ed|ing)\s+by\b/.test(r)) return 80;
 
-  return 99;
+  // 9. ENGINEERING — explicit "Engineering by" credit lives here.
+  //    "Recorded by" is FILTERED OUT (see isFilteredRole) per Nick.
+  if (/^engineer|engineered by/.test(r)) return 90;
+
+  // 10. STUDIO / LOCATION (separate footer block on the album view).
+  if (/recorded at|recording studio|cut at|studio$/.test(r)) return 100;
+
+  // 11. Other / catch-all (artwork, A&R, publishing, etc.).
+  if (/(artwork|cover|design|photo|illustration|layout|sleeve)/.test(r)) return 110;
+  if (/(a&r|management|exec|publishing|label)/.test(r)) return 120;
+
+  return 999;
+}
+
+/**
+ * Roles that should NOT render on the public release page. Per Nick:
+ * programming and keys credits are too granular for the vinyl-jacket
+ * read, and "Recorded by" engineer credit needs per-release fact-checking
+ * before it ships publicly.
+ */
+export function isFilteredRole(role: string): boolean {
+  const r = (role ?? "").toLowerCase().trim();
+  if (!r) return false;
+  // Programming / sequencing / drum machine / sample / beat
+  if (/(program|sequenc|drum\s*machine|^sampl|^beats?\b)/.test(r)) return true;
+  // Keys family — piano, Rhodes, Wurli, Moog, organ, synth
+  if (/(^keys?\b|piano|rhodes|wurlitzer|wurli\b|moog|^organ\b|synth)/.test(r)) return true;
+  // "Recorded by" engineer label (the studio LOCATION "Recorded at" still
+  // renders — different rank, handled by isLocationRole).
+  if (/^record(ed)?\s+by\b/.test(r)) return true;
+  return false;
 }
 
 /**
  * Sort a list of credits (or anything with a `role` field) into vinyl-jacket
- * reading order. Stable for ties — entries with the same rank stay in
- * input order.
+ * reading order. Filters out roles flagged by `isFilteredRole`. Stable for
+ * ties — entries with the same rank stay in input order.
  */
 export function sortByRoleOrder<T extends { role?: string }>(credits: T[]): T[] {
   return credits
+    .filter((c) => !isFilteredRole(c.role ?? ""))
     .map((c, i) => ({ c, i, k: rankRole(c.role ?? "") }))
     .sort((a, b) => a.k - b.k || a.i - b.i)
     .map((x) => x.c);
 }
 
 /**
- * Split a list of roles into the "people" group (lines 1–7) vs the
- * "location" group (line 8, the studio footer). Used by the album-wide
+ * Split a list of roles into the "people" group (lines 1–9) vs the
+ * "location" group (line 10, the studio footer). Used by the album-wide
  * credits room to render them in two distinct typographic blocks.
  */
 export function isLocationRole(role: string): boolean {
-  return rankRole(role) === 80;
+  return rankRole(role) === 100;
 }

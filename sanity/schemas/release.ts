@@ -368,10 +368,17 @@ export const release = defineType({
               description: "If this song has a music video, drop the URL here. A play button appears on the tracklist row.",
             },
             {
+              name: "audio",
+              type: "file",
+              title: "Audio file (full track · MP3/M4A)",
+              options: { accept: "audio/mp3,audio/mpeg,audio/mp4,audio/x-m4a" },
+              description: "Sanity-hosted full-track stream. Preferred over audioPreviewUrl. Upload via scripts/upload-owned-tracks.ts or manually. Renders the play button on the tracklist row + adds to the global queue.",
+            },
+            {
               name: "audioPreviewUrl",
               type: "url",
-              title: "Audio preview (30s clip) — auto-scraped from Bandcamp",
-              description: "Don't fill this in manually — the scraper sets it. If empty, no play button on the row.",
+              title: "Audio preview URL (legacy — Bandcamp)",
+              description: "DEPRECATED — Bandcamp stream tokens expire (return 410). Used as fallback only when `audio` is empty. Migrate to the `audio` file upload instead.",
             },
           ],
           preview: {

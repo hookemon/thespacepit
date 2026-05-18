@@ -21,7 +21,7 @@ import { OldEnglishCover } from "../../_components/releases/OldEnglishCover";
 import { PromoPlayer } from "../../_components/releases/PromoPlayer";
 import { urlFor, sanityFetch } from "../../_lib/sanity";
 import { buildMusicAlbumJsonLd, jsonLdScript } from "../../_lib/schema-jsonld";
-import { rankRole, isLocationRole } from "../../_lib/credit-order";
+import { rankRole, isLocationRole, isFilteredRole } from "../../_lib/credit-order";
 
 // Per-release custom cover components — when a release has a fully
 // designed live cover (React handoffs from the design package), it slots in here in place
@@ -36,7 +36,10 @@ const LIVE_COVERS: Record<string, () => ReactElement> = {
 import { getVideosFromPlaylist } from "../../_lib/youtube";
 import { FOOTER_LINKS } from "../../_lib/social-links";
 
-export const revalidate = 3600;
+// During the catalog build-out, keep revalidate short so Sanity edits
+// propagate to production within a minute. Bump back up to 3600 once
+// the catalog is stable.
+export const revalidate = 60;
 
 export async function generateStaticParams() {
   const slugs = await getReleaseSlugs();
@@ -513,136 +516,32 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                   </div>
                 )}
 
-                {/* Liner notes — moved up so they sit right under the hero,
-                    not buried below the tracklist. */}
-                {release.notes && Array.isArray(release.notes) && release.notes.length > 0 && (
-                  <div className="mt-8 max-w-[640px]">
-                    <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-3">LINER NOTES</div>
-                    <PortableText value={release.notes} />
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* === THE CREDITS === Grouped by role, one line per role, names
-                joined with " + " (vinyl-jacket reading order, not a database
-                table). Sits RIGHT AFTER the bio per Nick — vinyl-jacket
-                reading order = words first, then who played what, THEN you
-                hit play. Recording locations roll into a centered block.
-                Ordering is the canonical convention from
-                `_lib/credit-order.ts`: Vocals → Produced by → Co-prod/Remix
-                → Instrumentalists → Mixed → Mastered. "Recorded at"
-                splits out into the location footer below. */}
-            {release.credits && release.credits.length > 0 && (() => {
-              const byRole = new Map<string, typeof release.credits>();
-              for (const c of release.credits) {
-                const k = c.role ?? "—";
-                if (!byRole.has(k)) byRole.set(k, []);
-                byRole.get(k)!.push(c);
-              }
-              const sortRoles = (rs: string[]) =>
-                rs.sort((a, b) => {
-                  const d = rankRole(a) - rankRole(b);
-                  return d !== 0 ? d : a.localeCompare(b);
-                });
-              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !isLocationRole(r)));
-              const locationRoles = [...byRole.keys()].filter((r) => isLocationRole(r));
+            {/* === THE BIO === Standalone full-width section. Nick's locked
+                order is hero → bandcamp/listen-on → bio → tracks → credits →
+                videos → press → physical. The bio used to live inside the
+                hero right-column; promoted to its own room so it gets the
+                editorial breathing room a record's story deserves. */}
+            {release.notes && Array.isArray(release.notes) && release.notes.length > 0 && (
+              <Room number="02" title="the words" kicker="liner notes">
+                <div className="max-w-[680px] prose-bio">
+                  <PortableText value={release.notes} />
+                </div>
+              </Room>
+            )}
 
-              return (
-                <Room number="01a" title="the credits" kicker="vinyl jacket">
-                  <div className="max-w-[720px] mx-auto">
-                    <ul className="grid gap-0">
-                      {peopleRoles.map((role) => {
-                        const cs = byRole.get(role)!;
-                        return (
-                          <li
-                            key={role}
-                            className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-ink/15 py-3.5"
-                          >
-                            <span className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 shrink-0 w-[120px]">
-                              {role}
-                            </span>
-                            <span className="flex-1 font-display font-semibold text-[20px] uppercase tracking-[-0.005em] leading-tight">
-                              {cs.map((c, i) => (
-                                <span key={i}>
-                                  {c.person ? (
-                                    <Link
-                                      href={`/artists/${c.person.slug}`}
-                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                                    >
-                                      {c.person.name}
-                                    </Link>
-                                  ) : (
-                                    c.name ?? "—"
-                                  )}
-                                  {i < cs.length - 1 ? <span className="text-ink-3"> + </span> : null}
-                                </span>
-                              ))}
-                            </span>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                    {locationRoles.length > 0 && (() => {
-                      // Flatten all location credits into a single ordered list,
-                      // each becoming a clickable studio link when matched.
-                      const locs = locationRoles.flatMap((role) => byRole.get(role)!);
-                      return (
-                        <div className="mt-8 pt-6 border-t border-ink/30 text-center">
-                          <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
-                            {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
-                          </div>
-                          <div className="font-display text-[18px] uppercase tracking-[-0.005em] flex flex-wrap justify-center items-baseline gap-x-2 gap-y-1">
-                            {locs.map((c, i) => {
-                              const display = c.name ?? c.person?.name ?? "—";
-                              const city = c.instrument;
-                              const linkHref = c.studio?.slug
-                                ? `/studios/${c.studio.slug}`
-                                : null;
-                              const label = (
-                                <>
-                                  {linkHref ? (
-                                    <Link
-                                      href={linkHref}
-                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                                    >
-                                      {display}
-                                    </Link>
-                                  ) : (
-                                    display
-                                  )}
-                                  {city && (
-                                    <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 ml-1.5">
-                                      · {city}
-                                    </span>
-                                  )}
-                                </>
-                              );
-                              return (
-                                <span key={i} className="inline-flex items-baseline">
-                                  {label}
-                                  {i < locs.length - 1 && (
-                                    <span className="text-ink-3 mx-2">·</span>
-                                  )}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })()}
-                  </div>
-                </Room>
-              );
-            })()}
-
-            {/* === THE AUDIO === Bandcamp player. Shown only when there's NO
-                promoAudio (so it doesn't double-up with the in-house player
-                that sits right under the hero). When you've uploaded an MP3
-                via `promoAudio`, that's the canonical listen surface; this
-                Bandcamp embed becomes a redundant block and gets skipped.
-                Bandcamp lives further down in the LISTEN ON platform chips. */}
-            {!release.promoAudio && (release.bandcampAlbumId || release.bandcampTrackId) && (
+            {/* === THE AUDIO === Bandcamp player fallback. Skipped when ANY
+                other audio surface is already on the page: a release-level
+                promoAudio mp3, per-track audio in the tracklist (the new
+                full-stream pattern), or the hero already rendering a
+                Bandcamp embed from bandcampUrl. Avoids stacking two
+                identical iframes. */}
+            {!release.promoAudio &&
+              !release.tracklist?.some((t) => t.audioUrl) &&
+              !release.bandcampUrl &&
+              (release.bandcampAlbumId || release.bandcampTrackId) && (
               <Room
                 number="01"
                 title="the audio"
@@ -728,35 +627,12 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               );
             })()}
 
-            {/* === THE WATCH === music videos + reels + performance clips.
-                Renders as a hero player with a clickable thumbnail rail so
-                you can bounce between the official video, the audio rip,
-                and any vertical reel edits without leaving the page.
-                Falls back to a grid for releases with only one clip. */}
-            {allClips.length > 0 && (
-              <Room
-                number={leadVideoUrl ? "01" : "02"}
-                title="the watch"
-                kicker={allClips.length > 1 ? "the whole playlist" : "music video"}
-              >
-                {allClips.length > 1 ? (
-                  <VideoPlaylist
-                    items={allClips.map((c) => ({ url: c.url, title: c.title ?? undefined }))}
-                    accent={release.coverColor ?? "#F2B705"}
-                  />
-                ) : (
-                  <div>
-                    <MediaEmbed url={allClips[0].url} title={allClips[0].title ?? release.title} />
-                    {allClips[0].title && (
-                      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{allClips[0].title}</div>
-                    )}
-                  </div>
-                )}
-              </Room>
-            )}
+            {/* (THE WATCH moved down — Nick's locked order is hero → bandcamp
+                → bio → tracks → credits → watch → press → physical. New home
+                is after the credits room below.) */}
 
             {/* Default position for the sample pack room — every release
-                that isn't KUSA renders it here, after THE WATCH. */}
+                that isn't KUSA renders it here. */}
             {release.slug !== "cc029-kusa" && samplePackRoom}
 
             {/* === PLAY WITH IT === per-stem mixer + FX machine. Renders only
@@ -790,14 +666,9 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </Room>
             )}
 
-            {/* Videos auto-attached via Sanity (`video.relatedRelease`) used to
-                live at the very bottom of the page — past tracklist + credits +
-                gallery + session block — which on a 16-track LP meant they were
-                effectively invisible. Hoisted up here so they sit RIGHT BEFORE
-                the tracklist: cinematic media first, then the full song list. */}
-            {releaseVideos.length > 0 && (
-              <RelatedVideos videos={releaseVideos} eyebrow={`FROM THE CHANNEL · ${releaseVideos.length}`} title="videos" theme="light" />
-            )}
+            {/* (RelatedVideos moved DOWN — Nick's locked order puts videos
+                after the credits room, not before the tracklist. New home is
+                just after THE CREDITS below.) */}
 
             {/* === THE TRACKS === tracklist */}
             {release.tracklist && release.tracklist.length > 0 && (
@@ -820,15 +691,145 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </Room>
             )}
 
-            {/* (The credits room used to live here at room 05 but got
-                hoisted up to room 01a — sits right after the bio per Nick.
-                Vinyl-jacket reading order: words → who played what → then
-                you hit play.) */}
+            {/* === THE CREDITS === Sits AFTER the tracklist per Nick's locked
+                order — listener has just heard the songs, now reads who made
+                them. Grouped by role, one line per role, names joined with
+                " + ". Ordering from `_lib/credit-order.ts`: Vocals → Produced
+                by → Co-prod/Remix → Instrumentalists → Mixed → Mastered.
+                "Recorded at" splits out into the location footer below. */}
+            {release.credits && release.credits.length > 0 && (() => {
+              // Filter out programming, keys, "recorded by" per Nick's spec.
+              // Bucket remaining credits by role.
+              const visibleCredits = release.credits.filter((c) => !isFilteredRole(c.role ?? ""));
+              if (visibleCredits.length === 0) return null;
+              const byRole = new Map<string, typeof release.credits>();
+              for (const c of visibleCredits) {
+                const k = c.role ?? "—";
+                if (!byRole.has(k)) byRole.set(k, []);
+                byRole.get(k)!.push(c);
+              }
+              const sortRoles = (rs: string[]) =>
+                rs.sort((a, b) => {
+                  const d = rankRole(a) - rankRole(b);
+                  return d !== 0 ? d : a.localeCompare(b);
+                });
+              const peopleRoles = sortRoles([...byRole.keys()].filter((r) => !isLocationRole(r)));
+              const locationRoles = [...byRole.keys()].filter((r) => isLocationRole(r));
 
-            {/* (The physical / vinyl-jackets room used to live here at 05b
-                but got hoisted up to room 01b — sits between the bio and
-                the watch room now so the jacket reads at decision-time, not
-                buried past 16 tracks of credits.) */}
+              return (
+                <Room number="04" title="the credits" kicker="vinyl jacket">
+                  <div className="max-w-[720px] mx-auto">
+                    <ul className="grid gap-0">
+                      {peopleRoles.map((role) => {
+                        const cs = byRole.get(role)!;
+                        return (
+                          <li
+                            key={role}
+                            className="flex flex-wrap items-baseline gap-x-4 gap-y-1 border-b border-ink/15 py-3.5"
+                          >
+                            <span className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 shrink-0 w-[120px]">
+                              {role}
+                            </span>
+                            <span className="flex-1 font-display font-semibold text-[20px] uppercase tracking-[-0.005em] leading-tight">
+                              {cs.map((c, i) => (
+                                <span key={i}>
+                                  {c.person ? (
+                                    <Link
+                                      href={`/artists/${c.person.slug}`}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {c.person.name}
+                                    </Link>
+                                  ) : (
+                                    c.name ?? "—"
+                                  )}
+                                  {i < cs.length - 1 ? <span className="text-ink-3"> + </span> : null}
+                                </span>
+                              ))}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                    {locationRoles.length > 0 && (() => {
+                      const locs = locationRoles.flatMap((role) => byRole.get(role)!);
+                      return (
+                        <div className="mt-8 pt-6 border-t border-ink/30 text-center">
+                          <div className="font-mono text-[10px] tracking-[.18em] uppercase text-ink-3 mb-2">
+                            {locationRoles.map((r) => r.toLowerCase()).join(" · ")}
+                          </div>
+                          <div className="font-display text-[18px] uppercase tracking-[-0.005em] flex flex-wrap justify-center items-baseline gap-x-2 gap-y-1">
+                            {locs.map((c, i) => {
+                              const display = c.name ?? c.person?.name ?? "—";
+                              const city = c.instrument;
+                              const linkHref = c.studio?.slug
+                                ? `/studios/${c.studio.slug}`
+                                : null;
+                              const label = (
+                                <>
+                                  {linkHref ? (
+                                    <Link
+                                      href={linkHref}
+                                      className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                    >
+                                      {display}
+                                    </Link>
+                                  ) : (
+                                    display
+                                  )}
+                                  {city && (
+                                    <span className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 ml-1.5">
+                                      · {city}
+                                    </span>
+                                  )}
+                                </>
+                              );
+                              return (
+                                <span key={i} className="inline-flex items-baseline">
+                                  {label}
+                                  {i < locs.length - 1 && (
+                                    <span className="text-ink-3 mx-2">·</span>
+                                  )}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </Room>
+              );
+            })()}
+
+            {/* Auto-attached channel videos sit here, right after the credits.
+                These come from Sanity videos with `relatedRelease` references. */}
+            {releaseVideos.length > 0 && (
+              <RelatedVideos videos={releaseVideos} eyebrow={`FROM THE CHANNEL · ${releaseVideos.length}`} title="videos" theme="light" />
+            )}
+
+            {/* === THE WATCH === music videos + reels + performance clips. */}
+            {allClips.length > 0 && (
+              <Room
+                number="05"
+                title="the watch"
+                kicker={allClips.length > 1 ? "the whole playlist" : "music video"}
+              >
+                {allClips.length > 1 ? (
+                  <VideoPlaylist
+                    items={allClips.map((c) => ({ url: c.url, title: c.title ?? undefined }))}
+                    accent={release.coverColor ?? "#F2B705"}
+                  />
+                ) : (
+                  <div>
+                    <MediaEmbed url={allClips[0].url} title={allClips[0].title ?? release.title} />
+                    {allClips[0].title && (
+                      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{allClips[0].title}</div>
+                    )}
+                  </div>
+                )}
+              </Room>
+            )}
 
             {/* === THE GALLERY === cinematic photo gallery w/ lightbox */}
             {(() => {

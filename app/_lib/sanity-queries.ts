@@ -69,6 +69,10 @@ export type Track = {
   note?: string;
   videoUrl?: string;
   audioPreviewUrl?: string;
+  /** Sanity-hosted full-track stream URL. Preferred over audioPreviewUrl
+   *  (which uses Bandcamp tokens that expire). Resolved by GROQ via
+   *  audio.asset->url projection. */
+  audioUrl?: string;
   /** Plain-text lyrics. Verse markers ([Verse 1], [Chorus], etc.) are
    *  rendered bold by the tracklist UI. */
   lyrics?: string;
@@ -665,6 +669,7 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
         lyrics,
         videoUrl,
         audioPreviewUrl,
+        "audioUrl": coalesce(audio.asset->url, audioPreviewUrl),
         bpm,
         explicit
       },
@@ -804,6 +809,7 @@ export async function getReleaseDossier(slug: string): Promise<ReleaseDossier | 
         lyrics,
         videoUrl,
         audioPreviewUrl,
+        "audioUrl": coalesce(audio.asset->url, audioPreviewUrl),
         bpm,
         explicit,
         writerCredits
