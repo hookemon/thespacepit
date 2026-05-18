@@ -432,25 +432,10 @@ const releaseListProjection = `
 // One pinned exception: Color Film "Until You Turn Blue" (CC001) is the
 // kickoff Calm + Collect single but chronologically belongs between the
 // Hookemon catalog and the LDCC × Cubic Zirconia catalog. Pin it to
-// priority 4.5 so the timeline reads cleanly — Without You → Until You
-// Turn Blue → Darko — instead of stranding it at the bottom of the
-// C+C block.
-const LABEL_PRIORITY = `select(
-  _id == "release-cc001-until-you-turn-blue" => 4.5,
-  label == "Calm + Collect" => 1,
-  label == "Calm + Collect Instrumental" => 2,
-  label == "Calllm" => 3,
-  label == "Hookemon" => 4,
-  label == "Lockhart Dynasty × Calm + Collect" => 5,
-  99
-)`;
-
 export async function getReleases(limit = 60): Promise<ReleaseListItem[]> {
-  // Catalog number IS the canonical release order — Nick assigned them
-  // sequentially as records came out. Year/releaseDate are unreliable for
-  // reclaimed catalog (Bandcamp re-upload dates won the scrape), so sort by
-  // catalog # as primary. Label priority groups the imprints (C+C → CC INST
-  // → CALLLM → Hookemon → LDCC).
+  // Chronological — newest first per Nick (2026-05-17). Falls back to year
+  // when releaseDate is missing, then catalogNumber as tiebreaker so reissues
+  // / same-year releases stay grouped consistently.
   //
   // Filter: `withdrawn != true` drops delisted records, AND we exclude
   // status in ("dropping","upcoming") so pre-release pitch records stay
@@ -463,7 +448,7 @@ export async function getReleases(limit = 60): Promise<ReleaseListItem[]> {
       && label != "Other"
       && !(coalesce(status, "out") in ["dropping", "upcoming"])
     ]
-      | order(featured desc, ${LABEL_PRIORITY} asc, catalogNumber desc) [0...$limit] {
+      | order(releaseDate desc, year desc, catalogNumber desc) [0...$limit] {
       ${releaseListProjection}
     }
   `, { limit });
