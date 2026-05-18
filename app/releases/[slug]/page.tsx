@@ -145,7 +145,17 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
   const playlistVideos = release.youtubePlaylistId
     ? await getVideosFromPlaylist(release.youtubePlaylistId, 50)
     : [];
-  const manualClips = (release.videos ?? []).map((v) => ({ url: v.youtubeUrl, title: v.title }));
+  // Pull videos from THREE places — release-level `videos[]`, plus any
+  // per-track `videoUrl` set on the tracklist (the most common pattern
+  // when only the "main" track has a video, like Darko or Take Me High),
+  // plus the existing playlist scrape further down.
+  const trackClips = (release.tracklist ?? [])
+    .filter((t): t is { videoUrl: string; title: string } => Boolean(t.videoUrl))
+    .map((t) => ({ url: t.videoUrl, title: t.title }));
+  const manualClips = [
+    ...(release.videos ?? []).map((v) => ({ url: v.youtubeUrl, title: v.title })),
+    ...trackClips,
+  ];
   const playlistClips = playlistVideos.map((v) => ({
     url: `https://www.youtube.com/watch?v=${v.id}`,
     title: v.title,
@@ -691,6 +701,22 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               </Room>
             )}
 
+            {/* === THE VIDEO === When a release has exactly ONE video, embed
+                it big right under the tracklist per Nick — the "main" video
+                gets prime placement instead of being buried in a separate
+                section. Multi-video releases keep the playlist treatment
+                further down in THE WATCH (after credits). */}
+            {allClips.length === 1 && (
+              <Room number="04" title="the video" kicker="music video">
+                <div className="max-w-[920px]">
+                  <MediaEmbed url={allClips[0].url} title={allClips[0].title ?? release.title} />
+                  {allClips[0].title && (
+                    <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{allClips[0].title}</div>
+                  )}
+                </div>
+              </Room>
+            )}
+
             {/* === THE CREDITS === Sits AFTER the tracklist per Nick's locked
                 order — listener has just heard the songs, now reads who made
                 them. Grouped by role, one line per role, names joined with
@@ -723,7 +749,7 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               const locationRoles = [...byRole.keys()].filter((r) => isLocationRole(r));
 
               return (
-                <Room number="04" title="the credits" kicker="vinyl jacket">
+                <Room number="05" title="the credits" kicker="vinyl jacket">
                   <div className="max-w-[720px] mx-auto">
                     <ul className="grid gap-0">
                       {peopleRoles.map((role) => {
@@ -814,26 +840,20 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
               <RelatedVideos videos={releaseVideos} eyebrow={`FROM THE CHANNEL · ${releaseVideos.length}`} title="videos" theme="light" />
             )}
 
-            {/* === THE WATCH === music videos + reels + performance clips. */}
-            {allClips.length > 0 && (
+            {/* === THE WATCH === multi-video playlist. Single-video releases
+                render their video higher up (right under the tracklist —
+                see "THE VIDEO" above). This block only fires for releases
+                with 2+ music videos / reels / performance clips. */}
+            {allClips.length > 1 && (
               <Room
-                number="05"
+                number="06"
                 title="the watch"
-                kicker={allClips.length > 1 ? "the whole playlist" : "music video"}
+                kicker="the whole playlist"
               >
-                {allClips.length > 1 ? (
-                  <VideoPlaylist
-                    items={allClips.map((c) => ({ url: c.url, title: c.title ?? undefined }))}
-                    accent={release.coverColor ?? "#F2B705"}
-                  />
-                ) : (
-                  <div>
-                    <MediaEmbed url={allClips[0].url} title={allClips[0].title ?? release.title} />
-                    {allClips[0].title && (
-                      <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2">{allClips[0].title}</div>
-                    )}
-                  </div>
-                )}
+                <VideoPlaylist
+                  items={allClips.map((c) => ({ url: c.url, title: c.title ?? undefined }))}
+                  accent={release.coverColor ?? "#F2B705"}
+                />
               </Room>
             )}
 
