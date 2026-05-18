@@ -265,6 +265,9 @@ export type MixDetail = MixListItem & {
   mixcloudUrl?: string;
   soundcloudUrl?: string;
   youtubeUrl?: string;
+  /** Direct-upload audio file — resolved Sanity CDN URL. Plays via the
+   *  global MiniPlayer when no Mixcloud/SoundCloud embed is present. */
+  audioUrl?: string;
   description?: unknown[];
   tracklist?: string[];
 };
@@ -1227,6 +1230,7 @@ export async function getMixBySlug(slug: string): Promise<MixDetail | null> {
       mixcloudUrl,
       soundcloudUrl,
       youtubeUrl,
+      "audioUrl": audio.asset->url,
       description,
       tracklist
     }

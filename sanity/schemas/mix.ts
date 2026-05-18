@@ -27,6 +27,13 @@ export const mix = defineType({
     }),
     defineField({ name: "soundcloudUrl", title: "SoundCloud URL", type: "url" }),
     defineField({ name: "youtubeUrl", title: "YouTube URL", type: "url" }),
+    defineField({
+      name: "audio",
+      title: "Audio file (direct upload)",
+      type: "file",
+      options: { accept: "audio/mpeg,audio/mp3,audio/mp4,audio/x-m4a,audio/wav" },
+      description: "Optional. Direct upload of the mix file — used when the mix isn't (yet) on Mixcloud / SoundCloud. Plays via the global MiniPlayer when the mix is opened.",
+    }),
     defineField({ name: "duration", title: "Duration (e.g. 1:24:11)", type: "string" }),
     defineField({ name: "cover", title: "Cover art", type: "image", options: { hotspot: true } }),
     defineField({

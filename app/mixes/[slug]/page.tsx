@@ -5,6 +5,7 @@ import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
 import { MixcloudEmbed } from "../../_components/shared/MixcloudEmbed";
 import { MediaEmbed } from "../../_components/shared/MediaEmbed";
+import { MixAudioPlayer } from "./MixAudioPlayer";
 import { getMixBySlug, getMixSlugs } from "../../_lib/sanity-queries";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
@@ -82,6 +83,22 @@ export default async function MixPage({ params }: { params: Promise<{ slug: stri
                 {mix.youtubeUrl && (
                   <div className="mt-5">
                     <MediaEmbed url={mix.youtubeUrl} title={mix.title} />
+                  </div>
+                )}
+
+                {/* Direct-upload audio (no external embed) → play through the
+                    global MiniPlayer. Only renders when there's no
+                    Mixcloud/YouTube embed already taking the audio surface. */}
+                {mix.audioUrl && !mix.mixcloudUrl && !mix.youtubeUrl && (
+                  <div className="mt-7">
+                    <MixAudioPlayer
+                      audioUrl={mix.audioUrl}
+                      title={mix.title}
+                      era={mix.era}
+                      coverUrl={mix.cover ? urlFor(mix.cover).width(400).height(400).fit("crop").url() : null}
+                      duration={mix.duration}
+                      mixSlug={mix.slug}
+                    />
                   </div>
                 )}
 
