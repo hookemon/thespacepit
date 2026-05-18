@@ -268,38 +268,26 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
       <TopNav current="label" />
       <main className="relative flex-1 text-ink overflow-hidden">
         {/* Layered page background:
-             1. Solid coverColor (or paper) as the back wash
-             2. Optional pageBackgroundImage tile, overlaid at ~50% opacity
-                so the photo's wall + scrawl actually read
-             3. Cover-color tint on top so the photo gets pulled into the
-                release's palette
-            All three stack as absolutely-positioned siblings BEFORE the
-            <article> so we don't fight CSS's "negative z-index goes
-            behind the parent's background" rule. */}
+             1. Solid coverColor (or paper) as the back wash for text readability
+             2. Optional pageBackgroundImage tile at 0.75 opacity — dominant
+                visual when set. Originally muted to 0.55 with a 0.4 cover-
+                color tint on top; that tint washed out designed gradients
+                so they read as noise instead of intent. Cream wash beneath
+                still provides the legibility base. */}
         <div
           className="pointer-events-none absolute inset-0"
           style={{ background: release.coverColor ?? "var(--color-paper)" }}
           aria-hidden
         />
         {release.pageBackgroundImage && (
-          <>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={urlFor(release.pageBackgroundImage).width(2400).fit("max").url()}
-              alt=""
-              aria-hidden
-              className="pointer-events-none absolute inset-0 w-full h-full object-cover"
-              style={{ opacity: 0.55 }}
-            />
-            <div
-              className="pointer-events-none absolute inset-0"
-              style={{
-                background: release.coverColor ?? "transparent",
-                opacity: 0.4,
-              }}
-              aria-hidden
-            />
-          </>
+          /* eslint-disable-next-line @next/next/no-img-element */
+          <img
+            src={urlFor(release.pageBackgroundImage).width(2400).fit("max").url()}
+            alt=""
+            aria-hidden
+            className="pointer-events-none absolute inset-0 w-full h-full object-cover"
+            style={{ opacity: 0.75 }}
+          />
         )}
         <article className="relative px-6 sm:px-8 py-12">
           <div className="max-w-[1180px] mx-auto">

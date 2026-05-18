@@ -107,13 +107,44 @@ function rgbToHex(r: number, g: number, b: number): string {
 }
 
 // ── sample dominant color from a cover URL ────────────────────────────────
+//
+// Strategy: find the most VIVID color (highest saturation, weighted by
+// pixel count) rather than the literal most-common pixel. Dark-background
+// covers like SF Drums have a near-black "dominant" color but read
+// VISUALLY as red/blue/green from their thin streaks — those are what
+// the page background should reflect.
 async function dominantColor(url: string): Promise<{ r: number; g: number; b: number } | null> {
   try {
     const res = await fetch(url);
     if (!res.ok) return null;
     const buf = Buffer.from(await res.arrayBuffer());
-    const stats = await sharp(buf).resize(200, 200, { fit: "cover" }).stats();
-    return stats.dominant;
+    const { data, info } = await sharp(buf).resize(64, 64).raw().toBuffer({ resolveWithObject: true });
+    type Bucket = { r: number; g: number; b: number; count: number; sat: number };
+    const buckets = new Map<string, Bucket>();
+    for (let i = 0; i < data.length; i += info.channels) {
+      const r = data[i], g = data[i+1], b = data[i+2];
+      const max = Math.max(r,g,b), min = Math.min(r,g,b);
+      // Skip near-black and near-white — they have no hue signal.
+      if (max < 35 || min > 225) continue;
+      const sat = (max - min) / Math.max(max, 1);
+      if (sat < 0.25) continue;
+      // Quantize to 16-step buckets to merge similar colors.
+      const qr = Math.round(r / 24) * 24;
+      const qg = Math.round(g / 24) * 24;
+      const qb = Math.round(b / 24) * 24;
+      const k = `${qr},${qg},${qb}`;
+      const existing = buckets.get(k);
+      if (existing) existing.count += 1;
+      else buckets.set(k, { r: qr, g: qg, b: qb, count: 1, sat });
+    }
+    if (buckets.size === 0) {
+      // No vivid pixels — fall back to sharp's stats dominant.
+      const stats = await sharp(buf).resize(200, 200, { fit: "cover" }).stats();
+      return stats.dominant;
+    }
+    // Pick the bucket with the highest score: count × saturation.
+    const top = [...buckets.values()].sort((a, b) => b.count * b.sat - a.count * a.sat)[0];
+    return { r: top.r, g: top.g, b: top.b };
   } catch {
     return null;
   }
@@ -121,19 +152,19 @@ async function dominantColor(url: string): Promise<{ r: number; g: number; b: nu
 
 // ── derive a soft, readable background from a sampled color ───────────────
 //
-// Target: very light tint of the dominant hue. Black body text needs the
-// background to land around L ~ 0.88-0.92 with saturation kept low so
-// it reads as a "tint" not a "color" — like the soft-color page bgs on
-// Apple Music / Spotify.
+// Target: a tint that clearly carries the cover's hue identity but stays
+// light enough that black body text reads at WCAG-AA. Previous version
+// pushed everything to the same pale cream — Nick wanted more distinction
+// between releases (2026-05-17). New range: lightness 0.78-0.86, saturation
+// 0.35-0.55 — softer than the saturated original but with real hue identity.
 function deriveBackground(r: number, g: number, b: number): string {
   const [h, s, l] = rgbToHsl(r, g, b);
-  // If the cover is essentially achromatic (no saturation, e.g. B&W
-  // photo), use a paper-cream neutral instead of dead grey.
-  if (s < 0.08) return "#F4EFE6";
-  // Otherwise: keep the hue, dial saturation way down, lift lightness
-  // to ~0.9 so dark text reads.
-  const newS = Math.min(0.32, s * 0.45);
-  const newL = 0.9 - (l > 0.85 ? 0.04 : 0); // very-light covers go SLIGHTLY darker so the bg differentiates
+  // Achromatic covers (B&W photos, monochrome typography) → paper cream.
+  if (s < 0.06) return "#F4EFE6";
+  // Carry the cover's hue, keep saturation in the soft-but-visible band,
+  // lift lightness so dark text reads without washing the color out.
+  const newS = Math.max(0.32, Math.min(0.55, s * 0.7));
+  const newL = 0.82 + (l > 0.7 ? -0.04 : 0.02); // mid-light, darker covers go slightly lighter
   const [nr, ng, nb] = hslToRgb(h, newS, newL);
   return rgbToHex(nr, ng, nb);
 }
