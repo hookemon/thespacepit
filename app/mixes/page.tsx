@@ -41,7 +41,7 @@ export default async function MixesIndex() {
             <p className="font-serif italic text-[20px] mt-4 max-w-[640px] text-paper-2">
               {mixes.length === 0
                 ? "no mixes yet — add your first via /studio."
-                : "the mixes. cubic zirconia → drop the lime → calm + collect → today."}
+                : "the mixes."}
             </p>
           </div>
         </header>
