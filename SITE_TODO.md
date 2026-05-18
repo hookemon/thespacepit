@@ -1,6 +1,30 @@
 # site · master to-do
 
-Last updated: morning, working session.
+Last updated: 2026-05-18 overnight catalog session.
+
+## crushed overnight (2026-05-17 → 2026-05-18)
+
+- [x] **Full-track audio uploaded across the owned catalog** — 175+ tracks across 38 C+C / Calllm / Hookemon / Lockhart releases now have per-track audio hosted on Sanity CDN (was Bandcamp tokens that expired → 410). MiniPlayer, full-album queue, durable URLs.
+- [x] **Per-track `audio` schema field + render integration** — replaces the legacy `audioPreviewUrl` Bandcamp pattern.
+- [x] **DSP platform URLs filled to all 9 platforms** — fetch-platform-urls.ts extended past spotify/apple/youtube to also fill tidal, amazonMusic, deezer, youtubeMusic, soundcloud. 27+ releases got new DSP links in round 1; round 2 running.
+- [x] **Release page locked in Nick's canonical order** — Hero → Bio → Tracks → (single-Video room) → Credits → (multi-Watch room) → Press → Physical → Gallery.
+- [x] **Credit ordering + filter spec** — Produced → Additional Prod → Written → Performed → instruments (Vocals, Guitar, Bass, etc.) → Mixed → Mastered → Engineering → Recorded at. Programming/keys/"Recorded by" filtered out per Nick.
+- [x] **Per-track credit popouts** — features show inline ("▾ credits" on track row) instead of polluting the vinyl jacket.
+- [x] **Tracklists reordered to release order** — 11 alphabetized tracklists patched via `reorder-tracklists-from-files.ts`.
+- [x] **Missing tracks added to incomplete releases** — Josephine (1→5 tracks), Black & Blue (1→5), Darko (5→6), Breath You Out (0→6).
+- [x] **Hero chip strip lit up with linkable artist refs** — 31 free-text credits upgraded to person refs across 9 releases. Recurring collaborators (Trooko, Thee Mike B, Seven Davis Jr, Nadus, Hooke, etc.) all clickable.
+- [x] **Per-release Rothko gradient backgrounds** — 40 releases got a 2-color diagonal sweep sampled from their own cover art (cream center for legibility). 8 typographic / B&W releases stayed clean negative-space. Render layer updated to 0.75 opacity (was 0.55 + 0.4 tint sandwich that washed designed work to noise).
+- [x] **Catalog sort is now chronological** (releaseDate desc) — newest at the top instead of label-priority.
+- [x] **Bios + credits patched per Nick's spec** — Josephine, Hoes Come Out, Follow Your Heart (full per-track depth), Take Me High, Darko, Without You, Peephole, Drums, Like Water, Spiritual Friendship S/T, all 7 Calllm chakras (Root → Crown with the shared DRONES PR doc bio).
+- [x] **Drums gallery** — 51 photos (session shots + drum machine macros + spacePitDrums series) uploaded as `release.gallery[]`.
+- [x] **19 artist bios + taglines + city written** — Joe LaPorta, Jamire Williams, Lenny Castro, Gaslamp Killer, Computer Jay, Adam Garcia, Dust La Rock, Mike 2600, Daryl Palumbo, Rick Penzone, Brian Iele, John Kuker, Bilal, Drop The Lime, Andrea Balency, Dâm-Funk, Seven Davis Jr, Nadus, Thee Mike B.
+- [x] **Cubic Zirconia + Spiritual Friendship + member bios** — duo / band canonical bios written. Tiombe Lockhart, Todd Weinstock, Daud Sturdivant expanded.
+- [x] **Lola Mitchell merged → Gangsta Boo. The Pressure merged → Adam Garcia.** Dup stub docs deleted; credits remapped to canonical refs.
+- [x] **Fake "Nick Hook" YouTube remix removed from Without You + bogus "Superhero Killer" video removed from CC022** — the Odesli backfill caught wrong-channel matches; verified + cleared.
+- [x] **Salva remix removed from CC021 Tardes de Verano** — flagged for the future unreleased-vault section, asset still in Sanity storage.
+- [x] **Adam Garcia credited for Drums artwork. Dust La Rock credited for Follow Your Heart.**
+
+---
 
 This is the running list of everything outstanding across the three sites.
 Sorted by **what unblocks the most** first.
@@ -21,6 +45,14 @@ These I'll knock out as I have time. No need to wait on you.
 - [x] **Hallway photo** — extracted from the EPK, wired as the spacepit hero.
 - [ ] **Wall-tag close-up gallery** — crop sections of the hallway photo around the GUCCI / SHABADU / NAKED signatures and surface them as a strip on /spacepit. (small effort, does it match the gear shelf re-skin work? deciding.)
 - [ ] **Re-skin the gear shelf** — turn the dry table on /spacepit into a magazine-style row-per-piece with a photo + provenance story. (medium effort.)
+
+### Dossier / publishing pipeline (opened 2026-05-17)
+
+- [ ] **Re-patch CC015 writer + publisher splits from Master Discog 2.0** — currently `publisherShare` mirrors `writerShare` everywhere (because I only had one number when migrating). The Master Discog 2.0 sheet has them as separate columns and they diverge on some tracks (e.g. "+3" — 25% writer / 30% publisher for Nick). Pull both columns track-by-track for accurate splits sheets.
+- [ ] **Splits-sheet CSV export** — `/releases/[slug]/splits.csv?key=<DOSSIER_ACCESS_KEY>` route that emits the format publishers actually want: one row per writer × track with writerShare / publisherShare / PRO / IPI / publisher / publisher PRO / publisher IPI. Same gating as the dossier page.
+- [ ] **CCINST001 Relationships (Instrumentals) enrichment** — same pass we did on CC015: writerCredits + ℗ © + UPC. Inherits compositions (and therefore writer splits) from CC015; new master so own P-copyright (℗ 2025 Calm + Collect Instrumental, set).
+- [ ] **Stub the 2004 "Burn Out Baby" EP (In Music)** — catalog gap surfaced via RA artist page. Two RA reviews exist (original + remixes) that can attach to the doc once it lands. Era: pre-Cubic-Zirconia / MWC-adjacent.
+- [ ] **Brand `articleBody` data migration** — schema rename `block` → `articleBlock` (done this session to clear the Studio-blocking error). If any brand docs have populated `articleBody` (Ableton, TE), the old `_type: "block"` items need migrating to `_type: "articleBlock"` or re-seeding via `scripts/seed-ableton-brand.ts` / `seed-te-brand.ts`.
 
 ---
 
@@ -82,6 +114,12 @@ Drop the answers/files in chat and I bulk-add via script.
 ### Press scrape
 
 - [ ] **Use Claude Chat for the wider web scrape** — Pitchfork / Sound on Sound / Fader / Fact / SPIN / XLR8R / Billboard. Paste me back URLs of articles I should seed.
+  - ✅ **Scraped 2026-05-17:** FADER (21), FACT Magazine (16), Complex (7), Pitchfork (3) — 47 articles, 326 pressQuote docs total in Sanity. Plus entity-cleanup pass fixed 40 docs across the whole archive.
+  - 🚫 **Blocked by Cloudflare / anti-scrape** (need workaround — RSS, direct URL paste, or auth): BrooklynVegan, Resident Advisor news/features, Pigeons & Planes, Paper Magazine. Their search returns 403/404 to non-browser requests even with a full Safari UA. If you can paste me URLs from those, I'll scrape individually.
+
+### Dossier deploy
+
+- [ ] **Set `DOSSIER_ACCESS_KEY` in production env** (Netlify dashboard → site → env vars) — separate value from local. Without it set, `/releases/[slug]/dossier?key=...` returns 404 in prod (which is fail-closed, safe — but means no one including you can open dossiers on the deployed site). Generate fresh: `openssl rand -hex 16`. Local key is in `.env.local`.
 
 ---
 
@@ -116,7 +154,19 @@ Nothing on the critical path. Captured here so we don't forget.
 - **A "now listening" widget** that pulls your most recent Spotify play and shows it somewhere. Cute, not load-bearing.
 - **OG / social meta images** for each release / mix / era so iMessage + Twitter previews look right.
 - **Real domain mapping** via Vercel/Netlify rewrites (nickhook.com, etc.).
+- **Nick's published writing on RA** — 4 reviews authored BY Nick (Machinedrum *Movin' Forward* 2015, Cardopusher/Nehuen *Split 01* 2012, plus 2 reviews of his own 2004 *Burn Out Baby* EP). Not press *about* him — his journalism. Could become a `byline` content type or sub-category on `/nick-hook` someday.
 
 ---
 
 **bottom line right now:** the site is in a strong, real state. The biggest wins from here come from **photos + missing URLs**, not from more code. Everything else can be filled in via /studio whenever you have time.
+
+---
+
+## key
+
+- 🟢 **solo** — claude can do this, no input needed. just gets done.
+- 🟡 **small input** — < 5 min from you. URL, file, yes/no, paste-back.
+- 🔴 **bigger ask** — real time investment. signup, download, multi-step.
+- 📦 **deploy** — netlify / domain / CORS / env-var work to ship.
+- 🎯 **active push** — the current strategic bet. one section at a time.
+- 🧠 **v2** — captured so we don't forget, but not on the critical path.
