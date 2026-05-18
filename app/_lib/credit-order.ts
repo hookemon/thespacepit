@@ -39,19 +39,21 @@ export function rankRole(role: string): number {
   if (/co-?produc/.test(r)) return 21;
   if (/remix|re-?edit|edit by/.test(r)) return 22;
 
-  // 3. WRITTEN BY
+  // 3. WRITTEN BY (then "Additional writer" right under it)
+  if (/additional\s*(writer|writing)/.test(r)) return 31;
   if (/^written by$|songwriter|^lyrics by$|\bwriter\b/.test(r)) return 30;
 
   // 4. PERFORMED BY — collective performer line.
   if (/^performed by\b|\bperformer\b/.test(r)) return 40;
 
-  // 5. VOCALS — lead first, then features/guests, then backing.
+  // 5. VOCALS — lead first, then additional, then features/guests, then backing.
   if (/lead vocal/.test(r)) return 50;
   if (/^vocals?$|^vox\b/.test(r)) return 51;
-  if (/featur|^ft\.?\b|guest/.test(r)) return 52;
-  if (/^rap\b|\brap by\b|\bverse\b/.test(r)) return 53;
-  if (/back(ing|ground)?\s*vocal/.test(r)) return 54;
-  if (/(harmon|ad-?lib|hook|chorus)/.test(r)) return 55;
+  if (/additional\s*vocal/.test(r)) return 52;
+  if (/featur|^ft\.?\b|guest/.test(r)) return 53;
+  if (/^rap\b|\brap by\b|\bverse\b/.test(r)) return 54;
+  if (/back(ing|ground)?\s*vocal/.test(r)) return 55;
+  if (/(harmon|ad-?lib|hook|chorus)/.test(r)) return 56;
 
   // 6. INSTRUMENTALISTS — stage-billing order. Programming + keys are
   //    intentionally absent (filtered via isFilteredRole below).
@@ -62,17 +64,18 @@ export function rankRole(role: string): number {
   if (/(horn|brass|trumpet|trombone|saxophone|sax\b|flute|woodwind)/.test(r)) return 64;
   if (/(turntabl|scratch|dj cut)/.test(r)) return 65;
 
-  // 7. MIX — lead engineer first, then co-mix, then assistant.
-  if (/(mix|mastering).*assist|assist.*(mix|engineer)/.test(r)) return 72;
-  if (/^co-?mix/.test(r)) return 71;
-  if (/^mix|mix(ed|ing)\s+by\b/.test(r)) return 70;
+  // 7. ENGINEERING — comes before Mixed in chronological record-making
+  //    order: recorded → mixed → mastered. "Recorded by" is FILTERED OUT
+  //    via isFilteredRole; "Engineering by" / "Engineered by" stay.
+  if (/^engineer|engineered by/.test(r)) return 70;
 
-  // 8. MASTER
-  if (/^master|master(ed|ing)\s+by\b/.test(r)) return 80;
+  // 8. MIX — lead engineer first, then co-mix, then assistant.
+  if (/(mix|mastering).*assist|assist.*(mix|engineer)/.test(r)) return 82;
+  if (/^co-?mix/.test(r)) return 81;
+  if (/^mix|mix(ed|ing)\s+by\b/.test(r)) return 80;
 
-  // 9. ENGINEERING — explicit "Engineering by" credit lives here.
-  //    "Recorded by" is FILTERED OUT (see isFilteredRole) per Nick.
-  if (/^engineer|engineered by/.test(r)) return 90;
+  // 9. MASTER
+  if (/^master|master(ed|ing)\s+by\b/.test(r)) return 90;
 
   // 10. STUDIO / LOCATION (separate footer block on the album view).
   if (/recorded at|recording studio|cut at|studio$/.test(r)) return 100;

@@ -698,9 +698,15 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                 by → Co-prod/Remix → Instrumentalists → Mixed → Mastered.
                 "Recorded at" splits out into the location footer below. */}
             {release.credits && release.credits.length > 0 && (() => {
-              // Filter out programming, keys, "recorded by" per Nick's spec.
-              // Bucket remaining credits by role.
-              const visibleCredits = release.credits.filter((c) => !isFilteredRole(c.role ?? ""));
+              // Album-wide credits ONLY — anything with a `tracks[]` scope is
+              // per-track and renders inside the tracklist popout, not in
+              // the vinyl jacket. Also drop programming/keys/"Recorded by"
+              // per Nick's filter spec.
+              const visibleCredits = release.credits.filter((c) => {
+                if (isFilteredRole(c.role ?? "")) return false;
+                if (Array.isArray((c as { tracks?: string[] }).tracks) && ((c as { tracks?: string[] }).tracks!.length > 0)) return false;
+                return true;
+              });
               if (visibleCredits.length === 0) return null;
               const byRole = new Map<string, typeof release.credits>();
               for (const c of visibleCredits) {
