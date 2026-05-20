@@ -98,9 +98,28 @@
     document.body.insertBefore(nav, document.body.firstChild);
   }
 
+  // Also wire the existing page header's TheSpacePit brand mark to atlas —
+  // Nick wants tapping the wordmark to feel like "home" no matter where you
+  // are. We do this from nav.js so we only have to touch one place; every
+  // module already inherits .brand from its inline header.
+  function wireBrandLink() {
+    var brand = document.querySelector('.brand');
+    if (!brand || brand.dataset.atlasWired) return;
+    brand.dataset.atlasWired = '1';
+    brand.style.cursor = 'pointer';
+    brand.setAttribute('role', 'link');
+    brand.setAttribute('tabindex', '0');
+    brand.addEventListener('click', function () { window.location.href = 'index.html'; });
+    brand.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); window.location.href = 'index.html'; }
+    });
+  }
+
+  function bootAll() { build(); wireBrandLink(); }
+
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', build);
+    document.addEventListener('DOMContentLoaded', bootAll);
   } else {
-    build();
+    bootAll();
   }
 })();

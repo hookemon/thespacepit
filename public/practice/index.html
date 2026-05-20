@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Vercel serves this page at /practice (no trailing slash). Without
+     <base>, relative links like "studio.html" resolve to /studio.html
+     (404). The base forces the right directory for every link below. -->
+<base href="/practice/">
 <title>TheSpacePit</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
