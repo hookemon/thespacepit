@@ -117,6 +117,78 @@ export default async function GearDetailPage({ params }: { params: Promise<{ slu
                     {g.note}
                   </p>
                 )}
+                {(() => {
+                  // Practice chip — either the explicit practiceLink set in
+                  // Sanity, or a category-driven fallback. The /practice/ app
+                  // has no shared TS types so we duplicate the small lookups
+                  // here rather than thread a dependency through Sanity.
+                  const MODULE_FILE: Record<string, string> = {
+                    chords: "hop_chords.html",
+                    pyramid: "hop_pyramid.html",
+                    drums: "finger_drum_practice.html",
+                    garden: "garden.html",
+                    lang: "language.html",
+                    studio: "studio.html",
+                    here: "be_here_now.html",
+                  };
+                  const MODULE_PARAM: Record<string, string | null> = {
+                    chords: "world", pyramid: "world",
+                    drums: "city", garden: "city",
+                    lang: "lang", studio: null, here: null,
+                  };
+                  const MODULE_LABEL: Record<string, string> = {
+                    chords: "chords",
+                    pyramid: "pyramid",
+                    drums: "drums",
+                    garden: "garden",
+                    lang: "language",
+                    studio: "studio",
+                    here: "be here now",
+                  };
+                  const CITY_LANG: Record<string, string> = {
+                    mexico: "es", oaxaca: "es", tulum: "es", medellin: "es", madrid: "es",
+                    paris: "fr", berlin: "de",
+                    rishikesh: "hi", varanasi: "hi", bombay: "hi",
+                    tokyo: "jp",
+                  };
+                  const CATEGORY_FALLBACK: Record<string, string> = {
+                    synth: "chords",
+                    "drum-machine": "drums",
+                    sampler: "studio",
+                    sequencer: "chords",
+                    modular: "chords",
+                    outboard: "studio",
+                    pedal: "studio",
+                    piano: "chords",
+                    guitar: "chords",
+                    controller: "drums",
+                  };
+                  const explicit = g.practiceLink;
+                  const mod = explicit?.module || CATEGORY_FALLBACK[g.category];
+                  if (!mod || !MODULE_FILE[mod]) return null;
+                  const world = explicit?.world;
+                  const file = MODULE_FILE[mod];
+                  let href = `/practice/${file}`;
+                  if (world) {
+                    if (mod === "lang") {
+                      const lang = CITY_LANG[world];
+                      if (lang) href += `?lang=${lang}`;
+                    } else if (MODULE_PARAM[mod]) {
+                      href += `?${MODULE_PARAM[mod]}=${world}`;
+                    }
+                  }
+                  const where = world ? `${world.charAt(0).toUpperCase() + world.slice(1)} · ${MODULE_LABEL[mod]}` : MODULE_LABEL[mod];
+                  return (
+                    <Link
+                      href={href}
+                      className="mt-6 inline-flex items-center gap-3 bg-lamp text-ink border-2 border-paper px-4 py-2.5 no-underline transition-transform hover:-translate-x-[1px] hover:-translate-y-[1px] hover:shadow-[3px_3px_0_#F4EFE6]"
+                      style={{ boxShadow: "2px 2px 0 #F4EFE6" }}
+                    >
+                      <span className="font-display font-bold uppercase tracking-[-0.005em]" style={{ fontSize: 14 }}>▶ play with this in practice</span>
+                      <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink/70">— {where}</span>
+                    </Link>
+                  );
+                })()}
               </div>
             </div>
           </div>

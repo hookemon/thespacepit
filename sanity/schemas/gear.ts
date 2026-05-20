@@ -58,6 +58,55 @@ export const gear = defineType({
     defineField({ name: "photo", type: "image", options: { hotspot: true } }),
     defineField({ name: "pinned", title: "Pin to homepage teaser", type: "boolean", initialValue: false }),
 
+    // ── Practice link — deep-link from this gear page into the right
+    //    /practice/ module + city/world so you can play the thing.
+    defineField({
+      name: "practiceLink",
+      title: "Play in practice",
+      type: "object",
+      description: "Deep-link from this gear page into the practice app. If omitted, falls back by category (synth → chords, drum machine → drums, etc.).",
+      fields: [
+        {
+          name: "module",
+          type: "string",
+          options: {
+            list: [
+              { title: "Hop Chords (chord generator)", value: "chords" },
+              { title: "Hop Pyramid (melodic game)", value: "pyramid" },
+              { title: "Finger Drum (drum patterns)", value: "drums" },
+              { title: "Garden (per-city plants)", value: "garden" },
+              { title: "Language (flashcards)", value: "lang" },
+              { title: "Studio (dub mixer)", value: "studio" },
+              { title: "Be Here Now (presence)", value: "here" },
+            ],
+          },
+        },
+        {
+          name: "world",
+          title: "World / City",
+          type: "string",
+          description: "Optional. If set, deep-links to that city's variant of the chosen module.",
+          options: {
+            list: [
+              { title: "Brooklyn",   value: "brooklyn" },
+              { title: "St. Louis",  value: "stlouis" },
+              { title: "Mexico City", value: "mexico" },
+              { title: "Oaxaca",     value: "oaxaca" },
+              { title: "Tulum",      value: "tulum" },
+              { title: "Medellín",   value: "medellin" },
+              { title: "Paris",      value: "paris" },
+              { title: "Madrid",     value: "madrid" },
+              { title: "Berlin",     value: "berlin" },
+              { title: "Rishikesh",  value: "rishikesh" },
+              { title: "Varanasi",   value: "varanasi" },
+              { title: "Bombay",     value: "bombay" },
+              { title: "Tokyo",      value: "tokyo" },
+            ],
+          },
+        },
+      ],
+    }),
+
     // ── External media — articles, videos, movies, related links ──
     defineField({
       name: "links",

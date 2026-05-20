@@ -99,6 +99,13 @@ export type ReleaseCredit = {
    *  track titles. Empty/undefined = album-wide. Used by the per-song
    *  pop-out on the release page tracklist. */
   tracks?: string[];
+  /** Optional Nick-voice museum-card commentary about this person's
+   *  contribution. Rendered as a pop-up when the credit chip is clicked.
+   *  NOT lyrics — original commentary only. */
+  annotation?: string;
+  /** Optional link to the verse / song on Genius (or another lyrics host).
+   *  Surfaces inside the credit pop-up as a "read on Genius" button. */
+  geniusUrl?: string;
 };
 
 export type Stem = {
@@ -119,6 +126,10 @@ export type PhysicalArtifact = { image: SanityImage; title?: string; kind?: stri
 
 export type ReleaseDetail = ReleaseListItem & {
   notes?: unknown[];
+  /** When true the page H1 collapses to sr-only — used on releases where
+   *  the cover image already carries the title artwork (e.g. Rap Monument
+   *  with the Noisey wordmark baked in). The cover does the heading job. */
+  hideTypesetTitle?: boolean;
   credits?: ReleaseCredit[];
   linerNotes?: LinerNotePage[];
   physicalArtifacts?: PhysicalArtifact[];
@@ -156,6 +167,10 @@ export type ArtistListItem = {
   city?: string;
   tagline?: string;
   portrait?: SanityImage;
+  /** Custom wordmark / logotype. When set, replaces the plain text headline
+   *  on the artist page hero. Used for acts with a distinctive logotype
+   *  (e.g. Cubic Zirconia's geometric wordmark from the Josephine cover). */
+  wordmark?: SanityImage;
   /** When true, the artist page (and rosters) render initials instead of the
    *  portrait — e.g. "NH" as a big monogram. Design-block over photo. */
   displayInitials?: boolean;
@@ -265,6 +280,8 @@ export type MixDetail = MixListItem & {
   mixcloudUrl?: string;
   soundcloudUrl?: string;
   youtubeUrl?: string;
+  /** Original Boiler Room session URL when the mix originated there. */
+  boilerRoomUrl?: string;
   /** Direct-upload audio file — resolved Sanity CDN URL. Plays via the
    *  global MiniPlayer when no Mixcloud/SoundCloud embed is present. */
   audioUrl?: string;
@@ -282,6 +299,10 @@ export type ProjectListItem = {
   tagline?: string;
   color?: string;
   cover?: SanityImage;
+  /** Custom wordmark / logotype. When set, replaces the plain text headline
+   *  on the era page hero. Used for projects with a distinctive logotype
+   *  (e.g. Cubic Zirconia's geometric wordmark from the Josephine cover). */
+  wordmark?: SanityImage;
   featured?: boolean;
   /** Page layout strategy. "default" = the standard vertical era page.
    *  "horizontal-journey" = full-viewport snap-scroll panels left-to-right
@@ -621,11 +642,14 @@ export async function getReleaseBySlug(slug: string): Promise<ReleaseDetail | nu
     *[_type == "release" && slug.current == $slug][0] {
       ${releaseListProjection},
       notes,
+      hideTypesetTitle,
       "credits": credits[]{
         role,
         name,
         instrument,
         tracks,
+        annotation,
+        geniusUrl,
         "person": person->{ name, "slug": slug.current, portrait },
         "studio": *[_type == "studio" && name == ^.name][0]{
           name,
@@ -771,6 +795,8 @@ export async function getReleaseDossier(slug: string): Promise<ReleaseDossier | 
         name,
         instrument,
         tracks,
+        annotation,
+        geniusUrl,
         "person": person->{ name, "slug": slug.current, portrait },
         "studio": *[_type == "studio" && name == ^.name][0]{ name, "slug": slug.current }
       },
@@ -908,6 +934,7 @@ const artistListProjection = `
   city,
   tagline,
   portrait,
+  wordmark,
   displayInitials,
   onLabel,
   tspCrew,
@@ -1230,6 +1257,7 @@ export async function getMixBySlug(slug: string): Promise<MixDetail | null> {
       mixcloudUrl,
       soundcloudUrl,
       youtubeUrl,
+      boilerRoomUrl,
       "audioUrl": audio.asset->url,
       description,
       tracklist
@@ -1253,6 +1281,7 @@ const projectListProjection = `
   tagline,
   color,
   cover,
+  wordmark,
   featured,
   layoutVariant
 `;
@@ -1608,10 +1637,16 @@ export type GearGalleryPhoto = {
   caption?: string;
 };
 
+export type GearPracticeLink = {
+  module?: "chords" | "pyramid" | "drums" | "garden" | "lang" | "studio" | "here";
+  world?: string;
+};
+
 export type GearDetail = GearItem & {
   packs: PackListItem[];
   links?: GearLink[];
   gallery?: GearGalleryPhoto[];
+  practiceLink?: GearPracticeLink;
 };
 
 export async function getPacks(): Promise<PackListItem[]> {
@@ -1746,6 +1781,7 @@ export async function getGearBySlug(slug: string): Promise<GearDetail | null> {
       photo,
       pinned,
       links,
+      practiceLink,
       "gallery": gallery[]{ image, caption },
       "packs": *[_type == "pack" && ^._id in gear[]._ref] | order(featured desc, releaseDate desc, year desc) {
         ${packListProjection}
