@@ -677,6 +677,54 @@
     pointer-events: none;
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ============ MUSIC BED ============
+     Per-world synthesized drone in the city's tonic+fifth. Same engine
+     pattern as language.html — AudioContext starts on user click; deck
+     change crossfades over ~3s. */
+  .bed-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 16px; margin: 0 12px;
+    background: var(--paper-2); border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .bed-toggle {
+    flex-shrink: 0; background: var(--paper); border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink); padding: 5px 10px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase;
+    cursor: pointer; color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: transform 0.08s, box-shadow 0.08s, background 0.18s, color 0.18s;
+  }
+  .bed-toggle:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 var(--ink); }
+  .bed-toggle.on { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--terracotta); }
+  .bed-toggle .bed-note { display: inline-block; transform-origin: center; }
+  .bed-toggle.on .bed-note { animation: bedNotePulse 1.4s ease-in-out infinite; }
+  @keyframes bedNotePulse { 0%,100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.2); opacity: 1; } }
+  .bed-vol-row { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .bed-vol-label {
+    font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.2px;
+    color: var(--ink-3); text-transform: uppercase; flex-shrink: 0;
+  }
+  .bed-vol {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; background: var(--paper-3); border: 1.5px solid var(--ink);
+    outline: none; cursor: pointer; min-width: 50px;
+  }
+  .bed-vol::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 18px; background: var(--yellow);
+    border: 1.5px solid var(--ink); cursor: pointer;
+  }
+  .bed-vol::-moz-range-thumb {
+    width: 14px; height: 18px; background: var(--yellow);
+    border: 1.5px solid var(--ink); cursor: pointer;
+  }
+  .bed-style {
+    flex-shrink: 0; font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 11px; color: var(--terracotta); white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -708,6 +756,19 @@
     <span class="world-current-name" id="worldCurrentName">MADRID — <em>iberian gold</em></span>
   </div>
   <div class="world-scroll" id="worldScroll"></div>
+
+<!-- Music bed: synthesized per-world drone. Toggle starts AudioContext
+     and triggers the city's bed; world change crossfades. -->
+<div class="bed-bar">
+  <button class="bed-toggle" id="bedToggle" type="button" onclick="toggleBed()" aria-pressed="false">
+    <span class="bed-note">♪</span><span id="bedLabel">BED OFF</span>
+  </button>
+  <div class="bed-vol-row">
+    <span class="bed-vol-label">— vol</span>
+    <input class="bed-vol" id="bedVol" type="range" min="0" max="100" value="35" oninput="setBedVol(this.value/100)">
+  </div>
+  <span class="bed-style" id="bedStyle">flamenco drone</span>
+</div>
 </div>
 
 <!-- Character card (theme-tinted) -->
@@ -1215,6 +1276,9 @@ const state = {
   comboBeat: 0,
   isPlaying: false,
   worldIdx: 0,
+  // Music bed
+  bedOn: false,
+  bedVol: 0.35,
 };
 
 function currentWorld() { return WORLDS[state.worldIdx]; }
@@ -1260,6 +1324,9 @@ async function loadState() {
       state.musicSkill = saved.musicSkill || 0;
       state.earSkill = saved.earSkill || 0;
       state.worldIdx = saved.hopWorld || 0;
+      if (typeof saved.pyramidBedVol === 'number') state.bedVol = saved.pyramidBedVol;
+      // bedOn intentionally NOT restored — browser autoplay requires a
+      // fresh user gesture to start the AudioContext.
     }
   } catch (e) {}
 }
@@ -1275,6 +1342,7 @@ async function saveState() {
     existing.hopWorld = state.worldIdx;
     existing.hopHighScore = Math.max(existing.hopHighScore || 0, state.score);
     existing.hopBestLevel = Math.max(existing.hopBestLevel || 1, state.level);
+    existing.pyramidBedVol = state.bedVol;
     await window.storage.set('drum_state', JSON.stringify(existing));
   } catch (e) {}
 }
@@ -2109,11 +2177,159 @@ function renderWorldSelector() {
   });
 }
 
+// ============ MUSIC BED ENGINE ============
+// Per-world synthesized drone — same engine pattern as language.html.
+// Voices stack root + 2 detuned root copies + fifth + soft octave for
+// unison thickness; BiquadFilter shapes the timbre; slow LFO moves the
+// cutoff. AudioContext only starts on user click (browser autoplay).
+const CITY_BED = {
+  // Madrid: Phrygian Dominant in D — flamenco pluck
+  madrid:    { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 8,  filterType: 'lowpass',  filterFreq: 900,  filterQ: 3.2, lfoRate: 0.18, lfoDepth: 280, label: 'flamenco drone' },
+  // Paris: Lydian in C — rhodes-ish warm
+  paris:     { root: 65.41, fifth: 98.00,  padWave: 'triangle', detune: 6,  filterType: 'lowpass',  filterFreq: 1400, filterQ: 1.2, lfoRate: 0.22, lfoDepth: 320, label: 'rhodes drift' },
+  // Medellín: Mixolydian in D — warm marimba pad
+  medellin:  { root: 73.42, fifth: 110.00, padWave: 'triangle', detune: 5,  filterType: 'lowpass',  filterFreq: 1300, filterQ: 1.5, lfoRate: 0.18, lfoDepth: 240, label: 'paisa pad' },
+  // Brooklyn: Dorian in A — lo-fi rhodes-ish
+  brooklyn:  { root: 55.00, fifth: 82.41,  padWave: 'sawtooth', detune: 9,  filterType: 'lowpass',  filterFreq: 800,  filterQ: 2.0, lfoRate: 0.14, lfoDepth: 220, label: 'lo-fi drone' },
+  // Berlin: Aeolian in E — cold saw
+  berlin:    { root: 82.41, fifth: 123.47, padWave: 'sawtooth', detune: 12, filterType: 'lowpass',  filterFreq: 700,  filterQ: 2.6, lfoRate: 0.10, lfoDepth: 200, label: 'concrete saw' },
+  // Tokyo: Insen in D — koto shimmer bandpass
+  tokyo:     { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 4,  filterType: 'bandpass', filterFreq: 1600, filterQ: 5.5, lfoRate: 0.28, lfoDepth: 480, label: 'koto bed' },
+};
+let bedCtx = null;
+let bedMaster = null;
+let currentBed = null;
+
+function ensureBedCtx() {
+  if (bedCtx) return bedCtx;
+  const Ctor = window.AudioContext || window.webkitAudioContext;
+  if (!Ctor) return null;
+  bedCtx = new Ctor();
+  bedMaster = bedCtx.createGain();
+  bedMaster.gain.value = 0;
+  bedMaster.connect(bedCtx.destination);
+  return bedCtx;
+}
+
+function makeBed(cityKey) {
+  if (!bedCtx) return null;
+  const c = CITY_BED[cityKey];
+  if (!c) return null;
+  const ctx = bedCtx;
+  const bedGain = ctx.createGain();
+  bedGain.gain.value = 0;
+  bedGain.connect(bedMaster);
+  const filter = ctx.createBiquadFilter();
+  filter.type = c.filterType;
+  filter.frequency.value = c.filterFreq;
+  filter.Q.value = c.filterQ;
+  filter.connect(bedGain);
+  const lfo = ctx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = c.lfoRate;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = c.lfoDepth;
+  lfo.connect(lfoGain).connect(filter.frequency);
+  lfo.start();
+  const oscs = [];
+  function voice(freq, detuneCents, gainVal) {
+    const o = ctx.createOscillator();
+    o.type = c.padWave;
+    o.frequency.value = freq;
+    o.detune.value = detuneCents;
+    const g = ctx.createGain();
+    g.gain.value = gainVal;
+    o.connect(g).connect(filter);
+    o.start();
+    oscs.push(o);
+  }
+  voice(c.root,        0,             0.20);
+  voice(c.root,        c.detune,      0.16);
+  voice(c.root,       -c.detune,      0.16);
+  voice(c.fifth,       c.detune * 0.4, 0.12);
+  voice(c.root * 2,    0,             0.06);
+  const now = ctx.currentTime;
+  bedGain.gain.setValueAtTime(0, now);
+  bedGain.gain.linearRampToValueAtTime(1, now + 3.0);
+  return {
+    cityKey, bedGain,
+    stop() {
+      const t = bedCtx.currentTime;
+      bedGain.gain.cancelScheduledValues(t);
+      bedGain.gain.setValueAtTime(bedGain.gain.value, t);
+      bedGain.gain.linearRampToValueAtTime(0, t + 2.0);
+      setTimeout(() => {
+        try { lfo.stop(); } catch (e) {}
+        oscs.forEach(o => { try { o.stop(); } catch (e) {} });
+      }, 2200);
+    },
+  };
+}
+
+function setBedForWorld(cityKey) {
+  if (!state.bedOn || !bedCtx) return;
+  if (!CITY_BED[cityKey]) return;
+  if (currentBed && currentBed.cityKey === cityKey) return;
+  if (currentBed) currentBed.stop();
+  currentBed = makeBed(cityKey);
+  updateBedStyleLabel();
+}
+
+function updateBedStyleLabel() {
+  const el = document.getElementById('bedStyle');
+  if (!el) return;
+  const c = CITY_BED[currentWorld().id];
+  el.textContent = c ? c.label : '';
+}
+
+function applyBedMasterVolume() {
+  if (!bedCtx || !bedMaster) return;
+  const target = state.bedOn ? state.bedVol : 0;
+  const t = bedCtx.currentTime;
+  bedMaster.gain.cancelScheduledValues(t);
+  bedMaster.gain.linearRampToValueAtTime(target, t + 0.4);
+}
+
+async function toggleBed() {
+  if (!ensureBedCtx()) return;
+  if (bedCtx.state === 'suspended') {
+    try { await bedCtx.resume(); } catch (e) {}
+  }
+  state.bedOn = !state.bedOn;
+  const btn = document.getElementById('bedToggle');
+  const lbl = document.getElementById('bedLabel');
+  if (btn && lbl) {
+    btn.classList.toggle('on', state.bedOn);
+    btn.setAttribute('aria-pressed', state.bedOn ? 'true' : 'false');
+    lbl.textContent = state.bedOn ? 'BED ON' : 'BED OFF';
+  }
+  if (state.bedOn) {
+    if (!currentBed) currentBed = makeBed(currentWorld().id);
+  } else {
+    if (currentBed) { currentBed.stop(); currentBed = null; }
+  }
+  applyBedMasterVolume();
+  updateBedStyleLabel();
+  saveState();
+}
+
+function setBedVol(v) {
+  state.bedVol = Math.max(0, Math.min(1, v));
+  applyBedMasterVolume();
+  saveState();
+}
+
+window.toggleBed = toggleBed;
+window.setBedVol = setBedVol;
+
 function selectWorld(i) {
   if (i === state.worldIdx) return;
   state.worldIdx = i;
   applyTheme();
   renderWorldSelector();
+  if (typeof applyCityBackground === 'function') applyCityBackground(currentWorld().id);
+  setBedForWorld(currentWorld().id);
+  updateBedStyleLabel();
   showToast('★ ENTERED ' + currentWorld().name);
   if (state.isPlaying) {
     // Reset game when switching worlds
@@ -2157,6 +2373,10 @@ function showToast(text) {
   renderStage();
   updateStats();
   if (typeof applyCityBackground === 'function') applyCityBackground(currentWorld().id);
+  // Reflect restored bed volume on the slider + label the right city style
+  const volEl = document.getElementById('bedVol');
+  if (volEl) volEl.value = Math.round(state.bedVol * 100);
+  updateBedStyleLabel();
   if (worldParam) showToast('★ YOU ARE IN ' + currentWorld().name);
 })();
 
