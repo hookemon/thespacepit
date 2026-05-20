@@ -1100,6 +1100,16 @@
       <span class="fx-dot"></span><span id="harpLabel">HARP OFF</span>
     </button>
   </div>
+  <div class="fx-row">
+    <span class="fx-label">— FILTER <span class="fx-val" id="filterVal">1.0×</span></span>
+    <input class="fx-slider" id="filterSlider" type="range" min="20" max="300" value="100"
+           oninput="setFilterMul(this.value/100)">
+  </div>
+  <div class="fx-row">
+    <span class="fx-label">— RELEASE <span class="fx-val" id="releaseVal">1.0×</span></span>
+    <input class="fx-slider" id="releaseSlider" type="range" min="20" max="300" value="100"
+           oninput="setReleaseMul(this.value/100)">
+  </div>
 </div>
 
 <!-- Arpeggiator panel — when ON, splits each landed chord into a stepped
@@ -1659,6 +1669,11 @@ const state = {
   // Harp mode: override the world's synth with the plucked harp voice.
   // Pairs beautifully with strum > 20ms for a real harp-roll feel.
   harpMode: false,
+  // Synth knobs — multipliers applied on top of the city's voice and the
+  // game-style transforms. 1.0 = no change. Filter affects the lowpass /
+  // bandpass cutoff; release affects how long each note fades out.
+  filterMul: 1.0,
+  releaseMul: 1.0,
 };
 function currentWorld() { return WORLDS[state.worldIdx]; }
 
@@ -2563,6 +2578,21 @@ function toggleHarp() {
 window.setStrum = setStrum;
 window.toggleHarp = toggleHarp;
 
+function setFilterMul(v) {
+  state.filterMul = Math.max(0.2, Math.min(3.0, Number(v) || 1.0));
+  const el = document.getElementById('filterVal');
+  if (el) el.textContent = state.filterMul.toFixed(2) + '×';
+  saveState();
+}
+function setReleaseMul(v) {
+  state.releaseMul = Math.max(0.2, Math.min(3.0, Number(v) || 1.0));
+  const el = document.getElementById('releaseVal');
+  if (el) el.textContent = state.releaseMul.toFixed(2) + '×';
+  saveState();
+}
+window.setFilterMul = setFilterMul;
+window.setReleaseMul = setReleaseMul;
+
 // Style chip wiring — flips state.gameStyle which is read inside createVoice
 document.querySelectorAll('#styleChips .style-chip').forEach(b => {
   b.addEventListener('click', () => {
@@ -2590,10 +2620,14 @@ const GAME_STYLES = {
 };
 
 /** Returns a deep-enough copy of the synth definition with the style's
- *  modifications applied. Originals in SYNTHS stay untouched. */
+ *  modifications applied, then layered with the user's FILTER and RELEASE
+ *  knobs. Originals in SYNTHS stay untouched. */
 function applyGameStyle(synth, styleId) {
   const style = GAME_STYLES[styleId] || GAME_STYLES.pure;
-  if (styleId === 'pure') return synth;
+  const userFilter = state.filterMul ?? 1.0;
+  const userRelease = state.releaseMul ?? 1.0;
+  // If style is pure AND the user knobs are both 1.0, no transform needed.
+  if (styleId === 'pure' && userFilter === 1.0 && userRelease === 1.0) return synth;
   const out = {
     osc: synth.osc.map(o => ({
       ...o,
@@ -2605,12 +2639,12 @@ function applyGameStyle(synth, styleId) {
     tremolo: synth.tremolo,
     filter: {
       ...synth.filter,
-      freq: Math.max(60, Math.min(8000, synth.filter.freq * style.filterMul)),
+      freq: Math.max(60, Math.min(12000, synth.filter.freq * style.filterMul * userFilter)),
       Q: Math.max(0.5, synth.filter.Q + style.qAdd),
     },
     env: {
       ...synth.env,
-      r: synth.env.r * style.releaseMul,
+      r: synth.env.r * style.releaseMul * userRelease,
     },
   };
   return out;
@@ -3006,6 +3040,8 @@ async function loadState() {
         gameStyle: saved.gameStyle ?? 'pure',
         strumMs: saved.strumMs ?? 0,
         harpMode: saved.harpMode ?? false,
+        filterMul: saved.filterMul ?? 1.0,
+        releaseMul: saved.releaseMul ?? 1.0,
         // ambient intentionally NOT restored to true — autoplay rules
       });
       document.getElementById('velocitySlider').value = state.velocity;
@@ -3042,6 +3078,10 @@ async function loadState() {
       if (stSl) { stSl.value = state.strumMs; document.getElementById('strumVal').textContent = state.strumMs + ' ms'; }
       const hpBtn = document.getElementById('harpToggle');
       if (hpBtn) { hpBtn.classList.toggle('on', state.harpMode); document.getElementById('harpLabel').textContent = state.harpMode ? 'HARP ON' : 'HARP OFF'; }
+      const fSl = document.getElementById('filterSlider');
+      if (fSl) { fSl.value = Math.round(state.filterMul * 100); document.getElementById('filterVal').textContent = state.filterMul.toFixed(2) + '×'; }
+      const rrSl = document.getElementById('releaseSlider');
+      if (rrSl) { rrSl.value = Math.round(state.releaseMul * 100); document.getElementById('releaseVal').textContent = state.releaseMul.toFixed(2) + '×'; }
       // Arp restore
       const arpBtn = document.getElementById('arpToggle');
       if (arpBtn) {
@@ -3071,6 +3111,7 @@ async function saveState() {
       songMode: state.songMode,
       delayMix: state.delayMix, reverbMix: state.reverbMix,
       gameStyle: state.gameStyle, strumMs: state.strumMs, harpMode: state.harpMode,
+      filterMul: state.filterMul, releaseMul: state.releaseMul,
     }));
   } catch (e) {}
 }
