@@ -350,6 +350,61 @@
   .lang-bg-tokyo .neon-2 { animation: neonPulse 5.5s ease-in-out infinite 0.7s; }
   .lang-bg-rishikesh .mandala { animation: mandalaSpin 120s linear infinite; transform-origin: 200px 420px; transform-box: fill-box; }
   .lang-bg-rishikesh .ripples { animation: rippleSlide 6s ease-in-out infinite; }
+
+  /* ============ MUSIC BED CONTROL ============
+     Small bar between banner and category chips. Toggle + volume slider.
+     Synthesizes a per-city drone pad via Web Audio API. */
+  .bed-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 20px 8px;
+    background: var(--paper-2);
+    border-bottom: 1.5px solid var(--ink);
+  }
+  .bed-toggle {
+    flex-shrink: 0;
+    background: var(--paper);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    padding: 5px 10px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800; font-size: 11px;
+    letter-spacing: 1.2px; text-transform: uppercase;
+    cursor: pointer;
+    color: var(--ink);
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: transform 0.08s, box-shadow 0.08s, background 0.18s, color 0.18s;
+  }
+  .bed-toggle:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .bed-toggle.on { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--terracotta); }
+  .bed-toggle .bed-note { display: inline-block; transform-origin: center; }
+  .bed-toggle.on .bed-note { animation: bedNotePulse 1.4s ease-in-out infinite; }
+  @keyframes bedNotePulse { 0%,100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.2); opacity: 1; } }
+
+  .bed-vol-row { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
+  .bed-vol-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.2px; color: var(--ink-3); text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .bed-vol {
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; background: var(--paper-3); border: 1.5px solid var(--ink);
+    outline: none; cursor: pointer; min-width: 60px;
+  }
+  .bed-vol::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 14px; height: 18px; background: var(--yellow);
+    border: 1.5px solid var(--ink); cursor: pointer;
+  }
+  .bed-vol::-moz-range-thumb {
+    width: 14px; height: 18px; background: var(--yellow);
+    border: 1.5px solid var(--ink); cursor: pointer;
+  }
+  .bed-style {
+    flex-shrink: 0;
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 11px; color: var(--terracotta); white-space: nowrap;
+  }
 </style>
 </head>
 <body>
@@ -580,6 +635,19 @@
   <div class="lang-banner-dj" id="langDj">"vamos al estudio."</div>
 </div>
 
+<!-- Music bed: synthesized per-city pad. Toggle starts AudioContext; the
+     volume slider sets sustained level. Ducks -6dB while TTS speaks. -->
+<div class="bed-bar">
+  <button class="bed-toggle" id="bedToggle" type="button" onclick="toggleBed()" aria-pressed="false">
+    <span class="bed-note">♪</span><span id="bedLabel">BED OFF</span>
+  </button>
+  <div class="bed-vol-row">
+    <span class="bed-vol-label">— vol</span>
+    <input class="bed-vol" id="bedVol" type="range" min="0" max="100" value="35" oninput="setBedVol(this.value/100)">
+  </div>
+  <span class="bed-style" id="bedStyle">flamenco drone</span>
+</div>
+
 <div class="cat-bar" id="catBar"></div>
 
 <div class="card-stage">
@@ -801,6 +869,8 @@ const state = {
   flipped: false,
   languageSkill: 0,
   studiedCards: new Set(),  // for skill counting — only count first study of a card
+  bedOn: false,             // music bed master toggle (requires user gesture)
+  bedVol: 0.35,             // master volume 0..1
 };
 
 // ============ DOM ============
@@ -932,6 +1002,8 @@ function setLang(langId) {
   renderBanner();
   renderCard();
   applyLangBackground();
+  setBedForLang(langId);
+  updateBedStyleLabel();
   saveState();
 }
 
@@ -1024,13 +1096,180 @@ function playAudio() {
               || voices.find(v => v.lang.startsWith(deck.voiceLocale.split('-')[0]));
     if (match) u.voice = match;
     audioBtn.classList.add('playing');
-    u.onend = () => audioBtn.classList.remove('playing');
-    u.onerror = () => audioBtn.classList.remove('playing');
+    duckBed();
+    u.onend = () => { audioBtn.classList.remove('playing'); unduckBed(); };
+    u.onerror = () => { audioBtn.classList.remove('playing'); unduckBed(); };
     window.speechSynthesis.speak(u);
   } catch (e) {
     audioBtn.classList.remove('playing');
   }
 }
+
+// ============ MUSIC BED ENGINE ============
+// Per-city analog-feeling drone pads. AudioContext starts on first user
+// click (browser autoplay rules), then each deck change crossfades to the
+// new city's voicing in that city's musical key/mode. Three voices stack
+// for unison thickness: root, root-detuned, fifth — pushed through a
+// filter with a slow LFO on cutoff for movement.
+const CITY_MUSIC = {
+  // Madrid: Phrygian Dominant in D — flamenco pluck timbre, biting filter
+  madrid:    { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 8,  filterType: 'lowpass',  filterFreq: 900,  filterQ: 3.2, lfoRate: 0.18, lfoDepth: 280, label: 'flamenco drone' },
+  // Paris: Lydian in C — rhodes-ish warm pad, gentle filter
+  paris:     { root: 65.41, fifth: 98.00,  padWave: 'triangle', detune: 6,  filterType: 'lowpass',  filterFreq: 1400, filterQ: 1.2, lfoRate: 0.22, lfoDepth: 320, label: 'rhodes drift' },
+  // Berlin: Aeolian in E — saw pad, cold and brutalist
+  berlin:    { root: 82.41, fifth: 123.47, padWave: 'sawtooth', detune: 12, filterType: 'lowpass',  filterFreq: 700,  filterQ: 2.6, lfoRate: 0.10, lfoDepth: 200, label: 'concrete saw' },
+  // Tokyo: Insen in D — koto bandpass shimmer
+  tokyo:     { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 4,  filterType: 'bandpass', filterFreq: 1600, filterQ: 5.5, lfoRate: 0.28, lfoDepth: 480, label: 'koto bed' },
+  // Rishikesh: Yaman in D — harmonium warm square
+  rishikesh: { root: 73.42, fifth: 110.00, padWave: 'square',   detune: 5,  filterType: 'lowpass',  filterFreq: 1100, filterQ: 1.1, lfoRate: 0.12, lfoDepth: 240, label: 'harmonium drone' },
+};
+
+const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'rishikesh' };
+
+let audioCtx = null;
+let masterGain = null;
+let currentBed = null;
+let duckMul = 1;  // 1 = normal, ~0.4 = ducked under TTS
+
+function ensureCtx() {
+  if (audioCtx) return audioCtx;
+  const Ctor = window.AudioContext || window.webkitAudioContext;
+  if (!Ctor) return null;
+  audioCtx = new Ctor();
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0;
+  masterGain.connect(audioCtx.destination);
+  return audioCtx;
+}
+
+function makeBed(cityKey) {
+  if (!audioCtx) return null;
+  const c = CITY_MUSIC[cityKey];
+  if (!c) return null;
+  const ctx = audioCtx;
+
+  // Per-bed sub-bus for crossfading
+  const bedGain = ctx.createGain();
+  bedGain.gain.value = 0;
+  bedGain.connect(masterGain);
+
+  // Filter shaping the whole bed
+  const filter = ctx.createBiquadFilter();
+  filter.type = c.filterType;
+  filter.frequency.value = c.filterFreq;
+  filter.Q.value = c.filterQ;
+  filter.connect(bedGain);
+
+  // LFO modulating filter cutoff — slow, organic movement
+  const lfo = ctx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.value = c.lfoRate;
+  const lfoGain = ctx.createGain();
+  lfoGain.gain.value = c.lfoDepth;
+  lfo.connect(lfoGain).connect(filter.frequency);
+  lfo.start();
+
+  // Drone voices: root low, two detuned root copies, a fifth, and a soft
+  // octave-up shimmer. Each through its own gain into the filter.
+  const oscs = [];
+  function voice(freq, detuneCents, gainVal) {
+    const o = ctx.createOscillator();
+    o.type = c.padWave;
+    o.frequency.value = freq;
+    o.detune.value = detuneCents;
+    const g = ctx.createGain();
+    g.gain.value = gainVal;
+    o.connect(g).connect(filter);
+    o.start();
+    oscs.push(o);
+  }
+  voice(c.root,        0,             0.20);
+  voice(c.root,        c.detune,      0.16);
+  voice(c.root,       -c.detune,      0.16);
+  voice(c.fifth,       c.detune * 0.4, 0.12);
+  voice(c.root * 2,    0,             0.06);
+
+  // 3-second swell in
+  const now = ctx.currentTime;
+  bedGain.gain.setValueAtTime(0, now);
+  bedGain.gain.linearRampToValueAtTime(1, now + 3.0);
+
+  return {
+    cityKey,
+    bedGain,
+    stop() {
+      const t = audioCtx.currentTime;
+      bedGain.gain.cancelScheduledValues(t);
+      bedGain.gain.setValueAtTime(bedGain.gain.value, t);
+      bedGain.gain.linearRampToValueAtTime(0, t + 2.0);
+      // Wait for fade then disconnect
+      setTimeout(() => {
+        try { lfo.stop(); } catch (e) {}
+        oscs.forEach(o => { try { o.stop(); } catch (e) {} });
+      }, 2200);
+    },
+  };
+}
+
+function setBedForLang(langId) {
+  if (!state.bedOn || !audioCtx) return;
+  const cityKey = LANG_CITY_FOR_BED[langId];
+  if (!cityKey) return;
+  if (currentBed && currentBed.cityKey === cityKey) return;
+  if (currentBed) currentBed.stop();
+  currentBed = makeBed(cityKey);
+  updateBedStyleLabel();
+}
+
+function updateBedStyleLabel() {
+  const el = document.getElementById('bedStyle');
+  if (!el) return;
+  const cityKey = LANG_CITY_FOR_BED[state.lang];
+  const c = CITY_MUSIC[cityKey];
+  el.textContent = c ? c.label : '';
+}
+
+function applyMasterVolume() {
+  if (!audioCtx || !masterGain) return;
+  const target = state.bedOn ? state.bedVol * duckMul : 0;
+  const t = audioCtx.currentTime;
+  masterGain.gain.cancelScheduledValues(t);
+  masterGain.gain.linearRampToValueAtTime(target, t + 0.4);
+}
+
+async function toggleBed() {
+  if (!ensureCtx()) return;
+  if (audioCtx.state === 'suspended') {
+    try { await audioCtx.resume(); } catch (e) {}
+  }
+  state.bedOn = !state.bedOn;
+  const btn = document.getElementById('bedToggle');
+  const lbl = document.getElementById('bedLabel');
+  if (btn && lbl) {
+    btn.classList.toggle('on', state.bedOn);
+    btn.setAttribute('aria-pressed', state.bedOn ? 'true' : 'false');
+    lbl.textContent = state.bedOn ? 'BED ON' : 'BED OFF';
+  }
+  if (state.bedOn) {
+    if (!currentBed) currentBed = makeBed(LANG_CITY_FOR_BED[state.lang]);
+  } else {
+    if (currentBed) { currentBed.stop(); currentBed = null; }
+  }
+  applyMasterVolume();
+  updateBedStyleLabel();
+  saveState();
+}
+
+function setBedVol(v) {
+  state.bedVol = Math.max(0, Math.min(1, v));
+  applyMasterVolume();
+  saveState();
+}
+
+// TTS ducking — drop bed gain when the spoken phrase is playing so the
+// pronunciation cuts through clearly. Restore on end.
+function duckBed()   { duckMul = 0.4; applyMasterVolume(); }
+function unduckBed() { duckMul = 1;   applyMasterVolume(); }
 
 // ============ PERSIST ============
 async function saveState() {
@@ -1040,6 +1279,8 @@ async function saveState() {
       cat: state.cat,
       languageSkill: state.languageSkill,
       studiedCards: Array.from(state.studiedCards),
+      bedOn: state.bedOn,
+      bedVol: state.bedVol,
     }));
   } catch (e) {}
 }
@@ -1076,6 +1317,12 @@ async function loadState() {
       if (saved.cat) state.cat = saved.cat;
       if (typeof saved.languageSkill === 'number') state.languageSkill = saved.languageSkill;
       if (Array.isArray(saved.studiedCards)) state.studiedCards = new Set(saved.studiedCards);
+      // Restore bed preference but never auto-start audio — browser autoplay
+      // policy requires a user gesture. The toggle button shows its prior
+      // state; clicking actually starts the AudioContext.
+      if (typeof saved.bedVol === 'number') state.bedVol = saved.bedVol;
+      // bedOn is intentionally NOT restored to true automatically. User
+      // re-enables on first interaction.
     }
   } catch (e) {}
 
@@ -1106,6 +1353,10 @@ async function init() {
   renderBanner();
   renderCard();
   applyLangBackground();
+  // Reflect restored bed volume on the slider + show the city's bed label
+  const volEl = document.getElementById('bedVol');
+  if (volEl) volEl.value = Math.round(state.bedVol * 100);
+  updateBedStyleLabel();
   statsVal.textContent = state.languageSkill;
 }
 init();
