@@ -1092,6 +1092,14 @@
       <button class="style-chip" data-style="gta">GTA</button>
     </div>
   </div>
+  <div class="fx-row">
+    <span class="fx-label">— STRUM <span class="fx-val" id="strumVal">0 ms</span></span>
+    <input class="fx-slider" id="strumSlider" type="range" min="0" max="80" value="0"
+           oninput="setStrum(this.value)">
+    <button class="fx-toggle" id="harpToggle" type="button" onclick="toggleHarp()" aria-pressed="false" title="override the city synth with a plucked harp">
+      <span class="fx-dot"></span><span id="harpLabel">HARP OFF</span>
+    </button>
+  </div>
 </div>
 
 <!-- Arpeggiator panel — when ON, splits each landed chord into a stepped
@@ -1579,6 +1587,19 @@ const SYNTHS = {
     filter: { type: 'bandpass', freq: 1700, Q: 4.2, envAmt: 1100, envTime: 0.06 },
     env: { a: 0.001, d: 0.5, s: 0.05, r: 0.7 },
   },
+  harp: {
+    // Plucked harp — clean triangle fundamental + octave shimmer + 2nd
+    // harmonic ring. Soft noise pluck attack, bandpass at 2.4kHz for
+    // harp brightness, decay-to-zero envelope (plucked, not sustained).
+    osc: [
+      { type: 'triangle', gain: 0.6,  detune: 0 },
+      { type: 'sine',     gain: 0.32, detune: 0, octave: 1 },
+      { type: 'sine',     gain: 0.16, detune: 3, octave: 2 },
+    ],
+    noiseBurst: { gain: 0.28, duration: 0.003 },
+    filter: { type: 'bandpass', freq: 2400, Q: 1.9, envAmt: 700, envTime: 0.05 },
+    env: { a: 0.001, d: 0.75, s: 0.0, r: 1.1 },
+  },
 };
 
 const NOTE_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
@@ -1632,6 +1653,12 @@ const state = {
   // Game-style preset — transforms the world's synth voicing without
   // changing the chord pool or palette. PURE is no-op.
   gameStyle: 'pure',
+  // Strum: ms between successive chord notes. 0 = block-chord (all
+  // simultaneous); 20-40ms is a natural strum. Up to 80ms is a roll.
+  strumMs: 0,
+  // Harp mode: override the world's synth with the plucked harp voice.
+  // Pairs beautifully with strum > 20ms for a real harp-roll feel.
+  harpMode: false,
 };
 function currentWorld() { return WORLDS[state.worldIdx]; }
 
@@ -2509,6 +2536,33 @@ function toggleAmbient() {
 }
 window.toggleAmbient = toggleAmbient;
 
+function setStrum(ms) {
+  state.strumMs = Math.max(0, Math.min(80, Number(ms) || 0));
+  const el = document.getElementById('strumVal');
+  if (el) el.textContent = state.strumMs + ' ms';
+  saveState();
+}
+function toggleHarp() {
+  state.harpMode = !state.harpMode;
+  const btn = document.getElementById('harpToggle');
+  const lbl = document.getElementById('harpLabel');
+  if (btn && lbl) {
+    btn.classList.toggle('on', state.harpMode);
+    btn.setAttribute('aria-pressed', state.harpMode ? 'true' : 'false');
+    lbl.textContent = state.harpMode ? 'HARP ON' : 'HARP OFF';
+  }
+  // Default to a natural strum amount when first turning harp on so it
+  // sounds like a real harp roll — not a piano block-chord with harp tone.
+  if (state.harpMode && state.strumMs === 0) {
+    setStrum(28);
+    const sl = document.getElementById('strumSlider');
+    if (sl) sl.value = 28;
+  }
+  saveState();
+}
+window.setStrum = setStrum;
+window.toggleHarp = toggleHarp;
+
 // Style chip wiring — flips state.gameStyle which is read inside createVoice
 document.querySelectorAll('#styleChips .style-chip').forEach(b => {
   b.addEventListener('click', () => {
@@ -2657,9 +2711,28 @@ function createVoice(midi, velocity, totalSec, synthKey) {
 function playChord(notes, velocity, durSec) {
   ensureAudio();
   releaseHeld();
-  const synthKey = currentWorld().synth;
-  const voices = notes.map(midi => createVoice(midi, velocity, durSec, synthKey));
-  heldVoices.push(...voices);
+  // Harp mode overrides the world's synth; otherwise use the city's voice.
+  const synthKey = state.harpMode ? 'harp' : currentWorld().synth;
+  const strumMs = state.strumMs || 0;
+  if (strumMs <= 0) {
+    // Block-chord — all notes start simultaneously (original behavior).
+    const voices = notes.map(midi => createVoice(midi, velocity, durSec, synthKey));
+    heldVoices.push(...voices);
+    return;
+  }
+  // Strum — stagger note starts. First note immediately, later notes
+  // delayed by N×strumMs. Each voice's total duration shortens slightly
+  // so they all release on roughly the same beat.
+  notes.forEach((midi, i) => {
+    const delaySec = (i * strumMs) / 1000;
+    if (i === 0) {
+      heldVoices.push(createVoice(midi, velocity, durSec, synthKey));
+    } else {
+      setTimeout(() => {
+        heldVoices.push(createVoice(midi, velocity, Math.max(0.1, durSec - delaySec), synthKey));
+      }, i * strumMs);
+    }
+  });
 }
 function releaseHeld() {
   if (!audioCtx) return;
@@ -2931,6 +3004,8 @@ async function loadState() {
         delayMix: saved.delayMix ?? 0.14,
         reverbMix: saved.reverbMix ?? 0.18,
         gameStyle: saved.gameStyle ?? 'pure',
+        strumMs: saved.strumMs ?? 0,
+        harpMode: saved.harpMode ?? false,
         // ambient intentionally NOT restored to true — autoplay rules
       });
       document.getElementById('velocitySlider').value = state.velocity;
@@ -2963,6 +3038,10 @@ async function loadState() {
       document.querySelectorAll('#styleChips .style-chip').forEach(x => x.classList.toggle('active', x.dataset.style === state.gameStyle));
       const svEl = document.getElementById('styleVal');
       if (svEl) svEl.textContent = (GAME_STYLES[state.gameStyle] || GAME_STYLES.pure).label;
+      const stSl = document.getElementById('strumSlider');
+      if (stSl) { stSl.value = state.strumMs; document.getElementById('strumVal').textContent = state.strumMs + ' ms'; }
+      const hpBtn = document.getElementById('harpToggle');
+      if (hpBtn) { hpBtn.classList.toggle('on', state.harpMode); document.getElementById('harpLabel').textContent = state.harpMode ? 'HARP ON' : 'HARP OFF'; }
       // Arp restore
       const arpBtn = document.getElementById('arpToggle');
       if (arpBtn) {
@@ -2991,7 +3070,7 @@ async function saveState() {
       doubleTime: state.doubleTime, fastHop: state.fastHop,
       songMode: state.songMode,
       delayMix: state.delayMix, reverbMix: state.reverbMix,
-      gameStyle: state.gameStyle,
+      gameStyle: state.gameStyle, strumMs: state.strumMs, harpMode: state.harpMode,
     }));
   } catch (e) {}
 }
