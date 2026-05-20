@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineModular, MOD_DEFAULTS, type ModularParams, type PatchProgram } from "../_lib/engineModular";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 
 const KEY_TO_OFFSET: Record<string, number> = {
   a: 0, s: 2, d: 4, f: 5, g: 7, h: 9, j: 11, k: 12, l: 14, ";": 16, "'": 17,
@@ -35,6 +36,11 @@ export function LabModularClient() {
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineModular | null>(null);
   const heldRef = useRef<Set<string>>(new Set());
+  const midiHeldRef = useRef<Set<number>>(new Set());
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const [midiInputs, setMidiInputs] = useState<MidiDevice[]>([]);
+  const [midiInId, setMidiInId] = useState<string>("");
 
   const ensureAudio = useCallback(() => {
     if (ctxRef.current) return ctxRef.current;
@@ -95,6 +101,34 @@ export function LabModularClient() {
 
   useEffect(() => () => { try { void ctxRef.current?.close(); } catch {} }, []);
 
+  // MIDI input
+  useEffect(() => {
+    if (!isMidiSupported()) return;
+    let cancelled = false;
+    let unsub: (() => void) | null = null;
+    const refresh = async () => { const ins = await listInputs(); if (!cancelled) setMidiInputs(ins); };
+    void refresh();
+    void onMidiStateChange(refresh).then((u) => { if (cancelled) u(); else unsub = u; });
+    return () => { cancelled = true; unsub?.(); };
+  }, []);
+  useEffect(() => {
+    if (!midiInId) return;
+    let cancelled = false;
+    let unbind: (() => void) | null = null;
+    void bindInput(midiInId, (msg) => {
+      if (cancelled) return;
+      if (msg.type === "noteon") {
+        midiHeldRef.current.add(msg.note);
+        noteOn(msg.note);
+      } else if (msg.type === "noteoff") {
+        midiHeldRef.current.delete(msg.note);
+        if (midiHeldRef.current.size === 0) noteOff();
+        else { const last = Array.from(midiHeldRef.current).pop()!; noteOn(last); }
+      }
+    }).then((u) => { if (cancelled) u(); else unbind = u; });
+    return () => { cancelled = true; unbind?.(); };
+  }, [midiInId, noteOn, noteOff]);
+
   const activeProgram = useMemo(() => PROGRAMS.find((p) => p.id === params.program)!, [params.program]);
 
   return (
@@ -133,6 +167,16 @@ export function LabModularClient() {
               <span className="font-mono text-[11px] text-paper">{midiToName(octaveBase)}</span>
               <button onClick={() => setOctaveBase((o) => Math.min(96, o+12))} className="font-mono text-[12px] text-paper border border-paper/60 px-2">+</button>
             </div>
+            {mounted && isMidiSupported() && (
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">MIDI IN</span>
+                <select value={midiInId} onChange={(e) => setMidiInId(e.target.value)}
+                  className="bg-ink border border-paper px-2 py-1 font-mono text-[11px] text-paper max-w-[140px]">
+                  <option value="">none</option>
+                  {midiInputs.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              </div>
+            )}
             <div className="ml-auto">
               <RecorderBar
                 getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}

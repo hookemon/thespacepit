@@ -71,4 +71,56 @@ export const FLASH_LIGHT_LESSON: Lesson<LessonMoogState> = {
   ],
 };
 
-export const LESSONS_MOOG: Lesson<LessonMoogState>[] = [FLASH_LIGHT_LESSON];
+export const CABARET_DRONE_LESSON: Lesson<LessonMoogState> = {
+  id: "cabaret-drone-dial",
+  title: "Dial in the Cabaret drone",
+  origin: "Cabaret Voltaire · Red Mecca, 1981",
+  intro:
+    "same moog circuit as flash light. completely different intent. sheffield 1981: saw + sub through a closed filter, slow attack, long release, high resonance. hold one note and let the filter envelope do all the work. load 'init' from the patch menu, then hit start.",
+  reward:
+    "that's sheffield. the moog wasn't built for industrial music — but the same architecture that gave bernie his bounce gives cabaret voltaire their dread. hold a single low note for 10 seconds and let the room evolve.",
+  steps: [
+    {
+      id: "saw-wave",
+      title: "Stay on the saw wave",
+      body:
+        "sawtooth — most harmonics, brightest before filtering. flash light used square; cabaret uses saw. confirm/click 'sawtooth' under OSCILLATOR.",
+      hint: "the wave button row, leftmost option.",
+      check: (s) => s.params.waveform === "sawtooth",
+    },
+    {
+      id: "add-sub-cab",
+      title: "Layer in the sub octave",
+      body:
+        "turn SUB to about 50. gives the drone weight without making it muddy. same sub as the flash light bass, slightly lower mix level.",
+      hint: "SUB knob, around 40–60%.",
+      check: (s) => s.params.subLevel >= 0.35 && s.params.subLevel <= 0.7,
+    },
+    {
+      id: "low-cutoff-high-reso",
+      title: "Close the filter + crank resonance",
+      body:
+        "drop CUTOFF to ~22% and push RESO up to ~70. high resonance + low cutoff = the filter starts to ring on its own. that's the moan in the sound.",
+      hint: "CUTOFF low, RESO high. the filter should be singing before you even hit a note.",
+      check: (s) => s.params.cutoff <= 0.3 && s.params.resonance >= 0.55,
+    },
+    {
+      id: "slow-attack",
+      title: "Slow the attack — both envelopes",
+      body:
+        "set AMP ENV's A to around 45% and FILTER ENV's A to around 60%. now nothing pops in suddenly — every note swells in over almost a full second. that's the sheffield drone shape.",
+      hint: "the A knob on AMP ENV (right panel, bottom row) and FILTER ENV (right panel, top row).",
+      check: (s) => s.params.aAttack >= 0.35 && s.params.fAttack >= 0.5,
+    },
+    {
+      id: "long-release",
+      title: "Long releases so notes rot out instead of cutting",
+      body:
+        "AMP ENV's R to ~80%, FILTER ENV's R to ~70%. when you let a key go, the sound takes its time to die. now hold a low note and listen for 5 seconds. the filter envelope is still moving long after you let go.",
+      hint: "the R knob on both envelope rows. crank both.",
+      check: (s) => s.params.aRelease >= 0.65 && s.params.fRelease >= 0.55,
+    },
+  ],
+};
+
+export const LESSONS_MOOG: Lesson<LessonMoogState>[] = [FLASH_LIGHT_LESSON, CABARET_DRONE_LESSON];

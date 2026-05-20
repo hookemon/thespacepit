@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineBuchla, BUCHLA_DEFAULTS, type BuchlaParams, type PlateShape } from "../_lib/engineBuchla";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 
 const PLATES: { id: PlateShape; label: string; color: string; story: string }[] = [
   { id: "bonk", label: "BONK", color: "#E83A1C", story: "fast attack, fast decay — the classic LPG percussion sound." },
@@ -32,6 +33,10 @@ export function LabBuchlaClient() {
   const [activePlate, setActivePlate] = useState<PlateShape | null>(null);
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineBuchla | null>(null);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  const [midiInputs, setMidiInputs] = useState<MidiDevice[]>([]);
+  const [midiInId, setMidiInId] = useState<string>("");
 
   const ensureAudio = useCallback(() => {
     if (ctxRef.current) return ctxRef.current;
@@ -83,6 +88,33 @@ export function LabBuchlaClient() {
     try { void ctxRef.current?.close(); } catch {}
   }, []);
 
+  // MIDI input — map incoming notes onto the 4 plates by pitch register.
+  // Low notes (< 48) → bonk, mid → pluck, high → swell, very high → drone.
+  useEffect(() => {
+    if (!isMidiSupported()) return;
+    let cancelled = false;
+    let unsub: (() => void) | null = null;
+    const refresh = async () => { const ins = await listInputs(); if (!cancelled) setMidiInputs(ins); };
+    void refresh();
+    void onMidiStateChange(refresh).then((u) => { if (cancelled) u(); else unsub = u; });
+    return () => { cancelled = true; unsub?.(); };
+  }, []);
+  useEffect(() => {
+    if (!midiInId) return;
+    let cancelled = false;
+    let unbind: (() => void) | null = null;
+    void bindInput(midiInId, (msg) => {
+      if (cancelled || msg.type !== "noteon") return;
+      const plate: PlateShape =
+        msg.note < 48 ? "bonk" :
+        msg.note < 60 ? "pluck" :
+        msg.note < 72 ? "swell" :
+        "drone";
+      tap(plate);
+    }).then((u) => { if (cancelled) u(); else unbind = u; });
+    return () => { cancelled = true; unbind?.(); };
+  }, [midiInId, tap]);
+
   // keyboard: 1/2/3/4 → plates, space = release
   useEffect(() => {
     const dn = (e: KeyboardEvent) => {
@@ -126,6 +158,17 @@ export function LabBuchlaClient() {
                 {PRESETS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
+            {mounted && isMidiSupported() && (
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">MIDI IN</span>
+                <select value={midiInId} onChange={(e) => setMidiInId(e.target.value)}
+                  className="bg-ink border border-paper px-2 py-1 font-mono text-[11px] text-paper max-w-[140px]"
+                  title="Low notes → bonk · mid → pluck · high → swell · very high → drone">
+                  <option value="">none</option>
+                  {midiInputs.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
+                </select>
+              </div>
+            )}
             <div className="ml-auto">
               <RecorderBar
                 getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
