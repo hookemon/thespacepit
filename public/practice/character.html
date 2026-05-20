@@ -398,6 +398,13 @@
     transform: translate(-1px, -1px);
   }
   .tile svg { width: 70%; height: 70%; }
+  /* Compact tiles for the DRIP section — short text labels, no preview SVG.
+     Faster to scan when the difference between options is positional. */
+  .tile.tile-compact { aspect-ratio: auto; padding: 8px 6px; min-height: 40px; }
+  .tile.tile-compact .tile-name {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 9.5px; letter-spacing: 1.1px; color: var(--ink); text-transform: uppercase; text-align: center;
+  }
   .tile-label {
     position: absolute;
     bottom: 3px;
@@ -804,6 +811,22 @@
   <div class="swatch-row" id="outfitColors"></div>
 </div>
 
+<!-- Section 5b: Drip — accessories, tattoos, headwear, jewelry -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">5b</span>
+    <span class="section-title">drip<em>.</em></span>
+  </div>
+  <div class="sub-label">— HEAD</div>
+  <div class="tile-row" id="headGearStyles"></div>
+  <div class="sub-label">— EARRINGS</div>
+  <div class="tile-row" id="earringStyles"></div>
+  <div class="sub-label">— NECK</div>
+  <div class="tile-row" id="neckPieceStyles"></div>
+  <div class="sub-label">— TATTOO</div>
+  <div class="tile-row" id="tattooStyles"></div>
+</div>
+
 <!-- Section 6: Language -->
 <div class="section">
   <div class="section-head">
@@ -972,6 +995,37 @@ const WHYS = [
   { id: 'committed', name: 'COMMITTED',    desc: "I'm here for the long haul. Show me the work." },
 ];
 
+const HEAD_GEAR = [
+  { id: 'none',      name: 'NONE' },
+  { id: 'durag',     name: 'DURAG' },
+  { id: 'fitted',    name: 'FITTED' },
+  { id: 'bandana',   name: 'BANDANA' },
+  { id: 'beanie',    name: 'BEANIE' },
+];
+const EARRINGS = [
+  { id: 'none',       name: 'NONE' },
+  { id: 'stud',       name: 'STUD' },
+  { id: 'hoop',       name: 'HOOP' },
+  { id: 'double',     name: 'DOUBLE' },
+  { id: 'chain',      name: 'CHAIN' },
+];
+const NECK_PIECES = [
+  { id: 'none',       name: 'NONE' },
+  { id: 'gold',       name: 'GOLD CHAIN' },
+  { id: 'cuban',      name: 'CUBAN LINK' },
+  { id: 'mala',       name: 'MALA' },
+  { id: 'choker',     name: 'CHOKER' },
+  { id: 'cross',      name: 'CROSS' },
+];
+const TATTOOS = [
+  { id: 'none',       name: 'NONE' },
+  { id: 'sleeve',     name: 'SLEEVE' },
+  { id: 'flash',      name: 'FLASH' },
+  { id: 'tear',       name: 'TEAR' },
+  { id: 'mehndi',     name: 'MEHNDI' },
+  { id: 'neck',       name: 'NECK SCRIPT' },
+];
+
 // ============ STATE ============
 const state = {
   name: '',
@@ -983,6 +1037,10 @@ const state = {
   eyeColor: 'e2',
   outfitStyle: 'hoodie',
   outfitColor: 'o1',
+  headGear: 'none',
+  earring: 'none',
+  neckPiece: 'none',
+  tattoo: 'none',
   language: '',
   city: '',
   why: '',
@@ -1126,7 +1184,158 @@ function renderAvatar() {
   // Mouth
   svg += `<path d="M 90,148 Q 100,152 110,148" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
 
+  // ── DRIP layers — drawn AFTER face so they sit on top ──
+  svg += tattooSVG(state.tattoo, skin, ink);
+  svg += earringSVG(state.earring);
+  svg += neckPieceSVG(state.neckPiece, ink);
+  svg += headGearSVG(state.headGear, hair, ink);
+
   document.getElementById('avatarSvg').innerHTML = svg;
+}
+
+// ============ DRIP SVG ============
+function headGearSVG(id, hair, ink) {
+  switch (id) {
+    case 'durag':
+      // dark fabric over crown with two tails hanging behind ear
+      return `
+        <path d="M 56,84 Q 100,52 144,84 Q 142,100 100,98 Q 58,100 56,84 Z" fill="${ink}" stroke="${ink}" stroke-width="2"/>
+        <path d="M 144,84 Q 165,98 168,124" fill="none" stroke="${ink}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M 142,90 Q 158,108 158,130" fill="none" stroke="#3a322a" stroke-width="2" stroke-linecap="round"/>
+      `;
+    case 'fitted':
+      // baseball cap — flat crown + curved brim
+      return `
+        <path d="M 52,90 Q 100,58 148,90 L 148,98 L 52,98 Z" fill="${ink}" stroke="${ink}" stroke-width="2"/>
+        <path d="M 48,98 Q 100,114 152,98 L 148,104 L 52,104 Z" fill="${ink}" stroke="${ink}" stroke-width="2"/>
+        <circle cx="100" cy="76" r="2.5" fill="#ffd400"/>
+      `;
+    case 'bandana':
+      // triangle tied across forehead with knot
+      return `
+        <path d="M 54,92 Q 100,76 146,92 L 142,100 L 58,100 Z" fill="#c44438" stroke="${ink}" stroke-width="2"/>
+        <path d="M 146,92 L 158,84 L 160,98 Z" fill="#c44438" stroke="${ink}" stroke-width="1.5"/>
+        <circle cx="68" cy="93" r="1.5" fill="#f3ecd8"/>
+        <circle cx="84" cy="89" r="1.5" fill="#f3ecd8"/>
+        <circle cx="100" cy="86" r="1.5" fill="#f3ecd8"/>
+        <circle cx="116" cy="89" r="1.5" fill="#f3ecd8"/>
+        <circle cx="132" cy="93" r="1.5" fill="#f3ecd8"/>
+      `;
+    case 'beanie':
+      // tall knit hat with cuff
+      return `
+        <path d="M 54,86 Q 100,30 146,86 L 146,98 L 54,98 Z" fill="${hair === '#15110d' ? '#5a8a47' : '#15110d'}" stroke="${ink}" stroke-width="2"/>
+        <rect x="52" y="92" width="96" height="8" fill="#3a322a" stroke="${ink}" stroke-width="1.5"/>
+        <circle cx="100" cy="34" r="6" fill="#f3ecd8" stroke="${ink}" stroke-width="1.5"/>
+      `;
+    case 'none':
+    default:
+      return '';
+  }
+}
+
+function earringSVG(id) {
+  switch (id) {
+    case 'stud':
+      return `<circle cx="50" cy="124" r="2.5" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <circle cx="150" cy="124" r="2.5" fill="#ffd400" stroke="#15110d" stroke-width="1"/>`;
+    case 'hoop':
+      return `<circle cx="50" cy="128" r="5" fill="none" stroke="#ffd400" stroke-width="2"/>
+              <circle cx="150" cy="128" r="5" fill="none" stroke="#ffd400" stroke-width="2"/>`;
+    case 'double':
+      return `<circle cx="50" cy="122" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <circle cx="50" cy="130" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <circle cx="150" cy="122" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <circle cx="150" cy="130" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>`;
+    case 'chain':
+      return `<circle cx="50" cy="124" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <line x1="50" y1="126" x2="50" y2="136" stroke="#ffd400" stroke-width="1.5"/>
+              <circle cx="50" cy="138" r="1.5" fill="#ffd400"/>
+              <circle cx="150" cy="124" r="2" fill="#ffd400" stroke="#15110d" stroke-width="1"/>
+              <line x1="150" y1="126" x2="150" y2="136" stroke="#ffd400" stroke-width="1.5"/>
+              <circle cx="150" cy="138" r="1.5" fill="#ffd400"/>`;
+    case 'none':
+    default:
+      return '';
+  }
+}
+
+function neckPieceSVG(id, ink) {
+  switch (id) {
+    case 'gold':
+      return `<path d="M 80,168 Q 100,178 120,168" fill="none" stroke="#ffd400" stroke-width="2"/>
+              <circle cx="100" cy="176" r="2.5" fill="#ffd400" stroke="${ink}" stroke-width="0.8"/>`;
+    case 'cuban':
+      // thick chain links
+      return `<path d="M 78,168 Q 100,180 122,168" fill="none" stroke="#ffd400" stroke-width="4"/>
+              <path d="M 78,168 Q 100,180 122,168" fill="none" stroke="${ink}" stroke-width="0.8" stroke-dasharray="3 2"/>
+              <rect x="96" y="178" width="8" height="8" fill="#ffd400" stroke="${ink}" stroke-width="1"/>`;
+    case 'mala':
+      // beads around neck
+      return `<g fill="#c8743e" stroke="${ink}" stroke-width="0.6">
+                <circle cx="82" cy="168" r="2"/><circle cx="88" cy="172" r="2"/>
+                <circle cx="94" cy="174" r="2"/><circle cx="100" cy="176" r="2"/>
+                <circle cx="106" cy="174" r="2"/><circle cx="112" cy="172" r="2"/>
+                <circle cx="118" cy="168" r="2"/>
+              </g>
+              <circle cx="100" cy="184" r="3" fill="#5a8a47" stroke="${ink}" stroke-width="0.8"/>`;
+    case 'choker':
+      return `<rect x="80" y="166" width="40" height="4" fill="${ink}" stroke="${ink}" stroke-width="0.8"/>
+              <circle cx="100" cy="168" r="1.5" fill="#ffd400"/>`;
+    case 'cross':
+      return `<path d="M 80,168 Q 100,178 120,168" fill="none" stroke="#ffd400" stroke-width="1.8"/>
+              <g transform="translate(100, 184)" stroke="${ink}" stroke-width="0.8">
+                <rect x="-2.5" y="-3" width="5" height="10" fill="#ffd400"/>
+                <rect x="-5" y="-1" width="10" height="3" fill="#ffd400"/>
+              </g>`;
+    case 'none':
+    default:
+      return '';
+  }
+}
+
+function tattooSVG(id, skin, ink) {
+  switch (id) {
+    case 'sleeve':
+      // blackwork sleeve on the visible arm shadow
+      return `<g opacity="0.85" stroke="${ink}" stroke-width="1.2" fill="none">
+                <path d="M 40,200 Q 36,210 38,222"/>
+                <path d="M 42,206 Q 38,216 40,228"/>
+                <circle cx="40" cy="212" r="3" fill="${ink}"/>
+                <path d="M 38,196 Q 32,200 36,206" stroke-width="1"/>
+                <path d="M 160,200 Q 164,210 162,222"/>
+                <path d="M 158,206 Q 162,216 160,228"/>
+                <circle cx="160" cy="212" r="3" fill="${ink}"/>
+              </g>`;
+    case 'flash':
+      // bright flash — small icons (star, heart, dagger hints)
+      return `<g stroke="${ink}" stroke-width="1">
+                <polygon points="38,206 41,212 47,212 42,216 44,222 38,219 32,222 34,216 29,212 35,212" fill="#c44438"/>
+                <path d="M 156,210 Q 160,206 164,210 Q 168,206 172,210 Q 168,220 164,222 Q 160,220 156,210 Z" fill="#c44438"/>
+                <circle cx="40" cy="226" r="3" fill="#ffd400"/>
+              </g>`;
+    case 'tear':
+      // single teardrop below the eye
+      return `<path d="M 82,124 Q 81,128 82,131 Q 83,128 82,124 Z" fill="${ink}" stroke="${ink}" stroke-width="0.6"/>`;
+    case 'mehndi':
+      // henna swirls on hands (low at the wrists)
+      return `<g stroke="#5c2858" stroke-width="0.8" fill="none" opacity="0.85">
+                <circle cx="40" cy="230" r="4"/>
+                <path d="M 36,230 Q 40,226 44,230"/>
+                <path d="M 36,230 Q 40,234 44,230"/>
+                <circle cx="40" cy="230" r="1.5" fill="#5c2858"/>
+                <circle cx="160" cy="230" r="4"/>
+                <path d="M 156,230 Q 160,226 164,230"/>
+                <path d="M 156,230 Q 160,234 164,230"/>
+                <circle cx="160" cy="230" r="1.5" fill="#5c2858"/>
+              </g>`;
+    case 'neck':
+      // small script tattoo on side of neck
+      return `<path d="M 88,160 Q 92,158 96,162 Q 100,160 102,164" stroke="${ink}" stroke-width="0.8" fill="none"/>`;
+    case 'none':
+    default:
+      return '';
+  }
 }
 
 function shadeColor(hex, percent) {
@@ -1259,6 +1468,33 @@ OUTFIT_COLORS.forEach(c => {
   });
   outfitColorsEl.appendChild(b);
 });
+
+// ============ DRIP WIRING ============
+// Generic helper: populate a tile-row with simple text tiles for a given
+// option list. Cheaper than rendering an SVG preview per tile when the
+// difference between options is small/positional (a stud vs a hoop).
+function wireDripTiles(containerId, list, stateKey) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
+  list.forEach(item => {
+    const b = document.createElement('button');
+    b.className = 'tile tile-compact' + (item.id === state[stateKey] ? ' active' : '');
+    b.dataset.id = item.id;
+    b.title = item.name;
+    b.innerHTML = `<span class="tile-name">${item.name}</span>`;
+    b.addEventListener('click', () => {
+      state[stateKey] = item.id;
+      el.querySelectorAll('.tile').forEach(s => s.classList.remove('active'));
+      b.classList.add('active');
+      renderAvatar();
+    });
+    el.appendChild(b);
+  });
+}
+wireDripTiles('headGearStyles', HEAD_GEAR, 'headGear');
+wireDripTiles('earringStyles', EARRINGS, 'earring');
+wireDripTiles('neckPieceStyles', NECK_PIECES, 'neckPiece');
+wireDripTiles('tattooStyles', TATTOOS, 'tattoo');
 
 // Pronouns
 document.querySelectorAll('#pronounChips .chip').forEach(chip => {
