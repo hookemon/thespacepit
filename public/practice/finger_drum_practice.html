@@ -8,7 +8,9 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="nav.css">
+<link rel="stylesheet" href="city-bgs.css">
 <script src="nav.js" defer></script>
+<script src="city-bgs.js"></script>
 <style>
   :root {
     --paper: #f3ecd8;
@@ -1825,6 +1827,8 @@ function selectPattern(id) {
   }
   renderPatternSelector();
   updateStats();
+  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo' };
+  if (typeof applyCityBackground === 'function') applyCityBackground(DRUM_CITY_TO_ID[PATTERNS[id].city]);
   saveState();
 }
 
@@ -1971,6 +1975,10 @@ window.addEventListener('keydown', (e) => {
 
   renderPatternSelector();
   updateStats();
+  // pattern.city is uppercase (BROOKLYN, MEDELLÍN, CDMX, BERLIN, TOKYO);
+  // map back to the lowercase atlas id so the mural lookup matches.
+  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo' };
+  if (typeof applyCityBackground === 'function') applyCityBackground(DRUM_CITY_TO_ID[currentPattern().city]);
   initMIDI();
   requestAnimationFrame(gameLoop);
 })();

@@ -8,7 +8,12 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="nav.css">
+<link rel="stylesheet" href="city-bgs.css">
 <script src="nav.js" defer></script>
+<!-- Sync (not deferred) so window.applyCityBackground is defined before
+     the inline init() further down the file calls it. The actual fetch
+     of city-bgs.html waits for DOMContentLoaded anyway. -->
+<script src="city-bgs.js"></script>
 <style>
   :root {
     --paper: #f3ecd8;
@@ -2151,6 +2156,7 @@ function showToast(text) {
   buildPyramid();
   renderStage();
   updateStats();
+  if (typeof applyCityBackground === 'function') applyCityBackground(currentWorld().id);
   if (worldParam) showToast('★ YOU ARE IN ' + currentWorld().name);
 })();
 

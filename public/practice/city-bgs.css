@@ -1,0 +1,23 @@
+/* Shared per-city mural styles. The actual 13 SVG layers live in
+   city-bgs.html and get injected by city-bgs.js into <body>. This file
+   handles their layout + crossfade + the small ambient animations. */
+.world-bg-layer {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none; overflow: hidden;
+  opacity: 0; transition: opacity 700ms ease;
+}
+.world-bg-layer.active { opacity: 1; }
+.world-bg-layer svg { width: 100%; height: 100%; display: block; }
+
+/* Per-city motion — match the inline keyframes in hop_chords.html so the
+   mural feels alive in every module. */
+@keyframes cityLanternBob  { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+@keyframes cityNeonPulse   { 0%,100% { opacity: 0.5; } 50% { opacity: 0.85; } }
+@keyframes cityCableGlide  { 0% { transform: translateX(-12px); } 100% { transform: translateX(12px); } }
+@keyframes cityRickshawBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+.world-bg-tokyo .lantern    { animation: cityLanternBob 7s ease-in-out infinite; }
+.world-bg-tokyo .lantern-2  { animation: cityLanternBob 9s ease-in-out infinite 1.2s; }
+.world-bg-tokyo .neon       { animation: cityNeonPulse 4s ease-in-out infinite; }
+.world-bg-tokyo .neon-2     { animation: cityNeonPulse 5.5s ease-in-out infinite 0.7s; }
+.world-bg-medellin .cable   { animation: cityCableGlide 12s ease-in-out infinite alternate; }
+.world-bg-bombay .rickshaw  { animation: cityRickshawBob 1.9s ease-in-out infinite; }
