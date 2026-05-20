@@ -34,6 +34,7 @@ const NAV_LINKS: Record<Site, { href: string; label: string }[]> = {
     { href: "/radio", label: "radio" },
     { href: "/mixes", label: "mixes" },
     { href: "/listening", label: "listening" },
+    { href: "/lab", label: "lab" },
     { href: "/packs", label: "packs" },
     { href: "/vault", label: "vault" },
     { href: "/map", label: "map" },
