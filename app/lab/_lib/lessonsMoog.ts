@@ -27,32 +27,36 @@ export const FLASH_LIGHT_LESSON: Lesson<LessonMoogState> = {
       id: "pick-square",
       title: "Switch the oscillator to square wave",
       body:
-        "click 'square' under OSCILLATOR. a square wave has more low-mid energy than a saw — it's punchier, more 'voiced'. bernie's bass is built on this.",
+        "click the pulsing 'square' button under OSCILLATOR. a square wave has more low-mid energy than a saw — punchier, more voiced. bernie's bass is built on this.",
       hint: "the wave buttons are above the DETUNE/SUB knobs.",
+      target: "moog:wave:square",
       check: (s) => s.params.waveform === "square",
     },
     {
       id: "add-sub",
       title: "Add the sub octave",
       body:
-        "turn SUB up to around 70. that adds a square wave one octave below the main oscillator. it's what gives the bass its weight without making it muddy.",
+        "drag the pulsing SUB knob up to around 70. adds a square wave one octave below the main oscillator. what gives the bass its weight without making it muddy.",
       hint: "drag the SUB knob up. you want it around 60–80%.",
+      target: "moog:knob:SUB",
       check: (s) => s.params.subLevel >= 0.55,
     },
     {
       id: "low-cutoff",
       title: "Close the filter way down",
       body:
-        "drop CUTOFF to about 25–30%. a closed filter mutes the highs. you should hear the patch get muffled, almost too dark. that's intentional — the envelope is about to open it.",
+        "drop the pulsing CUTOFF knob to about 25–30%. a closed filter mutes the highs. patch should get muffled, almost too dark — that's intentional. the envelope is about to open it.",
       hint: "CUTOFF lives in the FILTER panel. low values = closed.",
+      target: "moog:knob:CUTOFF",
       check: (s) => s.params.cutoff <= 0.35,
     },
     {
       id: "envelope-amount",
       title: "Now make the filter snap open with the envelope",
       body:
-        "turn ENV AMT up to around 70–80%. that tells the filter envelope to PUSH the cutoff up when you play a note. then set FILTER ENV's A to 0, D to about 18%. that's the snap.",
+        "crank ENV AMT (pulsing) up to ~70–80%. that tells the filter envelope to PUSH the cutoff up when you play a note. then set FILTER ENV's A to 0 + D to ~18% for the snap.",
       hint: "ENV AMT is the third knob in the filter panel. FILTER ENV is on the right side.",
+      target: "moog:knob:ENVAMT",
       check: (s) =>
         s.params.envAmount >= 0.6 &&
         s.params.fAttack <= 0.1 &&
@@ -63,7 +67,7 @@ export const FLASH_LIGHT_LESSON: Lesson<LessonMoogState> = {
       id: "play-the-riff",
       title: "Play a note and listen",
       body:
-        "hit any key on the on-screen keyboard or press a/s/d/f. you should hear the cutoff snap open and close on every note — that's the bernie sound. for the actual riff, try the C2 octave (z to go down two octaves from default), then play C → C → D# → C → F.",
+        "hit any key on the on-screen keyboard or press a/s/d/f. cutoff should snap open and shut on every note — that's the bernie sound. for the actual riff, try z to go down two octaves, then play C → C → D# → C → F.",
       hint: "click any white key on the keyboard, or press the 'a' key on your computer keyboard.",
       // any note played within the last 5 seconds counts as "played a note"
       check: (s) => s.lastNoteMidi !== null && performance.now() - s.lastNotePlayedAt < 5000,
@@ -84,40 +88,45 @@ export const CABARET_DRONE_LESSON: Lesson<LessonMoogState> = {
       id: "saw-wave",
       title: "Stay on the saw wave",
       body:
-        "sawtooth — most harmonics, brightest before filtering. flash light used square; cabaret uses saw. confirm/click 'sawtooth' under OSCILLATOR.",
+        "sawtooth — most harmonics, brightest before filtering. flash light used square; cabaret uses saw. confirm/click the pulsing 'sawtooth' button.",
       hint: "the wave button row, leftmost option.",
+      target: "moog:wave:sawtooth",
       check: (s) => s.params.waveform === "sawtooth",
     },
     {
       id: "add-sub-cab",
       title: "Layer in the sub octave",
       body:
-        "turn SUB to about 50. gives the drone weight without making it muddy. same sub as the flash light bass, slightly lower mix level.",
+        "turn the pulsing SUB knob to ~50. drone weight without mud. same sub as flash light, slightly lower mix level.",
       hint: "SUB knob, around 40–60%.",
+      target: "moog:knob:SUB",
       check: (s) => s.params.subLevel >= 0.35 && s.params.subLevel <= 0.7,
     },
     {
       id: "low-cutoff-high-reso",
       title: "Close the filter + crank resonance",
       body:
-        "drop CUTOFF to ~22% and push RESO up to ~70. high resonance + low cutoff = the filter starts to ring on its own. that's the moan in the sound.",
+        "drop the pulsing CUTOFF to ~22%, then push RESO up to ~70. high resonance + low cutoff = the filter starts ringing on its own. that moan IS the cabaret sound.",
       hint: "CUTOFF low, RESO high. the filter should be singing before you even hit a note.",
+      target: "moog:knob:CUTOFF",
       check: (s) => s.params.cutoff <= 0.3 && s.params.resonance >= 0.55,
     },
     {
       id: "slow-attack",
       title: "Slow the attack — both envelopes",
       body:
-        "set AMP ENV's A to around 45% and FILTER ENV's A to around 60%. now nothing pops in suddenly — every note swells in over almost a full second. that's the sheffield drone shape.",
+        "drag the pulsing AMP ENV 'A' (attack) knob up to ~45%, then do the same for FILTER ENV's A at ~60%. nothing pops in suddenly anymore — every note swells in over almost a second. that's the sheffield drone shape.",
       hint: "the A knob on AMP ENV (right panel, bottom row) and FILTER ENV (right panel, top row).",
+      target: "moog:knob:AMPA",
       check: (s) => s.params.aAttack >= 0.35 && s.params.fAttack >= 0.5,
     },
     {
       id: "long-release",
       title: "Long releases so notes rot out instead of cutting",
       body:
-        "AMP ENV's R to ~80%, FILTER ENV's R to ~70%. when you let a key go, the sound takes its time to die. now hold a low note and listen for 5 seconds. the filter envelope is still moving long after you let go.",
+        "drag the pulsing AMP ENV 'R' (release) up to ~80%, FILTER ENV's R to ~70%. when you let a key go, the sound takes its time to die. now hold a low note and listen for 5 seconds — the filter envelope is still moving long after you let go.",
       hint: "the R knob on both envelope rows. crank both.",
+      target: "moog:knob:AMPR",
       check: (s) => s.params.aRelease >= 0.65 && s.params.fRelease >= 0.55,
     },
   ],

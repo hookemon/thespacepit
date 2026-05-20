@@ -20,6 +20,7 @@ import {
 } from "../_lib/midi";
 import { Knob } from "../_components/Knob";
 import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 import { RecorderBar } from "../_components/RecorderBar";
 
 // computer-keyboard → midi offset (relative to base octave * 12 + 60)
@@ -42,7 +43,17 @@ const WAVE_GLYPH: Record<Waveform, string> = {
 const WHITE_KEYS_PER_OCTAVE = [0, 2, 4, 5, 7, 9, 11]; // C, D, E, F, G, A, B
 const BLACK_KEYS_PER_OCTAVE = [1, 3, 6, 8, 10];       // C#, D#, F#, G#, A#
 
+// Wrapper provides the spotlight context to children.
 export function LabMoogClient() {
+  return (
+    <LessonSpotlightProvider>
+      <LabMoogInner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabMoogInner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [params, setParams] = useState<MoogParams>({ ...MOOG_DEFAULTS });
   const [octaveBase, setOctaveBase] = useState(48); // C3 → midi 48
@@ -383,23 +394,27 @@ export function LabMoogClient() {
           <div className="p-4 border-r-2 border-paper/60">
             <div className="font-mono text-[9px] tracking-[.16em] uppercase text-lamp mb-2">OSCILLATOR</div>
             <div className="flex flex-wrap gap-2 mb-3">
-              {WAVEFORMS.map((w) => (
-                <button
-                  key={w}
-                  onClick={() => setParam("waveform", w)}
-                  className={`font-mono text-[11px] uppercase tracking-[.08em] px-2 py-1 border transition-colors ${
-                    params.waveform === w
-                      ? "border-lamp text-lamp bg-ink"
-                      : "border-paper/40 text-paper-2 hover:border-paper hover:text-paper"
-                  }`}
-                >
-                  <span className="mr-1.5 opacity-70">{WAVE_GLYPH[w]}</span>{w}
-                </button>
-              ))}
+              {WAVEFORMS.map((w) => {
+                const spot = isActive(`moog:wave:${w}`);
+                return (
+                  <button
+                    key={w}
+                    onClick={() => setParam("waveform", w)}
+                    className={`font-mono text-[11px] uppercase tracking-[.08em] px-2 py-1 border transition-colors ${
+                      params.waveform === w
+                        ? "border-lamp text-lamp bg-ink"
+                        : "border-paper/40 text-paper-2 hover:border-paper hover:text-paper"
+                    } ${spot ? "spotlight-on" : ""}`}
+                  >
+                    <span className="mr-1.5 opacity-70">{WAVE_GLYPH[w]}</span>{w}
+                  </button>
+                );
+              })}
             </div>
             <div className="flex flex-wrap gap-3">
               <Knob
                 label="DETUNE"
+                spotlightId="moog:knob:DETUNE"
                 value={(params.detune + 50) / 100}
                 onChange={(v) => setParam("detune", v * 100 - 50)}
                 defaultValue={0.5}
@@ -407,6 +422,7 @@ export function LabMoogClient() {
               />
               <Knob
                 label="SUB"
+                spotlightId="moog:knob:SUB"
                 value={params.subLevel}
                 onChange={(v) => setParam("subLevel", v)}
                 defaultValue={0.4}
@@ -414,6 +430,7 @@ export function LabMoogClient() {
               />
               <Knob
                 label="GLIDE"
+                spotlightId="moog:knob:GLIDE"
                 value={params.glide}
                 onChange={(v) => setParam("glide", v)}
                 defaultValue={0}
@@ -421,6 +438,7 @@ export function LabMoogClient() {
               />
               <Knob
                 label="VOLUME"
+                spotlightId="moog:knob:VOLUME"
                 value={params.volume}
                 onChange={(v) => setParam("volume", v)}
                 defaultValue={0.7}
@@ -437,6 +455,7 @@ export function LabMoogClient() {
             <div className="flex flex-wrap gap-3">
               <Knob
                 label="CUTOFF"
+                spotlightId="moog:knob:CUTOFF"
                 value={params.cutoff}
                 onChange={(v) => setParam("cutoff", v)}
                 color="#F2B705"
@@ -448,6 +467,7 @@ export function LabMoogClient() {
               />
               <Knob
                 label="RESO"
+                spotlightId="moog:knob:RESO"
                 value={params.resonance}
                 onChange={(v) => setParam("resonance", v)}
                 color="#F2B705"
@@ -456,6 +476,7 @@ export function LabMoogClient() {
               />
               <Knob
                 label="ENV AMT"
+                spotlightId="moog:knob:ENVAMT"
                 value={params.envAmount}
                 onChange={(v) => setParam("envAmount", v)}
                 color="#F2B705"
@@ -476,6 +497,7 @@ export function LabMoogClient() {
                 <Knob
                   key={k}
                   label={l}
+                  spotlightId={`moog:knob:FILTER${l}`}
                   value={params[k]}
                   onChange={(v) => setParam(k, v)}
                   size={44}
@@ -490,6 +512,7 @@ export function LabMoogClient() {
                 <Knob
                   key={k}
                   label={l}
+                  spotlightId={`moog:knob:AMP${l}`}
                   value={params[k]}
                   onChange={(v) => setParam(k, v)}
                   size={44}

@@ -18,6 +18,10 @@ export type LessonStep<S = unknown> = {
   // Optional one-off setup applied when the step is entered.
   // Receives the current state, returns a "patch" the runner merges.
   setup?: (state: S) => Partial<S> | void;
+  // Optional UI element to spotlight (pulse + glow) while this step is
+  // active. Read by the LessonSpotlight context — see
+  // _components/LessonSpotlight.tsx for the identifier convention.
+  target?: string;
 };
 
 export type Lesson<S = unknown> = {

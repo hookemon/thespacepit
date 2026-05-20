@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Lesson, LessonStep } from "../_lib/lesson-types";
+import { useSpotlight } from "./LessonSpotlight";
 
 type Props<S> = {
   lesson: Lesson<S>;
@@ -26,12 +27,17 @@ export function LessonPanel<S>({
   const step: LessonStep<S> | undefined = !isIntro && !isReward ? lesson.steps[stepIdx] : undefined;
   const [showHint, setShowHint] = useState(false);
   const total = lesson.steps.length;
+  const { setTarget } = useSpotlight();
 
   // Auto-advance: when check passes, fire onStepComplete (parent decides
   // when to actually call onAdvance — usually after a short celebrate delay).
   useEffect(() => {
-    if (!step) return;
+    if (!step) {
+      setTarget(null);
+      return;
+    }
     setShowHint(false);
+    setTarget(step.target ?? null);
     const hintTimer = window.setTimeout(() => setShowHint(true), 7000);
     // poll the state via the check — but since state is a closed-over prop
     // we get re-runs whenever React re-renders. Just check once per render.
@@ -41,6 +47,9 @@ export function LessonPanel<S>({
     return () => window.clearTimeout(hintTimer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state, step, stepIdx]);
+
+  // Clear the spotlight when the panel unmounts (e.g. lesson exited).
+  useEffect(() => () => setTarget(null), [setTarget]);
 
   return (
     <div

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useSpotlight } from "./LessonSpotlight";
 
 type Props = {
   label: string;
@@ -13,6 +14,9 @@ type Props = {
   format?: (v: number) => string;
   size?: number;
   defaultValue?: number;  // for double-click reset
+  // Optional lesson-spotlight identifier. When the current lesson step
+  // targets this id, the knob pulses with the lamp-color glow ring.
+  spotlightId?: string;
 };
 
 // Vertical-drag knob. Drag up = increase, drag down = decrease.
@@ -26,7 +30,10 @@ export function Knob({
   format,
   size = 56,
   defaultValue = 0.5,
+  spotlightId,
 }: Props) {
+  const { isActive } = useSpotlight();
+  const spotlight = isActive(spotlightId);
   const [dragging, setDragging] = useState(false);
   const startRef = useRef<{ y: number; v: number } | null>(null);
   const v = Math.max(0, Math.min(1, value));
@@ -90,7 +97,7 @@ export function Knob({
         onDoubleClick={onDoubleClick}
         className={`relative rounded-full border-2 cursor-ns-resize bg-ink-2 transition-shadow ${
           dragging ? "shadow-[0_0_20px_rgba(242,183,5,0.45)]" : ""
-        }`}
+        } ${spotlight ? "spotlight-on" : ""}`}
         style={{
           width: size,
           height: size,

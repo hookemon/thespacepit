@@ -33,6 +33,7 @@ import {
 } from "../_lib/midi";
 import { Knob } from "../_components/Knob";
 import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 
 // 909-strip color language — matches the original panel
 const VOICE_COLOR: Record<Voice, string> = {
@@ -67,7 +68,18 @@ const KEY_TO_VOICE: Record<string, Voice> = {
   "6": "RS", "7": "CP", "8": "CH", "9": "OH",
 };
 
+// Wrapper provides the spotlight context to all children (LessonPanel,
+// Knobs, step buttons). The actual room render is Lab909Inner.
 export function Lab909Client() {
+  return (
+    <LessonSpotlightProvider>
+      <Lab909Inner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function Lab909Inner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false); // audio unlocked?
   const [playing, setPlaying] = useState(false);
   const [bpm, setBpm] = useState(124);
@@ -815,6 +827,7 @@ export function Lab909Client() {
                   {row.steps.map((on, stepIdx) => {
                     const isPlayhead = currentStep === stepIdx;
                     const isDownbeat = stepIdx % 4 === 0;
+                    const spot = isActive(`909:step:${row.voice}:${stepIdx}`);
                     return (
                       <button
                         key={stepIdx}
@@ -825,7 +838,7 @@ export function Lab909Client() {
                             : isDownbeat
                               ? "border-paper/40 bg-ink-2 hover:bg-ink-3"
                               : "border-paper/15 bg-ink hover:bg-ink-2"
-                        }`}
+                        } ${spot ? "spotlight-on" : ""}`}
                         style={{
                           background: on
                             ? isPlayhead ? "#F2B705" : color

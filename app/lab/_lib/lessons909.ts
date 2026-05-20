@@ -32,32 +32,36 @@ export const CHICAGO_4X4_LESSON: Lesson<Lesson909State> = {
       id: "kick-on-1",
       title: "Put a kick on the downbeat",
       body:
-        "click step 1 on the BD (kick) row. that's beat one. it's the dance-floor anchor — no kick on 1, no house.",
+        "click the pulsing step on the BD (kick) row. that's beat one. it's the dance-floor anchor — no kick on 1, no house.",
       hint: "the BD row is the top row, the leftmost column is step 1.",
+      target: "909:step:BD:0",
       check: (s) => stepsOf(s, "BD")[0] === true,
     },
     {
       id: "kick-4on4",
       title: "Now make it 4-on-the-floor",
       body:
-        "add a kick on steps 5, 9, and 13 (every quarter note). that's the heartbeat. four kicks per bar — the entire physics of house music.",
+        "add a kick on steps 5, 9, and 13 (every quarter note). watch for the pulse — it'll move to the next slot as you go. four kicks per bar is the entire physics of house music.",
       hint: "click steps 5, 9, and 13 on the BD row.",
+      target: "909:step:BD:4",
       check: (s) => countOnSteps(s, "BD", [0, 4, 8, 12]) === 4,
     },
     {
       id: "clap-2-and-4",
       title: "Add the backbeat clap",
       body:
-        "place claps on steps 5 and 13 (the 'and' is wrong — the actual hit is on the 2 and the 4 of the bar). this is the same backbeat you'd play on snare in a rock kit. listening to chicago records, you'll hear the clap and the kick land together every other beat.",
+        "place claps on the pulsing step + step 13 — the 2 and the 4 of the bar. same backbeat you'd play on snare in a rock kit. you'll hear the clap land together with the kick every other beat.",
       hint: "click steps 5 and 13 on the CP (clap) row.",
+      target: "909:step:CP:4",
       check: (s) => stepsOf(s, "CP")[4] && stepsOf(s, "CP")[12],
     },
     {
       id: "offbeat-open-hat",
       title: "Drop the open hat on the offbeats",
       body:
-        "the OH (open hat) on steps 3, 7, 11, 15 is the engine of house. every kick gets answered by an open hat exactly halfway between. that's the call-and-response that makes you move.",
+        "OH (open hat) on steps 3, 7, 11, 15 — the engine of house. every kick gets answered by an open hat exactly halfway between. that's the call-and-response that makes you move.",
       hint: "click steps 3, 7, 11, 15 on the OH row.",
+      target: "909:step:OH:2",
       check: (s) => countOnSteps(s, "OH", [2, 6, 10, 14]) === 4,
     },
     {
