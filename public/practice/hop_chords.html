@@ -111,6 +111,11 @@
     transition: background 0.15s, color 0.15s;
   }
   .template-skip:hover { background: var(--w-accent); color: var(--ink); border-color: var(--w-accent); }
+  /* Queue chip rhythm-feel cues — short stabs look tight, holds look broad. */
+  .prog-chip.short { min-width: 32px; padding: 6px 6px; font-size: 10px; opacity: 0.9; }
+  .prog-chip.long  { min-width: 56px; padding: 6px 14px; }
+  /* Section divider in song mode — terracotta tag between role changes. */
+  .prog-section { flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.5px; color: var(--w-accent); padding: 0 6px; align-self: center; opacity: 0.85; }
   .stage { background: linear-gradient(180deg, var(--w-stage) 0%, color-mix(in srgb, var(--w-stage), var(--ink) 22%) 100%); padding: 22px 12px 12px; border-bottom: 2px solid var(--ink); position: relative; min-height: 430px; }
   .stage-svg { display: block; width: 100%; max-width: 460px; height: auto; margin: 0 auto; }
   .cube { transition: transform 0.12s; cursor: pointer; }
@@ -949,6 +954,10 @@
       <span class="gen-opt-label">— HOP</span>
       <button class="gen-chip" id="fastHopChip" title="snap the avatar between cubes">SLOW</button>
     </div>
+    <div class="gen-opt-group">
+      <span class="gen-opt-label">— SONG</span>
+      <button class="gen-chip" id="songModeChip" title="compose verse → pre → chorus → bridge → chorus">LOOP</button>
+    </div>
     <div class="gen-tempo">
       <span class="gen-opt-label">— BPM</span>
       <input type="range" class="gen-slider" id="tempoSlider" min="60" max="160" value="90">
@@ -1520,6 +1529,17 @@ const state = {
   // Move-faster toggles
   doubleTime: false,       // chord-per-beat instead of chord-per-bar
   fastHop: false,          // snappier hop animation
+  // Per-step duration (beats) parallel to state.queue; populated by generate()
+  queueRhythm: [],
+  // Section label per step ('verse','prechorus','chorus','bridge') — used by
+  // song mode to render dividers in the queue strip
+  queueSection: [],
+  // Song-mode: GENERATE composes verse→pre→chorus→bridge→chorus instead of
+  // looping a single template
+  songMode: false,
+  // Last template name(s) used, kept so SKIP cycles deterministically
+  lastTemplateIdx: null,
+  activeTemplateName: 'tap generate',
 };
 function currentWorld() { return WORLDS[state.worldIdx]; }
 
@@ -1556,56 +1576,88 @@ function buildPyramid() {
 function cubeAt(row, col) { return state.cubes.find(c => c.row === row && c.col === col); }
 
 // ============ PROGRESSION TEMPLATES ============
-// Each template is an array of scale-degree offsets (relative to the world's
-// rootMidi). generate() resolves each offset to a real chord in the world's
-// chordPool — preferring chords not in the recent-avoid set, picking among
-// multiple type variants (Am vs Am7 vs Am9) when the pool has them.
-// Worlds without an entry fall back to the old random-walk behavior.
+// Each template carries:
+//   - offsets: scale-degree offsets (semitones from world root)
+//   - rhythm:  duration per step IN BEATS (1 beat = quarter note; 4 = bar)
+//   - role:    'verse' | 'prechorus' | 'chorus' | 'bridge' — used by SONG MODE
+//
+// Verse-shape templates feel settled; pre-chorus templates build (faster
+// rhythms or quicker harmonic motion); chorus-shape templates HIT (mix of
+// holds + 1/16 stabs); bridges break tonality or reharmonize.
+//
+// Worlds without templates fall back to the old random-walk.
 const PROGRESSION_TEMPLATES = {
   brooklyn: [
-    { name: 'dorian vamp', offsets: [0, 10] },              // Am-G (i-VII)
-    { name: 'soul',        offsets: [0, 5, 10, 7] },        // Am-D-G-Em (i-IV-VII-v)
-    { name: 'lovers',      offsets: [0, 7, 10, 5] },        // Am-Em-G-D (i-v-VII-IV)
-    { name: 'boom bap',    offsets: [0, 5, 10, 2] },        // Am-D-G-Bm
-    { name: 'lo-fi loop',  offsets: [0, 10, 7, 5] },        // Am-G-Em-D
+    // VERSES
+    { name: 'dorian vamp',  role: 'verse',     offsets: [0, 10],            rhythm: [4, 4] },
+    { name: 'soul',         role: 'verse',     offsets: [0, 5, 10, 7],      rhythm: [4, 4, 4, 4] },
+    // PRE-CHORUS
+    { name: 'pre build',    role: 'prechorus', offsets: [0, 5, 7, 10],      rhythm: [2, 2, 2, 2] },
+    { name: 'pre turn',     role: 'prechorus', offsets: [0, 7, 10, 5],      rhythm: [3, 1, 2, 2] },
+    // CHORUS — stabs + holds
+    { name: 'chorus hit',   role: 'chorus',    offsets: [5, 10, 0, 0, 0, 5], rhythm: [4, 4, 0.5, 0.5, 1, 2] },
+    { name: 'lovers',       role: 'chorus',    offsets: [0, 7, 10, 5],      rhythm: [4, 4, 4, 4] },
+    // BRIDGE
+    { name: 'bridge break', role: 'bridge',    offsets: [10, 5, 2, 7],      rhythm: [2, 2, 4, 4] },
   ],
   madrid: [
-    { name: 'flamenco fall', offsets: [0, 1, 0, 1] },       // D-Eb-D-Eb (I-bII)
-    { name: 'gypsy cascade', offsets: [5, 3, 1, 0] },       // Gm-F-Eb-D (descent)
-    { name: 'phrygian dom',  offsets: [0, 1, 3, 1] },       // D-Eb-F-Eb
-    { name: 'iberian vamp',  offsets: [0, 1] },             // D-Eb
-    { name: 'half cadence',  offsets: [5, 1, 0, 1] },       // Gm-Eb-D-Eb
+    // VERSES
+    { name: 'iberian vamp',  role: 'verse',     offsets: [0, 1],         rhythm: [4, 4] },
+    { name: 'phrygian dom',  role: 'verse',     offsets: [0, 1, 3, 1],   rhythm: [4, 4, 4, 4] },
+    // PRE-CHORUS — fast cascade
+    { name: 'flamenco roll', role: 'prechorus', offsets: [0, 1, 3, 1, 0], rhythm: [1, 1, 1, 1, 4] },
+    // CHORUS — Andalusian + stabs
+    { name: 'andalusian',    role: 'chorus',    offsets: [5, 3, 1, 0],            rhythm: [4, 4, 4, 4] },
+    { name: 'chorus stab',   role: 'chorus',    offsets: [5, 3, 1, 0, 1, 0, 1, 0], rhythm: [0.5, 0.5, 0.5, 2, 0.5, 0.5, 0.5, 4] },
+    // BRIDGE
+    { name: 'gypsy bridge',  role: 'bridge',    offsets: [5, 3, 1, 0, 1], rhythm: [2, 2, 2, 2, 4] },
   ],
   medellin: [
-    { name: 'mixolydian vamp', offsets: [0, 10] },          // D-C (I-bVII)
-    { name: 'paisa pop',       offsets: [0, 7, 5, 0] },     // D-A-G-D
-    { name: 'eternal spring',  offsets: [0, 5, 7, 10] },    // D-G-A-C
-    { name: 'comuna groove',   offsets: [0, 10, 5, 7] },    // D-C-G-A
+    { name: 'mixolydian vamp', role: 'verse',     offsets: [0, 10],         rhythm: [4, 4] },
+    { name: 'eternal spring',  role: 'verse',     offsets: [0, 5, 7, 10],   rhythm: [4, 4, 4, 4] },
+    { name: 'pre build',       role: 'prechorus', offsets: [0, 5, 7, 10],   rhythm: [2, 2, 2, 2] },
+    { name: 'chorus paisa',    role: 'chorus',    offsets: [0, 7, 5, 10],   rhythm: [4, 2, 2, 4] },
+    { name: 'cable hit',       role: 'chorus',    offsets: [0, 0, 0, 0, 7, 10], rhythm: [0.5, 0.5, 0.5, 0.5, 4, 4] },
+    { name: 'bridge cable',    role: 'bridge',    offsets: [10, 5, 7, 0],   rhythm: [2, 2, 2, 2] },
   ],
   mexico: [
-    { name: 'pentatonic vamp', offsets: [0, 5, 7] },        // D-G-A
-    { name: 'altars',          offsets: [0, 5, 0, 7] },     // D-G-D-A
-    { name: 'plaza',           offsets: [0, 7, 9, 5] },     // D-A-Bm-G (pop)
-    { name: 'cumbia stripe',   offsets: [0, 7, 5, 0] },     // D-A-G-D
+    { name: 'plaza',           role: 'verse',     offsets: [0, 5, 0, 7],   rhythm: [4, 4, 4, 4] },
+    { name: 'altars',          role: 'verse',     offsets: [0, 5, 0, 7],   rhythm: [4, 4, 4, 4] },
+    { name: 'pre rise',        role: 'prechorus', offsets: [0, 5, 7, 9],   rhythm: [2, 2, 2, 2] },
+    { name: 'cumbia hit',      role: 'chorus',    offsets: [0, 7, 9, 5],   rhythm: [4, 4, 4, 4] },
+    { name: 'mariachi stab',   role: 'chorus',    offsets: [0, 0, 0, 5, 7, 0], rhythm: [0.5, 0.5, 1, 2, 2, 4] },
+    { name: 'bridge minor',    role: 'bridge',    offsets: [9, 7, 5, 0],   rhythm: [2, 2, 2, 2] },
   ],
   berlin: [
-    { name: 'minor vamp',       offsets: [0, 5] },          // Em-Am (i-iv)
-    { name: 'concrete cascade', offsets: [0, 3, 5, 8] },    // Em-G-Am-C
-    { name: 'dark phrygian',    offsets: [0, 1, 0, 5] },    // Em-F-Em-Am
-    { name: 'tunnel loop',      offsets: [0, 8, 10, 5] },   // Em-C-D-Am
+    { name: 'minor vamp',       role: 'verse',     offsets: [0, 5],            rhythm: [4, 4] },
+    { name: 'tunnel loop',      role: 'verse',     offsets: [0, 8, 10, 5],     rhythm: [4, 4, 4, 4] },
+    { name: 'pre build',        role: 'prechorus', offsets: [0, 3, 5, 8],      rhythm: [2, 2, 2, 2] },
+    { name: 'concrete chorus',  role: 'chorus',    offsets: [0, 8, 10, 5],     rhythm: [4, 4, 4, 4] },
+    { name: 'techno stab',      role: 'chorus',    offsets: [0, 0, 0, 0, 5, 5], rhythm: [0.25, 0.25, 0.25, 0.25, 2, 4] },
+    { name: 'bridge dark',      role: 'bridge',    offsets: [0, 1, 0, 5],      rhythm: [3, 1, 2, 2] },
   ],
   bombay: [
-    { name: 'bilawal pop',    offsets: [0, 5, 7, 0] },      // C-F-G-C
-    { name: 'bollywood drop', offsets: [0, 9, 5, 7] },      // C-Am-F-G
-    { name: 'sitar drone',    offsets: [0, 5, 0, 7] },      // C-F-C-G
-    { name: 'film loop',      offsets: [0, 4, 5, 7] },      // C-E?-F-G (uses minor 3rd swap)
+    { name: 'bilawal pop',    role: 'verse',     offsets: [0, 5, 7, 0],   rhythm: [4, 4, 4, 4] },
+    { name: 'sitar drone',    role: 'verse',     offsets: [0, 5, 0, 7],   rhythm: [4, 4, 4, 4] },
+    { name: 'pre bollywood',  role: 'prechorus', offsets: [0, 9, 5, 7],   rhythm: [2, 2, 2, 2] },
+    { name: 'chorus drop',    role: 'chorus',    offsets: [0, 7, 9, 5, 0], rhythm: [4, 2, 2, 2, 4] },
+    { name: 'tabla roll',     role: 'chorus',    offsets: [0, 0, 0, 0, 5, 7], rhythm: [0.25, 0.25, 0.5, 1, 2, 4] },
+    { name: 'bridge sitar',   role: 'bridge',    offsets: [9, 5, 7, 0],   rhythm: [2, 2, 2, 4] },
   ],
   paris: [
-    { name: 'lydian shimmer', offsets: [0, 2] },            // C-D (I-II — the Lydian move)
-    { name: 'gaudí curve',    offsets: [0, 4, 9, 5] },      // C-Em-Am-F (pop in Lydian palette)
-    { name: 'café drift',     offsets: [0, 2, 9, 5] },      // C-D-Am-F
+    { name: 'lydian shimmer', role: 'verse',     offsets: [0, 2],            rhythm: [4, 4] },
+    { name: 'café drift',     role: 'verse',     offsets: [0, 2, 9, 5],      rhythm: [4, 4, 4, 4] },
+    { name: 'pre rise',       role: 'prechorus', offsets: [0, 4, 9, 5],      rhythm: [2, 2, 2, 2] },
+    { name: 'gaudí curve',    role: 'chorus',    offsets: [0, 4, 9, 5],      rhythm: [4, 4, 4, 4] },
+    { name: 'chorus skip',    role: 'chorus',    offsets: [0, 2, 0, 2, 9, 5], rhythm: [0.5, 0.5, 0.5, 0.5, 2, 4] },
+    { name: 'bridge drift',   role: 'bridge',    offsets: [9, 5, 2, 0],      rhythm: [3, 1, 2, 2] },
   ],
 };
+
+/** SONG MODE structure — composes a real song by stringing role-tagged
+ *  templates back-to-back. Default arrangement; could be made per-city
+ *  later. */
+const SONG_STRUCTURE = ['verse', 'verse', 'prechorus', 'chorus', 'verse', 'prechorus', 'chorus', 'bridge', 'chorus'];
 
 // ============ CHORD GENERATION ============
 function pickFreshChord(extraAvoid = []) {
@@ -2010,43 +2062,91 @@ function pickChordByOffset(offset, world, avoidSet) {
 }
 
 /**
- * Generate a new progression. If forceTemplateIdx is set, use that template
- * (used by SKIP to advance through the deck). Otherwise pick a random
- * template that isn't the one just played. Worlds without templates fall
- * back to the original random-walk for unobtrusive backward compat.
+ * Lay one template down into the queue. Returns how many steps were appended.
+ * Used by both single-template generate and song-mode multi-section generate.
+ */
+function appendTemplate(template, world, tempRecent, sectionLabel) {
+  const steps = template.offsets.length;
+  for (let i = 0; i < steps; i++) {
+    const offset = template.offsets[i];
+    const avoid = new Set(tempRecent.slice(-2));
+    const chord = pickChordByOffset(offset, world, avoid) || world.chordPool[0];
+    state.queue.push(chord);
+    state.queueRhythm.push(template.rhythm ? template.rhythm[i] : 4);
+    state.queueSection.push(sectionLabel);
+    tempRecent.push(chord.name);
+  }
+  return steps;
+}
+
+/** Pick a random template tagged with the requested role. Falls back to
+ *  any template if no role match exists. */
+function pickTemplateByRole(templates, role, avoidIdx = -1) {
+  const roleMatches = templates.map((t, i) => ({ t, i })).filter(x => x.t.role === role);
+  const pool = roleMatches.length > 0 ? roleMatches : templates.map((t, i) => ({ t, i }));
+  const candidates = pool.length > 1 ? pool.filter(x => x.i !== avoidIdx) : pool;
+  return candidates[Math.floor(Math.random() * candidates.length)];
+}
+
+/**
+ * Generate a new progression.
+ *
+ * - If state.songMode is true → composes a full song by chaining a verse →
+ *   prechorus → chorus → bridge → chorus structure from role-tagged templates.
+ * - Otherwise picks ONE template and loops/places it according to its rhythm.
+ *   forceTemplateIdx is honored by SKIP to advance deterministically.
+ *
+ * Worlds without templates fall back to a random walk (legacy behavior).
  */
 function generate(forceTemplateIdx = null) {
-  const length = state.barsLen;
   state.queue = [];
+  state.queueRhythm = [];
+  state.queueSection = [];
   state.queueIdx = 0;
   const world = currentWorld();
   const templates = PROGRESSION_TEMPLATES[world.id];
 
   if (templates && templates.length > 0) {
-    let template;
-    let templateIdx;
-    if (forceTemplateIdx !== null && templates[forceTemplateIdx]) {
-      templateIdx = forceTemplateIdx;
-      template = templates[templateIdx];
-    } else {
-      // Random — but avoid repeating the last one if there's a choice
-      const lastIdx = state.lastTemplateIdx ?? -1;
-      const candidates = templates.length > 1
-        ? templates.map((t, i) => i).filter(i => i !== lastIdx)
-        : [0];
-      templateIdx = candidates[Math.floor(Math.random() * candidates.length)];
-      template = templates[templateIdx];
-    }
-    state.lastTemplateIdx = templateIdx;
-    state.activeTemplateName = template.name;
-
     const tempRecent = [];
-    for (let i = 0; i < length; i++) {
-      const offset = template.offsets[i % template.offsets.length];
-      const avoid = new Set(tempRecent.slice(-2));
-      const chord = pickChordByOffset(offset, world, avoid) || world.chordPool[0];
-      state.queue.push(chord);
-      tempRecent.push(chord.name);
+
+    if (state.songMode) {
+      // Compose a full song from role-tagged templates
+      let lastIdx = -1;
+      const sectionNames = [];
+      SONG_STRUCTURE.forEach((role, sectionIdx) => {
+        const pick = pickTemplateByRole(templates, role, lastIdx);
+        if (!pick) return;
+        lastIdx = pick.i;
+        sectionNames.push(`${role.toUpperCase()} (${pick.t.name})`);
+        appendTemplate(pick.t, world, tempRecent, role);
+      });
+      state.lastTemplateIdx = null;
+      state.activeTemplateName = `SONG · ${SONG_STRUCTURE.length} sections`;
+    } else {
+      // Single-template mode — loop to fill approx barsLen bars
+      let template, templateIdx;
+      if (forceTemplateIdx !== null && templates[forceTemplateIdx]) {
+        templateIdx = forceTemplateIdx;
+        template = templates[templateIdx];
+      } else {
+        const lastIdx = state.lastTemplateIdx ?? -1;
+        const candidates = templates.length > 1
+          ? templates.map((t, i) => i).filter(i => i !== lastIdx)
+          : [0];
+        templateIdx = candidates[Math.floor(Math.random() * candidates.length)];
+        template = templates[templateIdx];
+      }
+      state.lastTemplateIdx = templateIdx;
+      state.activeTemplateName = template.name;
+
+      // Loop the template enough times to reach approximately barsLen bars.
+      // Each rhythm value is in beats; one bar = 4 beats.
+      const targetBeats = state.barsLen * 4;
+      const templateBeats = (template.rhythm || []).reduce((s, b) => s + b, 0) || template.offsets.length * 4;
+      const loops = Math.max(1, Math.ceil(targetBeats / templateBeats));
+      for (let l = 0; l < loops; l++) {
+        appendTemplate(template, world, tempRecent, template.role || 'verse');
+      }
     }
   } else {
     // Random-walk fallback (worlds without progression templates)
@@ -2054,7 +2154,7 @@ function generate(forceTemplateIdx = null) {
     state.activeTemplateName = 'random walk';
     const tempRecent = [...state.recentChordNames];
     const pool = world.chordPool;
-    for (let i = 0; i < length; i++) {
+    for (let i = 0; i < state.barsLen; i++) {
       const avoid = new Set(tempRecent.slice(-4));
       let candidates = pool.filter(c => !avoid.has(c.name));
       if (candidates.length === 0) {
@@ -2064,6 +2164,8 @@ function generate(forceTemplateIdx = null) {
       if (candidates.length === 0) candidates = pool;
       const pick = candidates[Math.floor(Math.random() * candidates.length)];
       state.queue.push(pick);
+      state.queueRhythm.push(4); // one bar each
+      state.queueSection.push('verse');
       tempRecent.push(pick.name);
     }
   }
@@ -2097,7 +2199,9 @@ function play() {
   document.querySelectorAll('.cube').forEach(c => c.classList.remove('hoppable'));
 
   const beatMs = 60000 / state.tempo;
-  const chordMs = state.doubleTime ? beatMs : (beatMs * 4);
+  // Scale factor applied to every step's beat-duration. doubleTime makes
+  // everything 4x faster (so a "4-beat hold" becomes 1 beat).
+  const scaleMs = state.doubleTime ? (beatMs / 4) : beatMs;
 
   function next() {
     if (!state.playing) return;
@@ -2112,18 +2216,23 @@ function play() {
       }
     }
     const chord = state.queue[state.queueIdx];
+    // Per-step duration from the template's rhythm field (in beats).
+    // Defaults to 4 (one bar) so legacy queues still play correctly.
+    const stepBeats = state.queueRhythm[state.queueIdx] || 4;
+    const stepMs = stepBeats * scaleMs;
     const player = state.cubes[state.player.cubeIdx];
     const target = pickAutoHopTarget(player);
-    const baseHopMax = state.fastHop ? 90 : 180;
-    const hopFrac = state.fastHop ? 0.10 : 0.18;
-    const hopDur = Math.min(baseHopMax, chordMs * hopFrac);
+    // Hop animation: stays snappy regardless of step length so short stabs
+    // don't get a slo-mo hop animation.
+    const baseHopMax = state.fastHop ? 70 : 140;
+    const hopDur = Math.min(baseHopMax, Math.max(50, stepMs * 0.18));
     renderQueueStrip();
 
     animateHop(player, target, hopDur, () => {
       state.player.cubeIdx = target.idx;
-      onLandCube(target, chord, (chordMs * 0.95) / 1000);
+      onLandCube(target, chord, (stepMs * 0.95) / 1000);
       state.queueIdx++;
-      setTimeout(next, chordMs - hopDur);
+      setTimeout(next, Math.max(60, stepMs - hopDur));
     });
   }
   next();
@@ -2174,10 +2283,26 @@ function renderQueueStrip() {
     return;
   }
   wrap.innerHTML = '';
+  let lastSection = null;
   state.queue.forEach((c, i) => {
+    const section = state.queueSection[i];
+    // Section divider — when role transitions, drop a tiny label so you can
+    // see verse → pre → chorus → bridge in the strip.
+    if (state.songMode && section && section !== lastSection) {
+      const label = document.createElement('span');
+      label.className = 'prog-section';
+      label.textContent = section.slice(0, 3).toUpperCase();
+      wrap.appendChild(label);
+      lastSection = section;
+    }
     const chip = document.createElement('div');
     chip.className = 'prog-chip ' + (i < state.queueIdx ? '' : (i === state.queueIdx ? 'now' : 'upcoming'));
     chip.textContent = c.name;
+    // Compact short-rhythm chips visually so 1/16 stabs look different from
+    // 1-bar holds at a glance.
+    const beats = state.queueRhythm[i] || 4;
+    if (beats <= 1) chip.classList.add('short');
+    else if (beats >= 4) chip.classList.add('long');
     wrap.appendChild(chip);
   });
 }
@@ -2498,6 +2623,12 @@ document.getElementById('fastHopChip').addEventListener('click', (e) => {
   e.target.textContent = state.fastHop ? 'FAST' : 'SLOW';
   saveState();
 });
+document.getElementById('songModeChip').addEventListener('click', (e) => {
+  state.songMode = !state.songMode;
+  e.target.classList.toggle('active', state.songMode);
+  e.target.textContent = state.songMode ? 'SONG' : 'LOOP';
+  saveState();
+});
 
 // Arp panel handlers
 function renderArpPatternChips() {
@@ -2585,6 +2716,7 @@ async function loadState() {
         arpOctaves: saved.arpOctaves ?? 1,
         doubleTime: saved.doubleTime ?? false,
         fastHop: saved.fastHop ?? false,
+        songMode: saved.songMode ?? false,
       });
       document.getElementById('velocitySlider').value = state.velocity;
       document.getElementById('velocityVal').textContent = state.velocity;
@@ -2606,6 +2738,8 @@ async function loadState() {
       if (dtBtn) { dtBtn.classList.toggle('active', state.doubleTime); dtBtn.textContent = state.doubleTime ? 'BEAT' : 'BAR'; }
       const fhBtn = document.getElementById('fastHopChip');
       if (fhBtn) { fhBtn.classList.toggle('active', state.fastHop); fhBtn.textContent = state.fastHop ? 'FAST' : 'SLOW'; }
+      const smBtn = document.getElementById('songModeChip');
+      if (smBtn) { smBtn.classList.toggle('active', state.songMode); smBtn.textContent = state.songMode ? 'SONG' : 'LOOP'; }
       // Arp restore
       const arpBtn = document.getElementById('arpToggle');
       if (arpBtn) {
@@ -2632,6 +2766,7 @@ async function saveState() {
       arpOn: state.arpOn, arpPattern: state.arpPattern,
       arpRate: state.arpRate, arpOctaves: state.arpOctaves,
       doubleTime: state.doubleTime, fastHop: state.fastHop,
+      songMode: state.songMode,
     }));
   } catch (e) {}
 }
