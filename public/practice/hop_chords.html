@@ -1107,8 +1107,13 @@
   </div>
   <div class="fx-row">
     <span class="fx-label">— RELEASE <span class="fx-val" id="releaseVal">1.0×</span></span>
-    <input class="fx-slider" id="releaseSlider" type="range" min="20" max="300" value="100"
+    <input class="fx-slider" id="releaseSlider" type="range" min="5" max="300" value="100"
            oninput="setReleaseMul(this.value/100)">
+  </div>
+  <div class="fx-row">
+    <span class="fx-label">— GATE <span class="fx-val" id="gateVal">100%</span></span>
+    <input class="fx-slider" id="gateSlider" type="range" min="5" max="100" value="100"
+           oninput="setGateMul(this.value/100)">
   </div>
 </div>
 
@@ -1674,6 +1679,9 @@ const state = {
   // bandpass cutoff; release affects how long each note fades out.
   filterMul: 1.0,
   releaseMul: 1.0,
+  // Gate: % of the chord's duration that the note actually rings before
+  // releasing. 1.0 = full hold (legato). Down to 0.05 = staccato stab.
+  gateMul: 1.0,
 };
 function currentWorld() { return WORLDS[state.worldIdx]; }
 
@@ -2585,13 +2593,20 @@ function setFilterMul(v) {
   saveState();
 }
 function setReleaseMul(v) {
-  state.releaseMul = Math.max(0.2, Math.min(3.0, Number(v) || 1.0));
+  state.releaseMul = Math.max(0.05, Math.min(3.0, Number(v) || 1.0));
   const el = document.getElementById('releaseVal');
   if (el) el.textContent = state.releaseMul.toFixed(2) + '×';
   saveState();
 }
+function setGateMul(v) {
+  state.gateMul = Math.max(0.05, Math.min(1.0, Number(v) || 1.0));
+  const el = document.getElementById('gateVal');
+  if (el) el.textContent = Math.round(state.gateMul * 100) + '%';
+  saveState();
+}
 window.setFilterMul = setFilterMul;
 window.setReleaseMul = setReleaseMul;
+window.setGateMul = setGateMul;
 
 // Style chip wiring — flips state.gameStyle which is read inside createVoice
 document.querySelectorAll('#styleChips .style-chip').forEach(b => {
@@ -2748,9 +2763,12 @@ function playChord(notes, velocity, durSec) {
   // Harp mode overrides the world's synth; otherwise use the city's voice.
   const synthKey = state.harpMode ? 'harp' : currentWorld().synth;
   const strumMs = state.strumMs || 0;
+  // Gate shortens the actual ring time — staccato when gateMul < 1.
+  // Floor at 30ms so even the tightest stab has SOME ring.
+  const ringSec = Math.max(0.03, durSec * (state.gateMul ?? 1.0));
   if (strumMs <= 0) {
     // Block-chord — all notes start simultaneously (original behavior).
-    const voices = notes.map(midi => createVoice(midi, velocity, durSec, synthKey));
+    const voices = notes.map(midi => createVoice(midi, velocity, ringSec, synthKey));
     heldVoices.push(...voices);
     return;
   }
@@ -2760,10 +2778,10 @@ function playChord(notes, velocity, durSec) {
   notes.forEach((midi, i) => {
     const delaySec = (i * strumMs) / 1000;
     if (i === 0) {
-      heldVoices.push(createVoice(midi, velocity, durSec, synthKey));
+      heldVoices.push(createVoice(midi, velocity, ringSec, synthKey));
     } else {
       setTimeout(() => {
-        heldVoices.push(createVoice(midi, velocity, Math.max(0.1, durSec - delaySec), synthKey));
+        heldVoices.push(createVoice(midi, velocity, Math.max(0.03, ringSec - delaySec), synthKey));
       }, i * strumMs);
     }
   });
@@ -3042,6 +3060,7 @@ async function loadState() {
         harpMode: saved.harpMode ?? false,
         filterMul: saved.filterMul ?? 1.0,
         releaseMul: saved.releaseMul ?? 1.0,
+        gateMul: saved.gateMul ?? 1.0,
         // ambient intentionally NOT restored to true — autoplay rules
       });
       document.getElementById('velocitySlider').value = state.velocity;
@@ -3082,6 +3101,8 @@ async function loadState() {
       if (fSl) { fSl.value = Math.round(state.filterMul * 100); document.getElementById('filterVal').textContent = state.filterMul.toFixed(2) + '×'; }
       const rrSl = document.getElementById('releaseSlider');
       if (rrSl) { rrSl.value = Math.round(state.releaseMul * 100); document.getElementById('releaseVal').textContent = state.releaseMul.toFixed(2) + '×'; }
+      const gSl = document.getElementById('gateSlider');
+      if (gSl) { gSl.value = Math.round(state.gateMul * 100); document.getElementById('gateVal').textContent = Math.round(state.gateMul * 100) + '%'; }
       // Arp restore
       const arpBtn = document.getElementById('arpToggle');
       if (arpBtn) {
@@ -3111,7 +3132,7 @@ async function saveState() {
       songMode: state.songMode,
       delayMix: state.delayMix, reverbMix: state.reverbMix,
       gameStyle: state.gameStyle, strumMs: state.strumMs, harpMode: state.harpMode,
-      filterMul: state.filterMul, releaseMul: state.releaseMul,
+      filterMul: state.filterMul, releaseMul: state.releaseMul, gateMul: state.gateMul,
     }));
   } catch (e) {}
 }
