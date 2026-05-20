@@ -7,17 +7,17 @@
     brooklyn: null, stlouis: null,
     mexico: 'es', oaxaca: 'es', tulum: 'es', medellin: 'es', madrid: 'es',
     paris: 'fr', berlin: 'de',
-    rishikesh: 'hi', varanasi: 'hi', mysore: 'hi',
+    rishikesh: 'hi', varanasi: 'hi', bombay: 'hi',
     tokyo: 'jp',
   };
   // Reverse map for landing on language.html?lang=xx with no city context.
-  var LANG_TO_CITY = { es: 'madrid', fr: 'paris', de: 'berlin', hi: 'rishikesh', jp: 'tokyo' };
+  var LANG_TO_CITY = { es: 'madrid', fr: 'paris', de: 'berlin', hi: 'bombay', jp: 'tokyo' };
 
   var CITY_NAMES = {
     brooklyn: 'Brooklyn', stlouis: 'St. Louis', mexico: 'Mexico City',
     oaxaca: 'Oaxaca', tulum: 'Tulum', medellin: 'Medellín',
     paris: 'Paris', madrid: 'Madrid', berlin: 'Berlin',
-    rishikesh: 'Rishikesh', varanasi: 'Varanasi', mysore: 'Mysore', tokyo: 'Tokyo',
+    rishikesh: 'Rishikesh', varanasi: 'Varanasi', bombay: 'Bombay', tokyo: 'Tokyo',
   };
 
   var MODULES = [

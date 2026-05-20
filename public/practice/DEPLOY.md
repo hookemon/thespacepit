@@ -107,7 +107,7 @@ The 13 cities on the Atlas are numbered roughly by the journey order — America
 9. **Berlin** (gray) — concrete brutalism
 10. **Rishikesh** (green) — Ganges, ashrams
 11. **Varanasi** (terracotta) — oldest city
-12. **Mysore** (gold) — sandalwood sunrise
+12. **Bombay** (yellow + black) — rickshaw thunder
 13. **Tokyo** (red) — lantern Insen
 
 Each number's font scales by digit count (single digits at 14px, double digits at 12px) so they all read clean on phone. Hover the number — it dances. Tap the city — bottom sheet slides up with 5 actions: CHORDS / DRUMS / GARDEN / STUDIO / BE HERE.
@@ -151,7 +151,7 @@ Setup is documented in the README — about 2 minutes from download to running i
 
 The standalone files still have a few things from the to-do list before they feel fully finished:
 
-1. **HOP pyramid worlds for the 7 new cities** — currently only 6 worlds in hop_pyramid.html (Madrid, Paris, Medellín, Brooklyn, Berlin, Tokyo). St. Louis, Mexico City, Oaxaca, Tulum, Rishikesh, Varanasi, Mysore need their own palettes + scales — chord version already has all 13 ✓
+1. **HOP pyramid worlds for the 7 new cities** — currently only 6 worlds in hop_pyramid.html (Madrid, Paris, Medellín, Brooklyn, Berlin, Tokyo). St. Louis, Mexico City, Oaxaca, Tulum, Rishikesh, Varanasi, Bombay need their own palettes + scales — chord version already has all 13 ✓
 2. **Tambora/Latin drum reskin** for finger_drum (palm/conga/güira/timbal pads when in Medellín/Mexico/Tulum)
 3. **Music theory module** — chord progression flashcards (famous progressions, "why this works" notes, key picker, MIDI out) — the thing you said you wanted next
 4. **MIDI input expansion** for finger_drum — broader pad mapping for K.O.II / Move / any controller (currently only 8 specific note numbers map)

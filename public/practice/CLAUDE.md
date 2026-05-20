@@ -108,7 +108,7 @@ When `language.html` is opened with no URL param, it falls back to the character
 | 9 | berlin | Berlin | Aeolian | Saw pad | E |
 | 10 | rishikesh | Rishikesh | Raga Yaman | Harmonium | D |
 | 11 | varanasi | Varanasi | Raga Bhairavi | Tanpura | C |
-| 12 | mysore | Mysore | Raga Mohanam | Veena koto | C |
+| 12 | bombay | Bombay | Raga Bilawal | Sitar + tabla | C |
 | 13 | tokyo | Tokyo | Insen / Quartal | Koto | D |
 
 These should stay consistent across hop_chords, hop_pyramid (when worlds are added), finger_drum, garden, etc. Cities are first-class identity in this app.
@@ -191,12 +191,12 @@ The relative file links work because all 8 HTML files sit in the same flat direc
 
 ## What's pending
 
-1. **HOP pyramid for the 7 new cities** — stlouis / mexico / oaxaca / tulum / rishikesh / varanasi / mysore need their own melodic worlds. The chord versions already exist; mirror the structure.
+1. **HOP pyramid for the 7 new cities** — stlouis / mexico / oaxaca / tulum / rishikesh / varanasi / bombay need their own melodic worlds. The chord versions already exist; mirror the structure.
 2. **Tambora/Latin drum pad** — reskin finger_drum_practice for Medellín / Mexico City / Oaxaca / Tulum cities with palm/conga/güira/timbal voices.
 3. **Music theory flashcard module** — famous progressions (I-V-vi-IV, ii-V-I, i-VI-III-VII, Andalusian, Coltrane changes, etc.) with key picker, voicing picker, MIDI out, "why this works" notes. Pattern off `hop_chords.html` + `language.html`'s flashcard structure.
 4. **MIDI input expansion for finger_drum** — currently only 8 specific note numbers map to the 4 pads. Should accept K.O.II / Move / any controller's full pad range. Consider a MIDI Learn mode.
 5. **Spacepit Radio** — `spacepit_radio.html` exists in progress (not in deploy bundle yet). 6+ stations by catalog era.
-6. **More language decks** — Portuguese (no city yet but could add São Paulo), regional Spanish varietals split per city, Kannada for Mysore, etc.
+6. **More language decks** — Portuguese (no city yet but could add São Paulo), regional Spanish varietals split per city, Kannada for Bombay, etc.
 7. **Working title decision** — Practice / Any City / The Quiet Game
 
 ---

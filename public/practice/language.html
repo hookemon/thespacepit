@@ -348,8 +348,11 @@
   .lang-bg-tokyo .lantern-2 { animation: lanternBob 9s ease-in-out infinite 1.2s; }
   .lang-bg-tokyo .neon { animation: neonPulse 4s ease-in-out infinite; }
   .lang-bg-tokyo .neon-2 { animation: neonPulse 5.5s ease-in-out infinite 0.7s; }
-  .lang-bg-rishikesh .mandala { animation: mandalaSpin 120s linear infinite; transform-origin: 200px 420px; transform-box: fill-box; }
-  .lang-bg-rishikesh .ripples { animation: rippleSlide 6s ease-in-out infinite; }
+  /* Bombay rickshaw bobs over potholes; garland sways in the breeze. */
+  @keyframes rickshawBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+  @keyframes garlandSway { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
+  .lang-bg-bombay .rickshaw { animation: rickshawBob 1.9s ease-in-out infinite; transform-origin: center; }
+  .lang-bg-bombay .garland  { animation: garlandSway 5.5s ease-in-out infinite; transform-origin: center; }
 
   /* ============ MUSIC BED CONTROL ============
      Small bar between banner and category chips. Toggle + volume slider.
@@ -555,55 +558,130 @@
   </svg>
 </div>
 
-<div class="lang-bg-layer lang-bg-rishikesh" data-lang="hi" aria-hidden="true">
+<div class="lang-bg-layer lang-bg-bombay" data-lang="hi" aria-hidden="true">
   <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <radialGradient id="rk-sun" cx="50%" cy="20%" r="55%">
-        <stop offset="0%"   stop-color="#d4a32d" stop-opacity="0.55"/>
-        <stop offset="55%"  stop-color="#d4a32d" stop-opacity="0.12"/>
-        <stop offset="100%" stop-color="#d4a32d" stop-opacity="0"/>
+      <radialGradient id="bombay-sky" cx="50%" cy="22%" r="60%">
+        <stop offset="0%"   stop-color="#ffd400" stop-opacity="0.50"/>
+        <stop offset="55%"  stop-color="#c8743e" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#c8743e" stop-opacity="0"/>
       </radialGradient>
+      <pattern id="bombay-stripe" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+        <rect width="10" height="20" fill="#ffd400"/>
+        <rect x="10" width="10" height="20" fill="#15110d"/>
+      </pattern>
     </defs>
-    <rect width="400" height="800" fill="url(#rk-sun)"/>
-    <!-- sun rays from top -->
-    <g opacity="0.3" stroke="#d4a32d" stroke-width="1">
-      <line x1="200" y1="0" x2="50"  y2="220"/>
-      <line x1="200" y1="0" x2="100" y2="240"/>
-      <line x1="200" y1="0" x2="160" y2="260"/>
-      <line x1="200" y1="0" x2="200" y2="270"/>
-      <line x1="200" y1="0" x2="240" y2="260"/>
-      <line x1="200" y1="0" x2="300" y2="240"/>
-      <line x1="200" y1="0" x2="350" y2="220"/>
-    </g>
-    <!-- mandala center -->
-    <g class="mandala" transform="translate(200, 420)" opacity="0.55">
-      <circle r="120" stroke="#c8743e" stroke-width="1.5" fill="none"/>
-      <circle r="95"  stroke="#d4a32d" stroke-width="1.5" fill="none"/>
-      <circle r="70"  stroke="#c8743e" stroke-width="1.5" fill="none"/>
-      <circle r="40"  stroke="#15110d" stroke-width="1.5" fill="none"/>
-      <circle r="10"  fill="#d4a32d"/>
-      <!-- 8 petals -->
-      <g stroke="#c8743e" stroke-width="1.5" fill="none">
-        <path d="M 0 -110 Q 20 -135 0 -160 Q -20 -135 0 -110 Z"/>
-        <path d="M 0  110 Q 20  135 0  160 Q -20  135 0  110 Z"/>
-        <path d="M -110 0 Q -135 20 -160 0 Q -135 -20 -110 0 Z"/>
-        <path d="M  110 0 Q  135 20  160 0 Q  135 -20  110 0 Z"/>
+    <!-- saffron sky -->
+    <rect width="400" height="800" fill="url(#bombay-sky)"/>
+    <!-- yellow-black caution stripes top + bottom -->
+    <rect x="0" y="0"   width="400" height="8" fill="url(#bombay-stripe)" opacity="0.4"/>
+    <rect x="0" y="792" width="400" height="8" fill="url(#bombay-stripe)" opacity="0.4"/>
+    <!-- Marigold garland — top swag with red centers -->
+    <g class="garland" opacity="0.65">
+      <path d="M 0 60 Q 100 100 200 70 T 400 60" stroke="#c8743e" stroke-width="2" fill="none" opacity="0.55"/>
+      <g fill="#c8743e">
+        <circle cx="40"  cy="78" r="8"/>
+        <circle cx="80"  cy="92" r="9"/>
+        <circle cx="125" cy="98" r="8"/>
+        <circle cx="170" cy="92" r="8"/>
+        <circle cx="215" cy="80" r="9"/>
+        <circle cx="260" cy="74" r="8"/>
+        <circle cx="305" cy="70" r="9"/>
+        <circle cx="350" cy="67" r="8"/>
       </g>
-      <g stroke="#d4a32d" stroke-width="1" fill="none" opacity="0.7">
-        <path d="M 78 -78 Q 100 -110 130 -100 Q 110 -75 78 -78 Z"/>
-        <path d="M -78 78 Q -100 110 -130 100 Q -110 75 -78 78 Z"/>
-        <path d="M -78 -78 Q -100 -110 -130 -100 Q -110 -75 -78 -78 Z"/>
-        <path d="M 78 78 Q 100 110 130 100 Q 110 75 78 78 Z"/>
+      <g fill="#c44438" opacity="0.85">
+        <circle cx="40"  cy="78" r="3"/>
+        <circle cx="80"  cy="92" r="3"/>
+        <circle cx="125" cy="98" r="3"/>
+        <circle cx="170" cy="92" r="3"/>
+        <circle cx="215" cy="80" r="3"/>
+        <circle cx="260" cy="74" r="3"/>
+        <circle cx="305" cy="70" r="3"/>
+        <circle cx="350" cy="67" r="3"/>
       </g>
     </g>
-    <!-- Ganges water ripples bottom -->
-    <g class="ripples" stroke="#2a5556" stroke-width="1.5" fill="none" opacity="0.35">
-      <path d="M -20 660 Q 100 645 200 660 T 420 660"/>
-      <path d="M -20 685 Q 100 670 200 685 T 420 685"/>
-      <path d="M -20 710 Q 100 695 200 710 T 420 710"/>
+    <!-- HORN OK PLEASE truck-sticker -->
+    <g opacity="0.7">
+      <rect x="60" y="690" width="280" height="42" fill="#15110d" rx="3"/>
+      <text x="200" y="713" font-family="Bricolage Grotesque, sans-serif" font-size="14" font-weight="900" fill="#ffd400" text-anchor="middle" letter-spacing="2.5px">HORN OK PLEASE</text>
+      <text x="200" y="727" font-family="serif" font-size="10" fill="#ffd400" text-anchor="middle" font-style="italic" opacity="0.7">— mumbai forever —</text>
     </g>
-    <!-- rishikesh stamp -->
-    <text x="20" y="770" font-family="serif" font-size="36" fill="#d4a32d" opacity="0.3" font-weight="900" font-style="italic">rishikesh.</text>
+    <!-- Auto-rickshaw — main feature, middle of page -->
+    <g class="rickshaw">
+      <g transform="translate(200, 440)">
+        <!-- shadow under wheels -->
+        <ellipse cx="0" cy="86" rx="110" ry="9" fill="#15110d" opacity="0.22"/>
+        <!-- yellow cabin body -->
+        <path d="M -90 30 L -90 -20 Q -90 -55 -55 -55 L 60 -55 Q 95 -55 95 -20 L 95 30 Z"
+              fill="#ffd400" stroke="#15110d" stroke-width="3"/>
+        <!-- black roof cap -->
+        <path d="M -90 -20 Q -90 -55 -55 -55 L 60 -55 Q 95 -55 95 -20 L 95 -8 Q 78 -45 50 -45 L -45 -45 Q -75 -45 -90 -8 Z"
+              fill="#15110d"/>
+        <!-- windshield -->
+        <path d="M -45 -45 L -45 -8 L 50 -8 L 50 -45 Z" fill="#f3ecd8" opacity="0.55"/>
+        <!-- center divider on body -->
+        <line x1="-90" y1="14" x2="95" y2="14" stroke="#15110d" stroke-width="2.5"/>
+        <line x1="2"   y1="-8" x2="2"  y2="30" stroke="#15110d" stroke-width="2"/>
+        <!-- driver silhouette -->
+        <circle cx="-30" cy="-25" r="10" fill="#15110d"/>
+        <rect   x="-40" y="-15" width="20" height="22" fill="#15110d"/>
+        <!-- 3 wheels — 2 back + 1 front -->
+        <g>
+          <circle cx="-65" cy="45" r="18" fill="#15110d"/>
+          <circle cx="-65" cy="45" r="9"  fill="#f3ecd8" opacity="0.7"/>
+          <circle cx="-65" cy="45" r="4"  fill="#15110d"/>
+        </g>
+        <g>
+          <circle cx="65"  cy="45" r="18" fill="#15110d"/>
+          <circle cx="65"  cy="45" r="9"  fill="#f3ecd8" opacity="0.7"/>
+          <circle cx="65"  cy="45" r="4"  fill="#15110d"/>
+        </g>
+        <g>
+          <circle cx="100" cy="55" r="14" fill="#15110d"/>
+          <circle cx="100" cy="55" r="6"  fill="#f3ecd8" opacity="0.7"/>
+        </g>
+        <!-- antenna + small red light -->
+        <line x1="-75" y1="-55" x2="-75" y2="-72" stroke="#15110d" stroke-width="2"/>
+        <circle cx="-75" cy="-75" r="3" fill="#c44438"/>
+        <!-- MH 01 license plate -->
+        <rect x="-15" y="18" width="40" height="14" fill="#15110d"/>
+        <text x="5" y="29" font-family="monospace" font-size="9" fill="#ffd400" text-anchor="middle" font-weight="900" letter-spacing="0.5">MH 01</text>
+        <!-- meter stick (running indicator) -->
+        <line x1="-80" y1="-35" x2="-72" y2="-35" stroke="#c44438" stroke-width="2"/>
+      </g>
+    </g>
+    <!-- bollywood-pink scatter dots, left + right -->
+    <g fill="#d96b7d" opacity="0.55">
+      <circle cx="35"  cy="220" r="4"/>
+      <circle cx="60"  cy="280" r="3"/>
+      <circle cx="25"  cy="340" r="5"/>
+      <circle cx="55"  cy="380" r="3"/>
+      <circle cx="370" cy="200" r="4"/>
+      <circle cx="350" cy="260" r="3"/>
+      <circle cx="380" cy="320" r="5"/>
+      <circle cx="355" cy="380" r="3"/>
+    </g>
+    <!-- rangoli dot patterns — bottom corners -->
+    <g fill="#c44438" opacity="0.55">
+      <circle cx="20"  cy="610" r="3"/>
+      <circle cx="35"  cy="600" r="3"/>
+      <circle cx="50"  cy="610" r="3"/>
+      <circle cx="35"  cy="625" r="3"/>
+      <circle cx="20"  cy="640" r="3"/>
+      <circle cx="50"  cy="640" r="3"/>
+      <circle cx="35"  cy="655" r="3"/>
+    </g>
+    <g fill="#5a8a47" opacity="0.55">
+      <circle cx="370" cy="610" r="3"/>
+      <circle cx="355" cy="600" r="3"/>
+      <circle cx="340" cy="610" r="3"/>
+      <circle cx="355" cy="625" r="3"/>
+      <circle cx="370" cy="640" r="3"/>
+      <circle cx="340" cy="640" r="3"/>
+      <circle cx="355" cy="655" r="3"/>
+    </g>
+    <!-- Devanagari Bombay stamp -->
+    <text x="20" y="770" font-family="serif" font-size="42" fill="#c44438" opacity="0.32" font-weight="900" font-style="italic">बम्बई.</text>
   </svg>
 </div>
 
@@ -846,17 +924,17 @@ const DECKS = {
     accent: '#d4a32d',
     dj: 'नमस्ते.',
     cards: [
-      { cat: 'greetings', phrase: 'नमस्ते', pronounce: 'nah-mah-STEH', en: 'Hello / I bow to you', ctx: 'Universal greeting. Hands together at the chest.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'greetings', phrase: 'धन्यवाद', pronounce: 'DHUN-yah-vahd', en: 'Thank you', ctx: 'Formal thanks. Or use "shukriya" — both work.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'greetings', phrase: 'शुभ प्रभात', pronounce: 'SHOOB prah-BAHT', en: 'Good morning', ctx: 'Use before noon. Pre-yoga / pre-meditation greeting.', cities: ['rishikesh','mysore'] },
-      { cat: 'food', phrase: 'पानी', pronounce: 'PAH-nee', en: 'Water', ctx: 'Most essential word. Always ask for bottled.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'food', phrase: 'चाय', pronounce: 'CHAI', en: 'Tea', ctx: 'Chai = tea. "Chai tea" is redundant. Just chai.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'music', phrase: 'राग', pronounce: 'RAHG', en: 'Raga', ctx: 'A melodic mode. Each raga has a feel, time, season.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'music', phrase: 'ताल', pronounce: 'TAHL', en: 'Rhythm cycle', ctx: 'The rhythmic framework. Teen taal = 16 beats.', cities: ['varanasi','mysore'] },
-      { cat: 'music', phrase: 'सा रे ग म', pronounce: 'sah reh gah mah', en: 'Sa Re Ga Ma', ctx: 'Indian solfege. Equivalent of "do re mi fa" in Western.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'street', phrase: 'अच्छा', pronounce: 'AHCH-cha', en: 'OK / good', ctx: 'Universal acknowledgment. Use often.', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'street', phrase: 'ठीक है', pronounce: 'TEEK heh', en: 'All right', ctx: 'Confirmation. "It\'s fine, it\'s good."', cities: ['rishikesh','varanasi','mysore'] },
-      { cat: 'directions', phrase: 'कितना', pronounce: 'KIT-nah', en: 'How much?', ctx: 'For markets and rickshaws. Negotiate from there.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'greetings', phrase: 'नमस्ते', pronounce: 'nah-mah-STEH', en: 'Hello / I bow to you', ctx: 'Universal greeting. Hands together at the chest.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'greetings', phrase: 'धन्यवाद', pronounce: 'DHUN-yah-vahd', en: 'Thank you', ctx: 'Formal thanks. Or use "shukriya" — both work.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'greetings', phrase: 'शुभ प्रभात', pronounce: 'SHOOB prah-BAHT', en: 'Good morning', ctx: 'Use before noon. Pre-yoga / pre-meditation greeting.', cities: ['rishikesh','bombay'] },
+      { cat: 'food', phrase: 'पानी', pronounce: 'PAH-nee', en: 'Water', ctx: 'Most essential word. Always ask for bottled.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'food', phrase: 'चाय', pronounce: 'CHAI', en: 'Tea', ctx: 'Chai = tea. "Chai tea" is redundant. Just chai.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'music', phrase: 'राग', pronounce: 'RAHG', en: 'Raga', ctx: 'A melodic mode. Each raga has a feel, time, season.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'music', phrase: 'ताल', pronounce: 'TAHL', en: 'Rhythm cycle', ctx: 'The rhythmic framework. Teen taal = 16 beats.', cities: ['varanasi','bombay'] },
+      { cat: 'music', phrase: 'सा रे ग म', pronounce: 'sah reh gah mah', en: 'Sa Re Ga Ma', ctx: 'Indian solfege. Equivalent of "do re mi fa" in Western.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'street', phrase: 'अच्छा', pronounce: 'AHCH-cha', en: 'OK / good', ctx: 'Universal acknowledgment. Use often.', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'street', phrase: 'ठीक है', pronounce: 'TEEK heh', en: 'All right', ctx: 'Confirmation. "It\'s fine, it\'s good."', cities: ['rishikesh','varanasi','bombay'] },
+      { cat: 'directions', phrase: 'कितना', pronounce: 'KIT-nah', en: 'How much?', ctx: 'For markets and rickshaws. Negotiate from there.', cities: ['rishikesh','varanasi','bombay'] },
     ],
   },
 };
@@ -1120,11 +1198,13 @@ const CITY_MUSIC = {
   berlin:    { root: 82.41, fifth: 123.47, padWave: 'sawtooth', detune: 12, filterType: 'lowpass',  filterFreq: 700,  filterQ: 2.6, lfoRate: 0.10, lfoDepth: 200, label: 'concrete saw' },
   // Tokyo: Insen in D — koto bandpass shimmer
   tokyo:     { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 4,  filterType: 'bandpass', filterFreq: 1600, filterQ: 5.5, lfoRate: 0.28, lfoDepth: 480, label: 'koto bed' },
-  // Rishikesh: Yaman in D — harmonium warm square
+  // Rishikesh: Yaman in D — harmonium warm square (unused since Hindi → Bombay)
   rishikesh: { root: 73.42, fifth: 110.00, padWave: 'square',   detune: 5,  filterType: 'lowpass',  filterFreq: 1100, filterQ: 1.1, lfoRate: 0.12, lfoDepth: 240, label: 'harmonium drone' },
+  // Bombay: Bilawal in D — sitar bandpass shimmer over a warm root drone
+  bombay:    { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 7,  filterType: 'bandpass', filterFreq: 1900, filterQ: 4.8, lfoRate: 0.32, lfoDepth: 480, label: 'sitar bed' },
 };
 
-const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'rishikesh' };
+const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'bombay' };
 
 let audioCtx = null;
 let masterGain = null;
