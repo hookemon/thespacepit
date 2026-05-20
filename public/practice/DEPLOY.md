@@ -4,7 +4,7 @@ Two bundles to ship. The **web bundle** goes on thespacepit.com. The **M4L bundl
 
 ---
 
-## WEB BUNDLE — 8 files, zero dependencies
+## WEB BUNDLE — 9 files, zero dependencies
 
 Everything's static HTML. No backend, no database, no API keys, no build step. Just Google Fonts from CDN. Drop the files in any directory, they wire to each other automatically.
 
@@ -18,8 +18,9 @@ Everything's static HTML. No backend, no database, no API keys, no build step. J
 | `finger_drum_practice.html` | 5 city drum patterns + MIDI in | 55K |
 | `studio.html` | dub mixer with 6 synced clips | 34K |
 | `be_here_now.html` | presence zone (drone + breath) | 20K |
+| `language.html` | language flashcards — 5 decks (es/fr/de/jp/hi) with TTS pronunciation | 43K |
 
-Total ~420K. Loads fast on phones.
+Total ~460K. Loads fast on phones.
 
 ---
 

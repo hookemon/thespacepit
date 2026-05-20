@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheSpacePit — Language</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@500;700;900&family=Noto+Sans+Devanagari:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ecd8;
+    --paper-2: #ebe2c8;
+    --paper-3: #e3d9bb;
+    --ink: #15110d;
+    --ink-2: #3a322a;
+    --ink-3: #6a5e4a;
+    --yellow: #ffd400;
+    --terracotta: #c8743e;
+    --teal: #2a5556;
+    --red: #c44438;
+    --green: #5a8a47;
+    --plum: #5c2858;
+    --rose: #d96b7d;
+    --gold: #d4a32d;
+    --lang-accent: var(--terracotta);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *:not(input):not(textarea):not(select) { user-select: none; }
+  html, body {
+    background: var(--paper); color: var(--ink);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; line-height: 1.4;
+    min-height: 100vh; overflow-x: hidden;
+  }
+  body {
+    background: radial-gradient(ellipse at top right, rgba(255,212,0,0.10), transparent 40%),
+                radial-gradient(ellipse at bottom left, rgba(200,116,62,0.06), transparent 40%),
+                var(--paper);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.18; pointer-events: none; z-index: 1; mix-blend-mode: multiply;
+  }
+  .app {
+    max-width: 560px; margin: 0 auto; min-height: 100vh;
+    background: var(--paper); position: relative; z-index: 2;
+    border-left: 2px solid var(--ink); border-right: 2px solid var(--ink);
+    padding-bottom: 32px;
+  }
+  header { border-bottom: 2px solid var(--ink); padding: 14px 20px 14px; }
+  .brand-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark { width: 24px; height: 24px; background: var(--yellow); border: 2px solid var(--ink); border-radius: 50%; position: relative; box-shadow: 2px 2px 0 var(--ink); }
+  .brand-mark::after { content: ''; position: absolute; inset: 5px; background: var(--ink); border-radius: 50%; }
+  .brand-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 18px; letter-spacing: -0.02em; }
+  .brand-name em { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; color: var(--terracotta); }
+  .practice-tag {
+    font-family: 'DM Mono', monospace; font-size: 8.5px; letter-spacing: 1.5px;
+    padding: 4px 9px; background: var(--ink); color: var(--yellow); border-radius: 100px;
+  }
+  .title-block { display: flex; align-items: flex-end; justify-content: space-between; gap: 14px; }
+  .title-block h1 {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 44px; line-height: 0.9; letter-spacing: -0.025em;
+  }
+  .title-block h1 em { font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; color: var(--terracotta); }
+  .subtitle {
+    text-align: right; font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.2px; color: var(--ink-3); line-height: 1.5; padding-bottom: 2px;
+  }
+  .subtitle strong { color: var(--ink); font-weight: 500; }
+  .subtitle em { font-family: 'Fraunces', serif; font-style: italic; color: var(--terracotta); font-weight: 500; }
+
+  /* Language chips */
+  .lang-bar {
+    display: flex; gap: 6px; padding: 12px 20px; overflow-x: auto;
+    border-bottom: 2px solid var(--ink); background: var(--paper-2);
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .lang-bar::-webkit-scrollbar { display: none; }
+  .lang-chip {
+    flex-shrink: 0; background: var(--paper); border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink); padding: 7px 11px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 11px;
+    letter-spacing: 1px; cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s; white-space: nowrap;
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+  }
+  .lang-chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .lang-chip.active { background: var(--ink); color: var(--paper); box-shadow: 3px 3px 0 var(--lang-accent); transform: translate(-1px, -1px); }
+  .lang-chip-native { font-family: 'DM Mono', monospace; font-size: 8px; letter-spacing: 0.6px; color: var(--ink-3); font-weight: 400; text-transform: uppercase; }
+  .lang-chip.active .lang-chip-native { color: var(--yellow); }
+
+  /* Banner */
+  .lang-banner {
+    background: linear-gradient(180deg, var(--paper-3) 0%, color-mix(in srgb, var(--paper-3), var(--ink) 10%) 100%);
+    padding: 14px 20px;
+    border-bottom: 2px solid var(--ink);
+    position: relative; overflow: hidden;
+  }
+  .lang-banner::after {
+    content: ''; position: absolute; right: -20px; top: -20px;
+    width: 70px; height: 70px; background: var(--lang-accent); border-radius: 50%;
+    opacity: 0.4; border: 2px solid var(--ink);
+  }
+  .lang-banner-name { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -0.02em; line-height: 1; }
+  .lang-banner-name em { font-family: 'Fraunces', serif; font-style: italic; color: var(--lang-accent); opacity: 0.85; font-weight: 500; }
+  .lang-banner-meta { margin-top: 5px; font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.3px; color: var(--ink-3); text-transform: uppercase; }
+  .lang-banner-dj { margin-top: 4px; font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: var(--ink-2); }
+
+  /* Category chips */
+  .cat-bar {
+    display: flex; gap: 6px; padding: 12px 20px; overflow-x: auto;
+    border-bottom: 1.5px solid var(--paper-3); background: var(--paper);
+    -ms-overflow-style: none; scrollbar-width: none;
+  }
+  .cat-bar::-webkit-scrollbar { display: none; }
+  .cat-chip {
+    flex-shrink: 0; background: var(--paper-2); border: 1.5px solid var(--ink);
+    padding: 5px 10px; cursor: pointer;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 10px;
+    letter-spacing: 1.1px; text-transform: uppercase;
+    transition: transform 0.08s, background 0.15s, color 0.15s;
+  }
+  .cat-chip:hover { transform: translate(-1px, -1px); }
+  .cat-chip.active { background: var(--ink); color: var(--yellow); }
+
+  /* Card stage */
+  .card-stage {
+    padding: 28px 20px 14px;
+    perspective: 1000px;
+    min-height: 320px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    width: 100%; max-width: 440px; aspect-ratio: 4 / 3;
+    position: relative;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+    cursor: pointer;
+  }
+  .card.flipped { transform: rotateY(180deg); }
+  .card-face {
+    position: absolute; inset: 0;
+    backface-visibility: hidden;
+    border: 2.5px solid var(--ink);
+    box-shadow: 6px 6px 0 var(--ink);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+  }
+  .card-front {
+    background: var(--yellow);
+    transform: rotate(-0.5deg);
+  }
+  .card-back {
+    background: var(--paper-2);
+    transform: rotate(0.4deg) rotateY(180deg);
+  }
+  .card-eyebrow {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.4px; color: var(--ink-3);
+    padding: 14px 18px 0; text-transform: uppercase;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .card-eyebrow em { font-family: 'Fraunces', serif; font-style: italic; color: var(--terracotta); font-weight: 500; }
+  .card-front .card-eyebrow { color: var(--ink-2); }
+  .card-body {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 12px 20px;
+    text-align: center;
+  }
+  .phrase {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 36px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 8px;
+  }
+  .phrase.lang-jp { font-family: 'Noto Sans JP', sans-serif; font-weight: 900; }
+  .phrase.lang-hi { font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 900; }
+  .phrase.long { font-size: 28px; }
+  .phrase.very-long { font-size: 22px; }
+  .pronounce {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 14px; color: var(--ink-2);
+    margin-top: 4px;
+  }
+  .meaning {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 10px;
+  }
+  .context {
+    font-family: 'Fraunces', serif; font-style: italic;
+    font-size: 13px; color: var(--ink-2);
+    line-height: 1.4;
+    max-width: 280px;
+    margin-bottom: 12px;
+  }
+  .card-cities {
+    display: flex; gap: 5px; flex-wrap: wrap; justify-content: center;
+    margin-top: 8px;
+  }
+  .city-pip {
+    font-family: 'DM Mono', monospace; font-size: 8.5px;
+    letter-spacing: 0.6px; padding: 3px 7px;
+    background: var(--ink); color: var(--yellow);
+    border-radius: 100px; text-transform: uppercase;
+  }
+  .audio-btn {
+    background: var(--ink); color: var(--yellow);
+    border: none; border-radius: 100px;
+    padding: 8px 14px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 11px;
+    letter-spacing: 1px; cursor: pointer;
+    margin: 8px 0;
+    display: inline-flex; align-items: center; gap: 6px;
+    box-shadow: 2px 2px 0 var(--lang-accent);
+    transition: transform 0.08s, box-shadow 0.08s;
+  }
+  .audio-btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--lang-accent); }
+  .audio-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--lang-accent); }
+  .audio-btn.playing { background: var(--green); }
+  .audio-btn .sym {
+    display: inline-block; width: 11px; height: 11px;
+    border-style: solid; border-width: 6px 0 6px 10px;
+    border-color: transparent transparent transparent var(--yellow);
+  }
+  .audio-btn.playing .sym {
+    border-style: double; border-width: 0px 0 0px 10px;
+    border-color: var(--yellow); height: 12px;
+  }
+  .card-footer {
+    padding: 12px 18px 14px;
+    border-top: 1.5px dashed var(--ink-3);
+    font-family: 'DM Mono', monospace; font-size: 8px;
+    letter-spacing: 1.2px; color: var(--ink-3);
+    text-align: center; text-transform: uppercase;
+  }
+  .card-footer em { font-family: 'Fraunces', serif; font-style: italic; color: var(--terracotta); font-weight: 500; }
+
+  /* Nav row */
+  .nav-row {
+    padding: 4px 20px 14px;
+    display: flex; gap: 8px; align-items: center; justify-content: center;
+  }
+  .nav-btn {
+    background: var(--paper-2); color: var(--ink);
+    border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+    padding: 10px 18px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 13px;
+    letter-spacing: 1.3px; cursor: pointer;
+    transition: transform 0.08s, box-shadow 0.08s;
+    text-transform: uppercase;
+    flex: 1; max-width: 100px;
+  }
+  .nav-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+  .nav-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+  .nav-btn.primary { background: var(--yellow); flex: 1.4; max-width: 160px; }
+  .nav-btn.primary em { font-family: 'Fraunces', serif; font-style: italic; color: var(--ink); opacity: 0.7; font-weight: 500; }
+  .nav-counter {
+    font-family: 'DM Mono', monospace; font-size: 10px;
+    letter-spacing: 1.4px; color: var(--ink-3);
+    text-align: center; padding: 6px 0 0;
+    text-transform: uppercase;
+  }
+  .nav-counter strong { color: var(--ink); font-weight: 700; }
+
+  /* Stats footer */
+  .stats {
+    margin: 14px 20px 0;
+    padding: 14px 16px;
+    background: var(--paper-2); border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    position: relative; overflow: hidden;
+  }
+  .stats::before {
+    content: ''; position: absolute; left: -16px; bottom: -16px;
+    width: 50px; height: 50px; background: var(--lang-accent); border-radius: 50%;
+    border: 2px solid var(--ink); opacity: 0.35;
+  }
+  .stats-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    position: relative; z-index: 2;
+  }
+  .stats-label {
+    font-family: 'DM Mono', monospace; font-size: 9px;
+    letter-spacing: 1.3px; color: var(--ink-3); text-transform: uppercase;
+  }
+  .stats-val {
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px;
+    color: var(--ink); letter-spacing: -0.01em;
+  }
+  .stats-meta {
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 11px;
+    color: var(--ink-2); margin-top: 3px;
+  }
+
+  .footer-link {
+    padding: 18px 20px 8px;
+    font-family: 'Fraunces', serif; font-style: italic; font-size: 12px;
+    color: var(--ink-3); text-align: center; line-height: 1.5;
+  }
+  .footer-link em { color: var(--terracotta); }
+  .footer-link a {
+    font-family: 'Bricolage Grotesque', sans-serif; font-style: normal;
+    font-weight: 800; font-size: 11px;
+    letter-spacing: 1.3px;
+    color: var(--ink); text-decoration: none;
+    padding: 5px 11px;
+    background: var(--paper-2); border: 1.5px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    text-transform: uppercase; margin: 0 4px;
+    display: inline-block;
+  }
+  .footer-link a:hover { background: var(--yellow); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">TheSpacePit<em>.</em></div>
+    </div>
+    <div class="practice-tag">★ LANGUAGE</div>
+  </div>
+  <div class="title-block">
+    <h1>language<em>.</em></h1>
+    <div class="subtitle">
+      learn what the<br>
+      <strong>CITY ACTUALLY SAYS</strong><br>
+      <em>tap the card to flip</em>
+    </div>
+  </div>
+</header>
+
+<div class="lang-bar" id="langBar"></div>
+
+<div class="lang-banner">
+  <div class="lang-banner-name" id="langName">ESPAÑOL<em>.</em></div>
+  <div class="lang-banner-meta" id="langMeta">— SPANISH // 5 CITIES // ES-ES VOICE</div>
+  <div class="lang-banner-dj" id="langDj">"vamos al estudio."</div>
+</div>
+
+<div class="cat-bar" id="catBar"></div>
+
+<div class="card-stage">
+  <div class="card" id="card">
+    <div class="card-face card-front">
+      <div class="card-eyebrow">
+        <span id="frontCat">— GREETINGS</span>
+        <span><em>tap to flip</em></span>
+      </div>
+      <div class="card-body">
+        <div class="phrase" id="phrase">Hola, ¿qué tal?</div>
+        <div class="pronounce" id="pronounce">oh-lah, keh tahl</div>
+      </div>
+      <div class="card-footer">— TAP THE CARD —</div>
+    </div>
+    <div class="card-face card-back">
+      <div class="card-eyebrow">
+        <span id="backCat">— GREETINGS</span>
+        <span><em>flip back</em></span>
+      </div>
+      <div class="card-body">
+        <div class="meaning" id="meaning">Hi, how are you?</div>
+        <div class="context" id="context">The most universal Spanish greeting. Friendly, works any time of day.</div>
+        <button class="audio-btn" id="audioBtn" onclick="event.stopPropagation(); playAudio()">
+          <span class="sym"></span> HEAR IT
+        </button>
+        <div class="card-cities" id="cityPips"></div>
+      </div>
+      <div class="card-footer">— USED IN <em id="footerCities">MADRID · MEDELLÍN · MEXICO CITY</em> —</div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-row">
+  <button class="nav-btn" id="prevBtn">← PREV</button>
+  <button class="nav-btn primary" id="shuffleBtn">★ shuffle<em>.</em></button>
+  <button class="nav-btn" id="nextBtn">NEXT →</button>
+</div>
+
+<div class="nav-counter" id="counter">— CARD <strong>1</strong> OF <strong>25</strong> —</div>
+
+<div class="stats">
+  <div class="stats-row">
+    <div>
+      <div class="stats-label">— LANGUAGE SKILL</div>
+      <div class="stats-meta" id="statsMeta">cards studied · counts toward YOU dashboard</div>
+    </div>
+    <div class="stats-val" id="statsVal">0</div>
+  </div>
+</div>
+
+<div class="footer-link">
+  <em>each card you flip adds to your language skill.</em><br>
+  <a href="index.html">← BACK TO ATLAS</a>
+  <a href="character.html">EDIT CHARACTER</a>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+// ============ STORAGE SHIM ============
+if (!window.storage) {
+  window.storage = {
+    async get(key) { const v = localStorage.getItem(key); return v ? { key, value: v } : null; },
+    async set(key, value) { localStorage.setItem(key, value); return { key, value }; },
+    async delete(key) { localStorage.removeItem(key); return { key, deleted: true }; },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!prefix || (k && k.startsWith(prefix))) keys.push(k);
+      }
+      return { keys, prefix };
+    }
+  };
+}
+
+// ============ DECKS ============
+// Each deck = { name, nativeName, voiceLocale, accent, cards: [...] }
+// Each card: { cat, phrase, pronounce, en, ctx, cities }
+const DECKS = {
+  es: {
+    name: 'ESPAÑOL',
+    nativeName: 'Spanish',
+    voiceLocale: 'es-ES',
+    accent: '#c44438',
+    dj: 'vamos al estudio.',
+    cards: [
+      // GREETINGS
+      { cat: 'greetings', phrase: 'Hola, ¿qué tal?', pronounce: 'oh-lah, keh tahl', en: 'Hi, how are you?', ctx: 'The universal Spanish greeting. Friendly, works any time.', cities: ['madrid','medellin','mexico'] },
+      { cat: 'greetings', phrase: 'Buenas', pronounce: 'BWEH-nahs', en: 'Hey / Sup', ctx: 'Casual greeting — shortened from "buenas tardes." Sounds local.', cities: ['madrid','medellin'] },
+      { cat: 'greetings', phrase: '¿Todo bien?', pronounce: 'TOH-doh byen', en: 'All good?', ctx: 'How you check in with a friend. Reply: "todo bien."', cities: ['medellin','mexico','oaxaca'] },
+      { cat: 'greetings', phrase: 'Hasta luego', pronounce: 'AHS-tah LWEH-goh', en: 'See you later', ctx: 'Standard goodbye. More formal than "chao."', cities: ['madrid','medellin','mexico','oaxaca','tulum'] },
+      // FOOD + DRINK
+      { cat: 'food', phrase: 'La cuenta, por favor', pronounce: 'lah KWEHN-tah por fah-VOR', en: 'The check, please', ctx: 'Universal. Mime writing on your palm if waiter is far.', cities: ['madrid','medellin','mexico','oaxaca','tulum'] },
+      { cat: 'food', phrase: 'Una cerveza más', pronounce: 'OO-nah ser-VEH-sah mahs', en: 'One more beer', ctx: 'Or "una caña" in Madrid (a draft).', cities: ['madrid','medellin'] },
+      { cat: 'food', phrase: 'Mezcal con todo', pronounce: 'MEHS-kahl kohn TOH-doh', en: 'Mezcal with the works', ctx: 'In Oaxaca: with sal de gusano, naranja, chapulines. The full ritual.', cities: ['oaxaca'] },
+      { cat: 'food', phrase: 'Sin gluten', pronounce: 'seen GLOO-ten', en: 'Gluten-free', ctx: 'For when you need it. Spain takes it seriously.', cities: ['madrid'] },
+      { cat: 'food', phrase: 'Para llevar', pronounce: 'PAH-rah yeh-VAR', en: 'To go / takeout', ctx: 'Versus "para aquí" (for here).', cities: ['madrid','mexico','medellin'] },
+      // MUSIC
+      { cat: 'music', phrase: '¿Tocas algo?', pronounce: 'TOH-kahs AHL-goh', en: 'Do you play something?', ctx: 'Producer to producer at a bar. "Algo" = anything (instrument).', cities: ['madrid','medellin','mexico'] },
+      { cat: 'music', phrase: 'Vamos al estudio', pronounce: 'VAH-mohs ahl es-TOO-dee-oh', en: "Let's go to the studio", ctx: 'The phrase you use when you mean business.', cities: ['medellin','mexico'] },
+      { cat: 'music', phrase: 'Una sesión', pronounce: 'OO-nah seh-SYOHN', en: 'A session', ctx: 'In music context. "Una sesión esta noche?" = "a session tonight?"', cities: ['madrid','medellin'] },
+      { cat: 'music', phrase: '¿Qué onda?', pronounce: 'keh OHN-dah', en: "What's the vibe?", ctx: 'Lit. "what wave." Asking the feel of a room, a track, a night.', cities: ['mexico','tulum'] },
+      { cat: 'music', phrase: 'Suena duro', pronounce: 'SWEH-nah DOO-roh', en: 'Sounds tough / hits hard', ctx: 'Highest praise in Medellín for a beat that knocks.', cities: ['medellin'] },
+      // STREET / SLANG
+      { cat: 'street', phrase: 'Parcero', pronounce: 'par-SEH-roh', en: 'Buddy / bro', ctx: 'Colombian for "friend." Foundational paisa slang. Shortens to "parce."', cities: ['medellin'] },
+      { cat: 'street', phrase: 'Bacano', pronounce: 'bah-KAH-noh', en: 'Cool / sick', ctx: 'Colombian. The thing is fire. "Está bacano" = it\'s sick.', cities: ['medellin'] },
+      { cat: 'street', phrase: 'Chido', pronounce: 'CHEE-doh', en: 'Cool', ctx: 'Mexican cool. "Está chido" = it\'s cool. Universal compliment.', cities: ['mexico','oaxaca','tulum'] },
+      { cat: 'street', phrase: 'Qué guay', pronounce: 'keh GWAI', en: 'How cool', ctx: 'Spain only. Won\'t fly in Latin America (they\'ll laugh).', cities: ['madrid'] },
+      { cat: 'street', phrase: 'Hablamos', pronounce: 'ah-BLAH-mohs', en: "We'll talk", ctx: 'Versatile sign-off. Open-ended "let\'s be in touch."', cities: ['madrid','medellin','mexico'] },
+      // DIRECTIONS / TAXI
+      { cat: 'directions', phrase: '¿Dónde está...?', pronounce: 'DOHN-deh es-TAH', en: 'Where is...?', ctx: 'Fill in: el baño / la salida / un cajero.', cities: ['madrid','medellin','mexico','oaxaca','tulum'] },
+      { cat: 'directions', phrase: 'A la izquierda', pronounce: 'ah lah ees-KYER-dah', en: 'To the left', ctx: 'Counterpart: a la derecha (right). Derecho = straight ahead.', cities: ['madrid','medellin','mexico'] },
+      { cat: 'directions', phrase: '¿Cuánto cuesta?', pronounce: 'KWAHN-toh KWES-tah', en: 'How much does it cost?', ctx: 'Universal for markets, taxis, anything you need a price for.', cities: ['madrid','medellin','mexico','oaxaca','tulum'] },
+      // FEELINGS
+      { cat: 'feelings', phrase: 'Estoy cansado', pronounce: 'es-TOY kahn-SAH-doh', en: "I'm tired", ctx: '"Cansada" if you\'re female-gendered. Studio life requires this often.', cities: ['madrid','medellin','mexico'] },
+      { cat: 'feelings', phrase: 'Tranqui', pronounce: 'TRAHN-kee', en: 'Chill / no worries', ctx: 'Short for "tranquilo." Defuse any situation. Foundational.', cities: ['madrid','medellin','mexico','oaxaca'] },
+      { cat: 'feelings', phrase: 'Me encanta', pronounce: 'meh en-KAHN-tah', en: 'I love it', ctx: 'Stronger than "me gusta." For when a beat or a meal really lands.', cities: ['madrid','medellin','mexico'] },
+    ],
+  },
+
+  fr: {
+    name: 'FRANÇAIS',
+    nativeName: 'French',
+    voiceLocale: 'fr-FR',
+    accent: '#2a5556',
+    dj: 'on y va.',
+    cards: [
+      { cat: 'greetings', phrase: 'Bonjour', pronounce: 'bohn-ZHOOR', en: 'Hello / Good day', ctx: 'Required when entering ANY shop in France. Skipping it is rude.', cities: ['paris'] },
+      { cat: 'greetings', phrase: 'Ça va?', pronounce: 'sah VAH', en: "How's it going?", ctx: 'Reply with "ça va" back — same words, statement vs question.', cities: ['paris'] },
+      { cat: 'greetings', phrase: 'Salut', pronounce: 'sah-LOO', en: 'Hi (informal)', ctx: 'For friends. Don\'t use in a shop with strangers — too casual.', cities: ['paris'] },
+      { cat: 'food', phrase: "L'addition s'il vous plaît", pronounce: 'lah-dee-SYOHN seel voo PLEH', en: 'The check, please', ctx: 'They won\'t bring it until you ask. Sit as long as you like.', cities: ['paris'] },
+      { cat: 'food', phrase: 'Un café', pronounce: 'uhn kah-FAY', en: 'An espresso', ctx: 'In France a "café" = espresso. For drip ask for "café allongé."', cities: ['paris'] },
+      { cat: 'food', phrase: 'Un verre de vin', pronounce: 'uhn vehr duh VAN', en: 'A glass of wine', ctx: 'Add "rouge" (red) or "blanc" (white). Lunch wine is normal.', cities: ['paris'] },
+      { cat: 'music', phrase: "C'est bon, ça", pronounce: 'say BOHN sah', en: "That's good", ctx: 'Compliment for music, food, anything. Said with feeling.', cities: ['paris'] },
+      { cat: 'music', phrase: 'Un accord', pronounce: 'uhn ah-KOR', en: 'A chord', ctx: 'Music term. Plural: des accords.', cities: ['paris'] },
+      { cat: 'street', phrase: 'Pas de souci', pronounce: 'pah duh soo-SEE', en: 'No worries', ctx: 'Universal "no problem." Use after thank-yous.', cities: ['paris'] },
+      { cat: 'street', phrase: 'Carrément', pronounce: 'kah-reh-MAHN', en: 'Totally / for sure', ctx: 'Strong agreement. "Yeah for sure."', cities: ['paris'] },
+      { cat: 'directions', phrase: 'Où est...?', pronounce: 'oo EH', en: 'Where is...?', ctx: 'Fill in: les toilettes, le métro, etc.', cities: ['paris'] },
+      { cat: 'directions', phrase: "C'est combien?", pronounce: 'say kohn-BYEN', en: 'How much is it?', ctx: 'For shops and markets. Numbers help.', cities: ['paris'] },
+      { cat: 'feelings', phrase: 'Je suis fatigué', pronounce: 'zhuh swee fah-tee-GAY', en: "I'm tired", ctx: '"Fatiguée" if female. Studio life is universal.', cities: ['paris'] },
+    ],
+  },
+
+  de: {
+    name: 'DEUTSCH',
+    nativeName: 'German',
+    voiceLocale: 'de-DE',
+    accent: '#d4f000',
+    dj: 'einmal noch.',
+    cards: [
+      { cat: 'greetings', phrase: 'Hallo', pronounce: 'HAH-loh', en: 'Hi', ctx: 'Universal. Works any time of day.', cities: ['berlin'] },
+      { cat: 'greetings', phrase: "Wie geht's?", pronounce: 'vee GAYTS', en: "How's it going?", ctx: "Short for 'Wie geht es dir.' Used between friends.", cities: ['berlin'] },
+      { cat: 'greetings', phrase: 'Tschüss', pronounce: 'CHOOSS', en: 'Bye', ctx: 'Casual goodbye. Or "ciao" — Berliners say both.', cities: ['berlin'] },
+      { cat: 'food', phrase: 'Ein Bier, bitte', pronounce: 'ain beer BIT-tuh', en: 'A beer, please', ctx: 'Essential. "Zwei Bier" for two.', cities: ['berlin'] },
+      { cat: 'food', phrase: 'Zahlen, bitte', pronounce: 'TSAH-len BIT-tuh', en: 'Check, please', ctx: 'Literally "to pay, please." Get the waiter\'s attention first.', cities: ['berlin'] },
+      { cat: 'music', phrase: 'Nochmal', pronounce: 'NOKH-mahl', en: 'Again / one more', ctx: 'For when the track needs another play. Or another shot.', cities: ['berlin'] },
+      { cat: 'music', phrase: 'Akkord', pronounce: 'ah-KORT', en: 'Chord', ctx: 'Music term. Hard German T at the end.', cities: ['berlin'] },
+      { cat: 'music', phrase: 'Geil', pronounce: 'GUYL', en: 'Sick / awesome', ctx: 'Universal compliment for a track, a night, a person. Strong.', cities: ['berlin'] },
+      { cat: 'street', phrase: 'Alles klar', pronounce: 'AH-less KLAR', en: 'All good / got it', ctx: 'Confirmation. The Berlin verbal shrug.', cities: ['berlin'] },
+      { cat: 'street', phrase: 'Krass', pronounce: 'KRAHSS', en: 'Wild / intense', ctx: '"Das war krass" = that was wild. Can be positive or negative.', cities: ['berlin'] },
+      { cat: 'directions', phrase: 'Wo ist...?', pronounce: 'voh IST', en: 'Where is...?', ctx: 'U-Bahn (subway), S-Bahn (overground), Klo (toilet).', cities: ['berlin'] },
+      { cat: 'feelings', phrase: 'Müde', pronounce: 'MUE-duh', en: 'Tired', ctx: '"Ich bin müde" = I\'m tired. After Berghain you\'ll need this.', cities: ['berlin'] },
+    ],
+  },
+
+  jp: {
+    name: '日本語',
+    nativeName: 'Japanese',
+    voiceLocale: 'ja-JP',
+    accent: '#c4291f',
+    dj: 'お疲れ様。',
+    cards: [
+      { cat: 'greetings', phrase: 'こんにちは', pronounce: 'kohn-NEE-chee-wah', en: 'Hello', ctx: 'Used in the afternoon. Morning = "ohayou."', cities: ['tokyo'] },
+      { cat: 'greetings', phrase: 'すみません', pronounce: 'soo-mee-mah-SEN', en: 'Excuse me / sorry', ctx: 'Multi-purpose: get attention, apologize, say thanks. Use often.', cities: ['tokyo'] },
+      { cat: 'greetings', phrase: 'ありがとう', pronounce: 'ah-ree-GAH-toh', en: 'Thanks', ctx: 'Casual. Formal: "arigatou gozaimasu."', cities: ['tokyo'] },
+      { cat: 'greetings', phrase: 'お疲れ様', pronounce: 'oh-tsu-kah-reh-SAH-mah', en: 'Good work (after the session)', ctx: 'Said when leaving the studio. Acknowledges the work just done.', cities: ['tokyo'] },
+      { cat: 'food', phrase: 'お会計お願いします', pronounce: 'oh-KAI-kay oh-neh-GAI-shee-mahs', en: 'Check please', ctx: 'Or shorter: "okaikei onegaishimasu."', cities: ['tokyo'] },
+      { cat: 'food', phrase: '美味しい', pronounce: 'oy-SHEE', en: 'Delicious', ctx: 'Higher praise: "totemo oishii" (very delicious).', cities: ['tokyo'] },
+      { cat: 'music', phrase: '音楽', pronounce: 'OHN-gah-koo', en: 'Music', ctx: 'Lit. "sound + comfort." Foundational word.', cities: ['tokyo'] },
+      { cat: 'music', phrase: '和音', pronounce: 'WAH-ohn', en: 'Chord', ctx: 'Lit. "harmony sound." Music theory term.', cities: ['tokyo'] },
+      { cat: 'music', phrase: '琴', pronounce: 'KOH-toh', en: 'Koto', ctx: 'The 13-string Japanese instrument. Pyramid sound in Tokyo world.', cities: ['tokyo'] },
+      { cat: 'street', phrase: 'なるほど', pronounce: 'nah-roo-HOH-doh', en: 'I see / makes sense', ctx: 'Universal "ah, got it." Use when following a story.', cities: ['tokyo'] },
+      { cat: 'street', phrase: 'やばい', pronounce: 'yah-BAI', en: 'Sick / crazy', ctx: 'Originally negative; now positive too. Context matters.', cities: ['tokyo'] },
+      { cat: 'directions', phrase: 'どこですか', pronounce: 'DOH-koh des-kah', en: 'Where is it?', ctx: 'Combine with a noun: "toilet wa doko desu ka."', cities: ['tokyo'] },
+    ],
+  },
+
+  hi: {
+    name: 'हिन्दी',
+    nativeName: 'Hindi',
+    voiceLocale: 'hi-IN',
+    accent: '#d4a32d',
+    dj: 'नमस्ते.',
+    cards: [
+      { cat: 'greetings', phrase: 'नमस्ते', pronounce: 'nah-mah-STEH', en: 'Hello / I bow to you', ctx: 'Universal greeting. Hands together at the chest.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'greetings', phrase: 'धन्यवाद', pronounce: 'DHUN-yah-vahd', en: 'Thank you', ctx: 'Formal thanks. Or use "shukriya" — both work.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'greetings', phrase: 'शुभ प्रभात', pronounce: 'SHOOB prah-BAHT', en: 'Good morning', ctx: 'Use before noon. Pre-yoga / pre-meditation greeting.', cities: ['rishikesh','mysore'] },
+      { cat: 'food', phrase: 'पानी', pronounce: 'PAH-nee', en: 'Water', ctx: 'Most essential word. Always ask for bottled.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'food', phrase: 'चाय', pronounce: 'CHAI', en: 'Tea', ctx: 'Chai = tea. "Chai tea" is redundant. Just chai.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'music', phrase: 'राग', pronounce: 'RAHG', en: 'Raga', ctx: 'A melodic mode. Each raga has a feel, time, season.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'music', phrase: 'ताल', pronounce: 'TAHL', en: 'Rhythm cycle', ctx: 'The rhythmic framework. Teen taal = 16 beats.', cities: ['varanasi','mysore'] },
+      { cat: 'music', phrase: 'सा रे ग म', pronounce: 'sah reh gah mah', en: 'Sa Re Ga Ma', ctx: 'Indian solfege. Equivalent of "do re mi fa" in Western.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'street', phrase: 'अच्छा', pronounce: 'AHCH-cha', en: 'OK / good', ctx: 'Universal acknowledgment. Use often.', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'street', phrase: 'ठीक है', pronounce: 'TEEK heh', en: 'All right', ctx: 'Confirmation. "It\'s fine, it\'s good."', cities: ['rishikesh','varanasi','mysore'] },
+      { cat: 'directions', phrase: 'कितना', pronounce: 'KIT-nah', en: 'How much?', ctx: 'For markets and rickshaws. Negotiate from there.', cities: ['rishikesh','varanasi','mysore'] },
+    ],
+  },
+};
+
+// ============ STATE ============
+const state = {
+  lang: 'es',
+  cat: 'all',
+  cardIdx: 0,
+  flipped: false,
+  languageSkill: 0,
+  studiedCards: new Set(),  // for skill counting — only count first study of a card
+};
+
+// ============ DOM ============
+const card = document.getElementById('card');
+const phrase = document.getElementById('phrase');
+const pronounce = document.getElementById('pronounce');
+const meaning = document.getElementById('meaning');
+const context = document.getElementById('context');
+const frontCat = document.getElementById('frontCat');
+const backCat = document.getElementById('backCat');
+const cityPips = document.getElementById('cityPips');
+const footerCities = document.getElementById('footerCities');
+const counter = document.getElementById('counter');
+const langName = document.getElementById('langName');
+const langMeta = document.getElementById('langMeta');
+const langDj = document.getElementById('langDj');
+const statsVal = document.getElementById('statsVal');
+const audioBtn = document.getElementById('audioBtn');
+
+// ============ HELPERS ============
+function currentDeck() { return DECKS[state.lang]; }
+function filteredCards() {
+  const deck = currentDeck();
+  if (state.cat === 'all') return deck.cards;
+  return deck.cards.filter(c => c.cat === state.cat);
+}
+
+// ============ RENDER ============
+function renderLangChips() {
+  const bar = document.getElementById('langBar');
+  bar.innerHTML = '';
+  Object.entries(DECKS).forEach(([id, deck]) => {
+    const chip = document.createElement('button');
+    chip.className = 'lang-chip' + (id === state.lang ? ' active' : '');
+    chip.innerHTML = `<span>${deck.nativeName.toUpperCase()}</span><span class="lang-chip-native">${deck.name}</span>`;
+    chip.addEventListener('click', () => setLang(id));
+    bar.appendChild(chip);
+  });
+}
+
+function renderCatChips() {
+  const cats = ['all', 'greetings', 'food', 'music', 'street', 'directions', 'feelings'];
+  const bar = document.getElementById('catBar');
+  bar.innerHTML = '';
+  for (const cat of cats) {
+    const chip = document.createElement('button');
+    chip.className = 'cat-chip' + (cat === state.cat ? ' active' : '');
+    chip.textContent = cat;
+    chip.addEventListener('click', () => setCat(cat));
+    bar.appendChild(chip);
+  }
+}
+
+function renderBanner() {
+  const deck = currentDeck();
+  langName.innerHTML = `${deck.name}<em>.</em>`;
+  const cardCount = deck.cards.length;
+  const cityCount = new Set(deck.cards.flatMap(c => c.cities)).size;
+  langMeta.textContent = `— ${deck.nativeName.toUpperCase()} // ${cardCount} CARDS // ${cityCount} ${cityCount === 1 ? 'CITY' : 'CITIES'}`;
+  langDj.textContent = `"${deck.dj}"`;
+  document.documentElement.style.setProperty('--lang-accent', deck.accent);
+}
+
+function renderCard() {
+  const cards = filteredCards();
+  if (cards.length === 0) {
+    phrase.textContent = '—';
+    pronounce.textContent = 'no cards in this category';
+    meaning.textContent = 'try another category';
+    context.textContent = '';
+    counter.innerHTML = `— <strong>0</strong> CARDS —`;
+    return;
+  }
+  state.cardIdx = ((state.cardIdx % cards.length) + cards.length) % cards.length;
+  const c = cards[state.cardIdx];
+
+  // Front
+  phrase.textContent = c.phrase;
+  phrase.className = 'phrase';
+  if (state.lang === 'jp') phrase.classList.add('lang-jp');
+  if (state.lang === 'hi') phrase.classList.add('lang-hi');
+  if (c.phrase.length > 18) phrase.classList.add('long');
+  if (c.phrase.length > 26) phrase.classList.add('very-long');
+  pronounce.textContent = c.pronounce;
+  frontCat.textContent = '— ' + c.cat.toUpperCase();
+
+  // Back
+  meaning.textContent = c.en;
+  context.textContent = c.ctx;
+  backCat.textContent = '— ' + c.cat.toUpperCase();
+  cityPips.innerHTML = '';
+  for (const cityId of c.cities) {
+    const pip = document.createElement('span');
+    pip.className = 'city-pip';
+    pip.textContent = cityId;
+    cityPips.appendChild(pip);
+  }
+  footerCities.textContent = c.cities.map(x => x.toUpperCase()).join(' · ');
+  counter.innerHTML = `— CARD <strong>${state.cardIdx + 1}</strong> OF <strong>${cards.length}</strong> —`;
+}
+
+// ============ INTERACTIONS ============
+function flipCard() {
+  state.flipped = !state.flipped;
+  card.classList.toggle('flipped', state.flipped);
+  if (state.flipped) {
+    // Count skill once per card seen-on-back
+    const cards = filteredCards();
+    if (cards.length === 0) return;
+    const c = cards[state.cardIdx];
+    const cardKey = `${state.lang}::${c.phrase}`;
+    if (!state.studiedCards.has(cardKey)) {
+      state.studiedCards.add(cardKey);
+      state.languageSkill++;
+      statsVal.textContent = state.languageSkill;
+      saveSkill();
+    }
+  }
+}
+card.addEventListener('click', flipCard);
+
+function setLang(langId) {
+  if (state.lang === langId) return;
+  state.lang = langId;
+  state.cardIdx = 0;
+  state.flipped = false;
+  card.classList.remove('flipped');
+  renderLangChips();
+  renderBanner();
+  renderCard();
+  saveState();
+}
+
+function setCat(cat) {
+  if (state.cat === cat) return;
+  state.cat = cat;
+  state.cardIdx = 0;
+  state.flipped = false;
+  card.classList.remove('flipped');
+  renderCatChips();
+  renderCard();
+  saveState();
+}
+
+document.getElementById('prevBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  state.cardIdx--;
+  state.flipped = false;
+  card.classList.remove('flipped');
+  setTimeout(() => renderCard(), 100);
+});
+document.getElementById('nextBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  state.cardIdx++;
+  state.flipped = false;
+  card.classList.remove('flipped');
+  setTimeout(() => renderCard(), 100);
+});
+document.getElementById('shuffleBtn').addEventListener('click', (e) => {
+  e.stopPropagation();
+  const cards = filteredCards();
+  if (cards.length <= 1) return;
+  let next;
+  do { next = Math.floor(Math.random() * cards.length); }
+  while (next === state.cardIdx);
+  state.cardIdx = next;
+  state.flipped = false;
+  card.classList.remove('flipped');
+  setTimeout(() => renderCard(), 100);
+});
+
+// Keyboard
+window.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); flipCard(); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); document.getElementById('prevBtn').click(); }
+  else if (e.key === 'ArrowRight') { e.preventDefault(); document.getElementById('nextBtn').click(); }
+  else if (e.key.toLowerCase() === 's') { document.getElementById('shuffleBtn').click(); }
+  else if (e.key.toLowerCase() === 'p') { e.preventDefault(); playAudio(); }
+});
+
+// ============ AUDIO (Web Speech) ============
+let voicesLoaded = false;
+function loadVoices() {
+  if (!('speechSynthesis' in window)) return;
+  // On Chrome, voices load async — call getVoices() once to trigger load
+  window.speechSynthesis.getVoices();
+  voicesLoaded = true;
+}
+loadVoices();
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function playAudio() {
+  const cards = filteredCards();
+  if (cards.length === 0) return;
+  const c = cards[state.cardIdx];
+  const deck = currentDeck();
+  if (!('speechSynthesis' in window)) {
+    audioBtn.textContent = '— BROWSER LACKS TTS —';
+    return;
+  }
+  try {
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(c.phrase);
+    u.lang = deck.voiceLocale;
+    u.rate = 0.82;
+    u.pitch = 1.0;
+    const voices = window.speechSynthesis.getVoices();
+    const match = voices.find(v => v.lang === deck.voiceLocale)
+              || voices.find(v => v.lang.startsWith(deck.voiceLocale.split('-')[0]));
+    if (match) u.voice = match;
+    audioBtn.classList.add('playing');
+    u.onend = () => audioBtn.classList.remove('playing');
+    u.onerror = () => audioBtn.classList.remove('playing');
+    window.speechSynthesis.speak(u);
+  } catch (e) {
+    audioBtn.classList.remove('playing');
+  }
+}
+
+// ============ PERSIST ============
+async function saveState() {
+  try {
+    await window.storage.set('language_state', JSON.stringify({
+      lang: state.lang,
+      cat: state.cat,
+      languageSkill: state.languageSkill,
+      studiedCards: Array.from(state.studiedCards),
+    }));
+  } catch (e) {}
+}
+
+async function saveSkill() {
+  saveState();
+  // Also merge into shared drum_state so YOU dashboard can read it
+  try {
+    const r = await window.storage.get('drum_state');
+    const existing = (r && r.value) ? JSON.parse(r.value) : {};
+    existing.languageSkill = state.languageSkill;
+    await window.storage.set('drum_state', JSON.stringify(existing));
+  } catch (e) {}
+}
+
+async function loadState() {
+  // First — load character to pick default language
+  try {
+    const r = await window.storage.get('character');
+    if (r && r.value) {
+      const char = JSON.parse(r.value);
+      if (char.language && DECKS[char.language]) {
+        state.lang = char.language;
+      }
+    }
+  } catch (e) {}
+
+  // Then — load language_state to restore prior session
+  try {
+    const r = await window.storage.get('language_state');
+    if (r && r.value) {
+      const saved = JSON.parse(r.value);
+      if (saved.lang && DECKS[saved.lang]) state.lang = saved.lang;
+      if (saved.cat) state.cat = saved.cat;
+      if (typeof saved.languageSkill === 'number') state.languageSkill = saved.languageSkill;
+      if (Array.isArray(saved.studiedCards)) state.studiedCards = new Set(saved.studiedCards);
+    }
+  } catch (e) {}
+
+  // Then — check URL param ?lang=
+  const params = new URLSearchParams(window.location.search);
+  const urlLang = params.get('lang');
+  if (urlLang && DECKS[urlLang]) state.lang = urlLang;
+  const urlCat = params.get('cat');
+  if (urlCat) state.cat = urlCat;
+
+  // Load existing languageSkill from shared drum_state if higher
+  try {
+    const r = await window.storage.get('drum_state');
+    if (r && r.value) {
+      const ds = JSON.parse(r.value);
+      if (typeof ds.languageSkill === 'number' && ds.languageSkill > state.languageSkill) {
+        state.languageSkill = ds.languageSkill;
+      }
+    }
+  } catch (e) {}
+}
+
+// ============ INIT ============
+async function init() {
+  await loadState();
+  renderLangChips();
+  renderCatChips();
+  renderBanner();
+  renderCard();
+  statsVal.textContent = state.languageSkill;
+}
+init();
+</script>
+</body>
+</html>

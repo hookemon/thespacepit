@@ -1198,6 +1198,7 @@
     <div class="city-actions">
       <a class="city-action" id="cityChordsBtn" href="hop_chords.html" target="_blank">CHORDS</a>
       <a class="city-action" id="cityDrumsBtn" href="finger_drum_practice.html" target="_blank">DRUMS</a>
+      <a class="city-action" id="cityLangBtn" href="language.html" target="_blank">LANG</a>
       <a class="city-action" id="cityGardenBtn" href="garden.html" target="_blank">GARDEN</a>
       <a class="city-action" href="studio.html" target="_blank">STUDIO</a>
       <a class="city-action" href="be_here_now.html" target="_blank">BE HERE</a>
@@ -1266,6 +1267,16 @@
       <div class="module-card-desc">Plants tied to every city. Marigolds in Mexico City, cacao in Tulum, tulsi in Rishikesh, sandalwood in Mysore. They grow over real time — even when you're not looking.</div>
       <div class="module-card-features">— 12 PLANTS BY REGION<br>— SACRED / CULINARY / HEALING<br>— REAL-TIME GROWTH<br>— CULTURAL CONTEXT</div>
       <a class="module-launch green" href="garden.html" target="_blank">★ OPEN GARDEN</a>
+    </div>
+
+    <div class="module-card tilt-r">
+      <div class="module-card-head">
+        <div class="module-card-name">LANGUAGE<em>.</em></div>
+        <div class="module-card-tag">SPEAK</div>
+      </div>
+      <div class="module-card-desc">Flashcards for what the city actually says. Spanish in Madrid + Latin America, French in Paris, German in Berlin, Japanese in Tokyo, Hindi in India. Music vocab + street slang + the phrase that defuses any situation.</div>
+      <div class="module-card-features">— 5 LANGUAGES<br>— CITY-TAGGED PHRASES<br>— NATIVE TTS PRONUNCIATION<br>— MUSIC + STREET CATEGORIES</div>
+      <a class="module-launch" href="language.html" target="_blank">★ OPEN LANGUAGE</a>
     </div>
   </div>
 </div>
@@ -1388,6 +1399,23 @@ const CITIES = {
   tokyo: { name: 'TOKYO', mood: 'LANTERN HIRAJOSHI', scale: 'HIRAJOSHI', tagline: 'paper rain, neon temple' },
 };
 
+// City → primary language for the LANG deep-link
+const CITY_LANGUAGE = {
+  brooklyn: null,     // English — no deck needed
+  stlouis: null,
+  mexico: 'es',
+  oaxaca: 'es',
+  tulum: 'es',
+  medellin: 'es',
+  paris: 'fr',
+  madrid: 'es',
+  berlin: 'de',
+  rishikesh: 'hi',
+  varanasi: 'hi',
+  mysore: 'hi',
+  tokyo: 'jp',
+};
+
 // ============ CHARACTER AVATAR RENDERING ============
 const SKIN_TONES = [
   { id: 's1', color: '#fbd5b5' },{ id: 's2', color: '#e8b894' },{ id: 's3', color: '#d29568' },
@@ -1508,6 +1536,7 @@ const state = {
   hopBestLevel: 1,
   gardenSkill: 0,
   chordSkill: 0,
+  languageSkill: 0,
 };
 
 // ============ ELEMENTS ============
@@ -1539,6 +1568,7 @@ async function loadDrumState() {
       state.hopBestLevel = saved.hopBestLevel || 1;
       state.gardenSkill = saved.gardenSkill || 0;
       state.chordSkill = saved.chordSkill || 0;
+      state.languageSkill = saved.languageSkill || 0;
     }
   } catch (e) { /* no drum state yet */ }
 }
@@ -1658,6 +1688,11 @@ function updateYouScreen() {
           <div class="stat-card-val flame">${state.chordSkill}</div>
           <div class="stat-card-meta">across 13 cities · every hop counted</div>
         </div>
+        <div class="stat-card" style="grid-column: span 2;">
+          <div class="stat-card-label">LANGUAGE</div>
+          <div class="stat-card-val">${state.languageSkill}</div>
+          <div class="stat-card-meta">phrases learned · ${langName !== '—' ? 'learning ' + langName.toLowerCase() : 'pick a language'}</div>
+        </div>
       </div>
 
       <div class="character-meta">
@@ -1721,9 +1756,14 @@ document.querySelectorAll('.city-node').forEach(node => {
       const drumsBtn = document.getElementById('cityDrumsBtn');
       const gardenBtn = document.getElementById('cityGardenBtn');
       const chordsBtn = document.getElementById('cityChordsBtn');
+      const langBtn = document.getElementById('cityLangBtn');
       if (drumsBtn) drumsBtn.href = `finger_drum_practice.html?city=${cityId}`;
       if (gardenBtn) gardenBtn.href = `garden.html?city=${cityId}`;
       if (chordsBtn) chordsBtn.href = `hop_chords.html?world=${cityId}`;
+      if (langBtn) {
+        const cityLang = CITY_LANGUAGE[cityId];
+        langBtn.href = cityLang ? `language.html?lang=${cityLang}` : 'language.html';
+      }
     }
     cityPanel.classList.add('visible');
     cityPanelBackdrop.classList.add('visible');
