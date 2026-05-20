@@ -24,7 +24,7 @@ export default function LabModularPage() {
         <header className="relative overflow-hidden px-5 sm:px-8 pt-12 pb-8 border-b-2 border-paper">
           <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(circle at 25% 30%, rgba(232,58,28,0.2), transparent 55%), radial-gradient(circle at 80% 80%, rgba(242,183,5,0.15), transparent 55%)" }} />
           <div className="relative">
-            <Link href="/lab" className="font-mono text-[11px] tracking-[.16em] uppercase text-lamp no-underline">← the lab</Link>
+            <Link href="/lessons" className="font-mono text-[11px] tracking-[.16em] uppercase text-lamp no-underline">← the lab</Link>
             <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mt-3 mb-1 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-redline sp-pulse" />
               <span>ROOM 07 · MODULAR · PATCH PROGRAMMING</span>

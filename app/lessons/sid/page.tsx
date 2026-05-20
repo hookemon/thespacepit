@@ -24,7 +24,7 @@ export default function LabSIDPage() {
         <header className="relative overflow-hidden px-5 sm:px-8 pt-12 pb-8 border-b-2 border-paper">
           <div aria-hidden className="absolute inset-0" style={{ background: "radial-gradient(circle at 20% 30%, rgba(101,199,247,0.22), transparent 55%), radial-gradient(circle at 80% 80%, rgba(122,251,13,0.10), transparent 55%)" }} />
           <div className="relative">
-            <Link href="/lab" className="font-mono text-[11px] tracking-[.16em] uppercase text-lamp no-underline">← the lab</Link>
+            <Link href="/lessons" className="font-mono text-[11px] tracking-[.16em] uppercase text-lamp no-underline">← the lab</Link>
             <div className="font-mono text-[11px] tracking-[.14em] uppercase mt-3 mb-1 flex items-center gap-2" style={{ color: "#65C7F7" }}>
               <span className="w-2 h-2 rounded-full sp-pulse" style={{ background: "#65C7F7" }} />
               <span>ROOM 05 · SID 6581 · C64 DEMOSCENE</span>

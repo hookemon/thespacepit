@@ -263,7 +263,7 @@ function buildKitManifest(meta: ExportMeta) {
       midiNote: { BD: 36, SD: 38, LT: 43, MT: 47, HT: 50, RS: 37, CP: 39, CH: 42, OH: 46 }[v],
     })),
     loop: `loop-${meta.bpm}bpm.wav`,
-    source: "thespacepit.com/lab/909",
+    source: "thespacepit.com/lessons/909",
     exportedAt: new Date().toISOString(),
   };
 }
@@ -271,7 +271,7 @@ function buildKitManifest(meta: ExportMeta) {
 function buildKitReadme(meta: ExportMeta): string {
   return `LAB 909 · ${meta.presetId.toUpperCase()} KIT
 ${meta.bpm} bpm · swing ${Math.round(meta.swing * 100)}%
-Exported from thespacepit.com/lab/909
+Exported from thespacepit.com/lessons/909
 
 What's inside
 -------------
@@ -302,7 +302,7 @@ hip-hop "sample your own kit" move.
 function buildStemsReadme(meta: ExportMeta): string {
   return `LAB 909 · ${meta.presetId.toUpperCase()} STEMS
 ${meta.bpm} bpm · swing ${Math.round(meta.swing * 100)}%
-Exported from thespacepit.com/lab/909
+Exported from thespacepit.com/lessons/909
 
 stems/      — per-voice WAVs (each voice plays its part of the pattern in isolation)
 loop.wav    — the full mix

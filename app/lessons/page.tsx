@@ -142,7 +142,7 @@ export default function LabIndex() {
               );
 
               return open ? (
-                <Link key={room.slug} href={`/lab/${room.slug}`} className="no-underline text-paper">
+                <Link key={room.slug} href={`/lessons/${room.slug}`} className="no-underline text-paper">
                   {Card}
                 </Link>
               ) : (
@@ -201,7 +201,7 @@ export default function LabIndex() {
             <p className="font-serif italic text-[18px] text-paper-2 leading-snug">
               this is room one of seven. real audio in your browser — no plugin, no download. if a
               room you want isn&apos;t live yet, it&apos;s next.{" "}
-              <Link href="/lab/909" className="text-lamp hover:text-redline transition-colors no-underline border-b border-lamp">
+              <Link href="/lessons/909" className="text-lamp hover:text-redline transition-colors no-underline border-b border-lamp">
                 start with the 909
               </Link>
               .

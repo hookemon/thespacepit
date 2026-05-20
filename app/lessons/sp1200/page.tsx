@@ -52,7 +52,7 @@ export default function LabSP1200Page() {
           />
           <div className="relative">
             <Link
-              href="/lab"
+              href="/lessons"
               className="font-mono text-[11px] tracking-[.16em] uppercase text-lamp hover:text-redline transition-colors no-underline"
             >
               ← the lab
@@ -182,13 +182,13 @@ export default function LabSP1200Page() {
             </ul>
             <div className="mt-6 flex gap-3 flex-wrap">
               <Link
-                href="/lab"
+                href="/lessons"
                 className="font-display font-semibold text-[14px] tracking-[.04em] uppercase px-4 py-2.5 border-2 border-paper text-paper hover:bg-paper hover:text-ink transition-colors no-underline"
               >
                 ← back to the lab
               </Link>
               <Link
-                href="/lab/909"
+                href="/lessons/909"
                 className="font-display font-semibold text-[14px] tracking-[.04em] uppercase px-4 py-2.5 border-2 border-lamp text-lamp hover:bg-lamp hover:text-ink transition-colors no-underline"
               >
                 the 909 room →
