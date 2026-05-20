@@ -235,34 +235,67 @@
 <div class="world-bg-layer world-bg-tokyo" data-world="tokyo" aria-hidden="true">
   <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
-      <radialGradient id="hc-tokyo-sun" cx="50%" cy="22%" r="42%">
-        <stop offset="0%" stop-color="#c44438" stop-opacity="0.55"/>
-        <stop offset="45%" stop-color="#c44438" stop-opacity="0.18"/>
-        <stop offset="100%" stop-color="#c44438" stop-opacity="0"/>
+      <radialGradient id="hc-tokyo-broth" cx="50%" cy="50%" r="60%">
+        <stop offset="0%"   stop-color="#c8743e" stop-opacity="0.95"/>
+        <stop offset="100%" stop-color="#3a1a08" stop-opacity="1"/>
       </radialGradient>
     </defs>
-    <rect width="400" height="800" fill="url(#hc-tokyo-sun)"/>
-    <circle cx="200" cy="180" r="62" fill="#c44438" opacity="0.55"/>
-    <rect class="neon"   x="370" y="50"  width="3" height="220" fill="#d96b7d" opacity="0.6"/>
-    <rect class="neon-2" x="380" y="100" width="3" height="320" fill="#ffd400" opacity="0.5"/>
-    <rect class="neon"   x="390" y="60"  width="3" height="380" fill="#c44438" opacity="0.55"/>
-    <rect class="neon-2" x="10"  y="100" width="3" height="220" fill="#5c2858" opacity="0.5"/>
-    <rect class="neon"   x="20"  y="240" width="3" height="180" fill="#d96b7d" opacity="0.4"/>
-    <g class="lantern" opacity="0.6">
-      <ellipse cx="80" cy="410" rx="22" ry="30" fill="#c44438" stroke="#15110d" stroke-width="2"/>
-      <line x1="80" y1="378" x2="80" y2="358" stroke="#15110d" stroke-width="1.5"/>
-      <line x1="80" y1="442" x2="80" y2="462" stroke="#15110d" stroke-width="1.5"/>
-      <rect x="64" y="402" width="32" height="2" fill="#15110d"/>
-      <rect x="64" y="420" width="32" height="2" fill="#15110d"/>
+    <rect width="400" height="800" fill="#f3ecd8"/>
+    <circle cx="350" cy="100" r="26" fill="#c44438" opacity="0.4"/>
+    <rect class="neon"   x="380" y="60"  width="3" height="240" fill="#d96b7d" opacity="0.45"/>
+    <rect class="neon-2" x="390" y="100" width="3" height="320" fill="#ffd400" opacity="0.4"/>
+    <g class="lantern" opacity="0.45" stroke="#15110d" stroke-width="2" fill="none" stroke-linecap="round">
+      <path d="M 160 410 Q 165 360 155 310 Q 145 260 160 210 Q 175 160 165 130"/>
+      <path d="M 200 415 Q 195 365 205 315 Q 215 265 200 215"/>
+      <path d="M 240 408 Q 245 358 235 308 Q 225 258 240 208 Q 255 158 245 128"/>
     </g>
-    <g class="lantern-2" opacity="0.5">
-      <ellipse cx="325" cy="540" rx="17" ry="23" fill="#c44438" stroke="#15110d" stroke-width="2"/>
-      <line x1="325" y1="515" x2="325" y2="498" stroke="#15110d" stroke-width="1.5"/>
-      <line x1="325" y1="565" x2="325" y2="582" stroke="#15110d" stroke-width="1.5"/>
-      <rect x="313" y="534" width="24" height="2" fill="#15110d"/>
+    <ellipse cx="200" cy="650" rx="170" ry="14" fill="#15110d" opacity="0.18"/>
+    <path d="M 60 460 Q 60 625 200 645 Q 340 625 340 460 Z" fill="#15110d" stroke="#15110d" stroke-width="3"/>
+    <g opacity="0.42" stroke="#f3ecd8" stroke-width="1.6" fill="none">
+      <path d="M 70 500 Q 100 488 130 500 Q 160 512 190 500 Q 220 488 250 500 Q 280 512 310 500 Q 340 488 360 500"/>
+      <path d="M 80 540 Q 110 528 140 540 Q 170 552 200 540 Q 230 528 260 540 Q 290 552 320 540"/>
+      <path d="M 90 580 Q 120 568 150 580 Q 180 592 210 580 Q 240 568 270 580 Q 300 592 330 580"/>
     </g>
-    <path d="M 0 730 L 130 590 L 175 605 L 215 590 L 285 625 L 400 730 Z" fill="#15110d" opacity="0.16"/>
-    <path d="M 165 610 L 175 605 L 215 590 L 240 605 L 215 605 L 195 615 Z" fill="#f3ecd8" opacity="0.4"/>
+    <ellipse cx="200" cy="460" rx="140" ry="22" fill="#15110d" stroke="#15110d" stroke-width="3"/>
+    <ellipse cx="200" cy="460" rx="135" ry="20" fill="url(#hc-tokyo-broth)"/>
+    <g opacity="0.85" stroke="#d4a32d" stroke-width="2" fill="none">
+      <ellipse cx="170" cy="455" rx="38" ry="6"/>
+      <ellipse cx="220" cy="463" rx="40" ry="7"/>
+      <ellipse cx="185" cy="450" rx="48" ry="5"/>
+      <ellipse cx="210" cy="465" rx="32" ry="6"/>
+      <ellipse cx="195" cy="460" rx="44" ry="6"/>
+    </g>
+    <g stroke="#d4a32d" stroke-width="2" fill="none" opacity="0.7" stroke-linecap="round">
+      <path d="M 140 448 Q 130 442 122 444"/>
+      <path d="M 262 462 Q 272 458 280 460"/>
+    </g>
+    <g fill="#5a8a47" stroke="#15110d" stroke-width="0.9">
+      <circle cx="158" cy="452" r="5"/>
+      <circle cx="232" cy="455" r="5"/>
+      <circle cx="195" cy="458" r="5"/>
+      <circle cx="172" cy="465" r="4"/>
+      <circle cx="248" cy="463" r="4"/>
+      <circle cx="180" cy="450" r="4"/>
+    </g>
+    <g fill="#f3ecd8" opacity="0.65">
+      <circle cx="158" cy="452" r="2"/>
+      <circle cx="232" cy="455" r="2"/>
+      <circle cx="195" cy="458" r="2"/>
+      <circle cx="172" cy="465" r="1.5"/>
+      <circle cx="248" cy="463" r="1.5"/>
+      <circle cx="180" cy="450" r="1.5"/>
+    </g>
+    <g transform="translate(260, 460)">
+      <circle r="10" fill="#f3ecd8" stroke="#15110d" stroke-width="1.5"/>
+      <path d="M -3 -6 Q 6 -8 6 0 Q 6 7 -2 6 Q -7 4 -5 -2 Z" fill="#d96b7d" stroke="#15110d" stroke-width="0.8"/>
+    </g>
+    <g transform="translate(60, 360) rotate(-12)" opacity="0.8">
+      <rect x="0" y="0"  width="280" height="4" fill="#6a5e4a" stroke="#15110d" stroke-width="1"/>
+      <rect x="0" y="12" width="280" height="4" fill="#6a5e4a" stroke="#15110d" stroke-width="1"/>
+      <polygon points="280,0  296,2  280,4"   fill="#3a322a" stroke="#15110d" stroke-width="0.8"/>
+      <polygon points="280,12 296,14 280,16"  fill="#3a322a" stroke="#15110d" stroke-width="0.8"/>
+    </g>
+    <text x="20" y="745" font-family="serif" font-size="60" fill="#c8743e" opacity="0.22" font-weight="700">そば</text>
   </svg>
 </div>
 
