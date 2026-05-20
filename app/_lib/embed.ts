@@ -22,6 +22,7 @@ export type Embed = {
  * Returns seconds (integer). Returns 0 if not present.
  */
 function parseYouTubeTimestamp(url: string): number {
+  if (!url) return 0;
   const m = url.match(/[?&](?:t|start)=([0-9hms]+)/i);
   if (!m) return 0;
   const v = m[1];
@@ -60,6 +61,9 @@ const SOUNDCLOUD_RE = /(?:^|\/\/)(?:www\.)?soundcloud\.com\/([^/?#]+\/(?:sets\/)
 const MIXCLOUD_RE = /(?:^|\/\/)(?:www\.)?mixcloud\.com\/([^/?#]+\/[^/?#]+)/;
 
 export function parseEmbed(url: string): Embed {
+  if (!url) {
+    return { kind: "unknown", src: "", aspectRatio: 16 / 9, rawUrl: "" };
+  }
   const ytMatch = url.match(YT_RE);
   if (ytMatch) {
     const id = ytMatch[1];
