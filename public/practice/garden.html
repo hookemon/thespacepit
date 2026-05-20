@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheSpacePit — Garden</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ecd8;
+    --paper-2: #ebe2c8;
+    --paper-3: #e3d9bb;
+    --ink: #15110d;
+    --ink-2: #3a322a;
+    --ink-3: #6a5e4a;
+    --yellow: #ffd400;
+    --yellow-soft: #f0d480;
+    --terracotta: #c8743e;
+    --teal: #2a5556;
+    --red: #c44438;
+    --green: #5a8a47;
+    --green-deep: #3d6230;
+    --green-soft: #8aae74;
+    --plum: #5c2858;
+    --rose: #d96b7d;
+    --gold: #d4a32d;
+    --earth: #6b4d2a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top left, rgba(90,138,71,0.10), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(200,116,62,0.06), transparent 40%),
+      var(--paper);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--paper);
+    position: relative;
+    z-index: 2;
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+  }
+
+  /* Header */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 14px 20px 12px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 24px; height: 24px;
+    background: var(--green);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .brand-name em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--terracotta);
+  }
+  .practice-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    padding: 4px 9px;
+    background: var(--ink);
+    color: var(--green-soft);
+    border-radius: 100px;
+  }
+  .title-block {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .title-block h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 44px;
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+  }
+  .title-block h1 em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--green-deep);
+  }
+  .subtitle {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    padding-bottom: 2px;
+  }
+  .subtitle strong { color: var(--ink); font-weight: 500; }
+  .subtitle em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--ink);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stats-bar::before {
+    content: '';
+    position: absolute;
+    right: -28px;
+    top: -28px;
+    width: 88px;
+    height: 88px;
+    background: var(--green);
+    border-radius: 50%;
+    opacity: 0.95;
+  }
+  .stat-block { position: relative; z-index: 2; }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.4px;
+    color: var(--paper);
+    opacity: 0.7;
+    margin-bottom: 3px;
+  }
+  .stat-val {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    color: var(--green-soft);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .stat-val.flame { color: var(--gold); }
+
+  /* Sections */
+  .section-head {
+    padding: 16px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--ink-3);
+  }
+  .section-action {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* Garden grid */
+  .garden-grid {
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .plant-slot {
+    aspect-ratio: 1;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .plant-slot:nth-child(odd) { transform: rotate(-0.5deg); }
+  .plant-slot:nth-child(even) { transform: rotate(0.4deg); }
+  .plant-slot:hover {
+    transform: rotate(0deg) translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .plant-slot.empty {
+    background: var(--paper-3);
+    border-style: dashed;
+  }
+  .empty-mark {
+    width: 36px; height: 36px;
+    border: 1.5px dashed var(--ink-3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-3);
+    font-family: 'DM Mono', monospace;
+    font-size: 16px;
+    font-weight: 300;
+  }
+  .empty-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.3px;
+    color: var(--ink-3);
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+  .plant-svg-wrap {
+    width: 70%; height: 70%;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    position: relative;
+  }
+  .plant-svg-wrap svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s ease-out, opacity 0.5s;
+  }
+  .stage-seed .plant-svg-wrap svg { transform: scale(0.22); opacity: 0.55; }
+  .stage-sprout .plant-svg-wrap svg { transform: scale(0.42); opacity: 0.8; }
+  .stage-growing .plant-svg-wrap svg { transform: scale(0.68); opacity: 0.92; }
+  .stage-flowering .plant-svg-wrap svg { transform: scale(0.9); opacity: 1; }
+  .stage-mature .plant-svg-wrap svg { transform: scale(1); opacity: 1; }
+
+  .plant-slot.stage-seed .plant-svg-wrap::before {
+    content: '';
+    width: 18px; height: 14px;
+    background: var(--earth);
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    position: absolute;
+    bottom: 14%;
+    z-index: -1;
+  }
+
+  .plant-name {
+    position: absolute;
+    bottom: 4px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    letter-spacing: 1px;
+    color: var(--ink);
+    background: rgba(243,236,216,0.92);
+    padding: 2px 0;
+  }
+  .plant-stage-tag {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 2px 5px;
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.8px;
+    border-radius: 2px;
+  }
+  .plant-stage-tag.mature { background: var(--green); color: var(--ink); }
+
+  /* Catalog */
+  .catalog-section { padding-bottom: 24px; }
+  .filter-chips {
+    padding: 0 20px 12px;
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .filter-chips::-webkit-scrollbar { display: none; }
+  .filter-chip {
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    padding: 5px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s, color 0.15s;
+  }
+  .filter-chip.active {
+    background: var(--green);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+
+  .catalog-grid {
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .catalog-card {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+    overflow: hidden;
+    position: relative;
+    color: var(--ink);
+    font-family: inherit;
+    text-align: left;
+    padding: 0;
+  }
+  .catalog-card:nth-child(odd) { transform: rotate(-0.4deg); }
+  .catalog-card:nth-child(even) { transform: rotate(0.4deg); }
+  .catalog-card:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .catalog-card-img {
+    height: 86px;
+    background: var(--paper-3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 2px solid var(--ink);
+  }
+  .catalog-card-img svg { width: 70%; height: 70%; }
+  .catalog-card-body { padding: 8px 10px 10px; }
+  .catalog-card-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: -0.01em;
+    margin-bottom: 4px;
+  }
+  .catalog-card-origin {
+    font-family: 'DM Mono', monospace;
+    font-size: 7.5px;
+    letter-spacing: 1px;
+    color: var(--ink-3);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+  }
+  .catalog-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3px;
+  }
+  .catalog-card-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 0.8px;
+    padding: 2px 5px;
+    background: var(--ink);
+    color: var(--green-soft);
+    border-radius: 2px;
+  }
+  .catalog-card-tag.sacred { background: var(--plum); color: var(--paper); }
+  .catalog-card-tag.culinary { background: var(--terracotta); color: var(--paper); }
+  .catalog-card-tag.healing { background: var(--green); color: var(--ink); }
+  .catalog-card-tag.ornamental { background: var(--rose); color: var(--paper); }
+  .catalog-card-tag.ceremonial { background: var(--gold); color: var(--ink); }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(21,17,13,0.5);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-backdrop.visible { opacity: 1; pointer-events: auto; }
+  .modal {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(100%);
+    max-width: 520px;
+    width: 100%;
+    background: var(--paper);
+    border-top: 2px solid var(--ink);
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+    z-index: 60;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+    max-height: 88vh;
+    overflow-y: auto;
+    box-shadow: 0 -6px 0 var(--ink);
+  }
+  .modal.visible { transform: translateX(-50%) translateY(0); }
+  .modal-head {
+    position: sticky;
+    top: 0;
+    background: var(--paper);
+    padding: 16px 20px 12px;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    z-index: 2;
+  }
+  .modal-close {
+    background: transparent;
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--ink); color: var(--paper); }
+  .modal-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-3);
+    margin-bottom: 3px;
+  }
+  .modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    line-height: 0.95;
+    letter-spacing: -0.02em;
+  }
+  .modal-title em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .modal-latin {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-3);
+    margin-top: 4px;
+  }
+  .modal-body { padding: 16px 20px 24px; }
+  .modal-illustration {
+    width: 100%;
+    height: 140px;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .modal-illustration svg { width: 65%; height: 75%; }
+  .modal-illustration-tag {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 4px 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.2px;
+  }
+  .modal-tags-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 14px;
+  }
+  .modal-tags-row .catalog-card-tag {
+    font-size: 8px;
+    padding: 3px 7px;
+  }
+  .modal-section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-3);
+    margin: 14px 0 6px;
+    text-transform: uppercase;
+  }
+  .modal-section-text {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--ink);
+    font-weight: 400;
+  }
+  .modal-section-text em {
+    font-style: italic;
+    color: var(--terracotta);
+  }
+  .modal-progress {
+    margin: 14px 0 0;
+    padding: 14px;
+    background: var(--ink);
+    color: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .modal-progress-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .modal-progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--green-soft);
+  }
+  .modal-progress-stage {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--paper);
+    text-transform: uppercase;
+  }
+  .progress-bar {
+    height: 10px;
+    background: var(--ink-2);
+    border: 1.5px solid var(--paper);
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--green-soft);
+    transition: width 1s ease-out;
+  }
+  .progress-fill.mature { background: var(--green); }
+  .modal-progress-time {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--paper);
+    opacity: 0.7;
+    margin-top: 6px;
+    text-align: right;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .modal-btn {
+    flex: 1;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    padding: 11px 14px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+  }
+  .modal-btn.primary { background: var(--green); color: var(--ink); }
+  .modal-btn.danger { background: var(--terracotta); color: var(--paper); }
+  .modal-btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+  .modal-btn:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--green-soft);
+    padding: 11px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--green);
+    z-index: 200;
+    transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .footer {
+    padding: 18px 20px 28px;
+    border-top: 2px solid var(--ink);
+    margin-top: 16px;
+    background: var(--paper-3);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 14px;
+    color: var(--ink-3);
+    text-align: center;
+    line-height: 1.5;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">TheSpacePit<em>.</em></div>
+    </div>
+    <div class="practice-tag">★ GARDEN</div>
+  </div>
+  <div class="title-block">
+    <h1>garden<em>.</em></h1>
+    <div class="subtitle">
+      PLANT + <strong>LEARN</strong><br>
+      grows in real time<br>
+      <em>tied to every city</em>
+    </div>
+  </div>
+</header>
+
+<div class="stats-bar">
+  <div class="stat-block">
+    <div class="stat-label">GARDEN SKILL</div>
+    <div class="stat-val" id="gardenSkillVal">0</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">GROWN</div>
+    <div class="stat-val flame" id="grownVal">0</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">KNOWN</div>
+    <div class="stat-val" id="knownVal">0</div>
+  </div>
+</div>
+
+<div class="section-head">
+  <span class="section-label">— YOUR GARDEN // 6 SLOTS</span>
+  <span class="section-action">tap to tend</span>
+</div>
+<div class="garden-grid" id="gardenGrid"></div>
+
+<div class="catalog-section">
+  <div class="section-head" style="margin-top: 6px;">
+    <span class="section-label">— PLANT CATALOG</span>
+    <span class="section-action">tap to plant</span>
+  </div>
+  <div class="filter-chips" id="filterChips">
+    <button class="filter-chip active" data-filter="all">ALL</button>
+    <button class="filter-chip" data-filter="sacred">SACRED</button>
+    <button class="filter-chip" data-filter="ceremonial">CEREMONIAL</button>
+    <button class="filter-chip" data-filter="culinary">CULINARY</button>
+    <button class="filter-chip" data-filter="healing">HEALING</button>
+    <button class="filter-chip" data-filter="ornamental">ORNAMENTAL</button>
+  </div>
+  <div class="catalog-grid" id="catalogGrid"></div>
+</div>
+
+<div class="footer">
+  <em>"to plant a garden is to believe in tomorrow."</em>
+</div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="modal" id="modal">
+  <div class="modal-head">
+    <div>
+      <div class="modal-eyebrow" id="modalEyebrow">— FROM MEXICO CITY</div>
+      <div class="modal-title" id="modalTitle">MARIGOLD</div>
+      <div class="modal-latin" id="modalLatin">Tagetes erecta · Cempasúchil</div>
+    </div>
+    <button class="modal-close" id="modalClose">×</button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+
+// ============ STORAGE SHIM ============
+// Maps window.storage (Claude artifact API) to localStorage when deployed to a real domain.
+if (!window.storage) {
+  window.storage = {
+    async get(key) { const v = localStorage.getItem(key); return v ? { key, value: v } : null; },
+    async set(key, value) { localStorage.setItem(key, value); return { key, value }; },
+    async delete(key) { localStorage.removeItem(key); return { key, deleted: true }; },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!prefix || (k && k.startsWith(prefix))) keys.push(k);
+      }
+      return { keys, prefix };
+    }
+  };
+}
+
+
+// ============ PLANT CATALOG ============
+const PLANTS = {
+  marigold: {
+    id: 'marigold', name: 'MARIGOLD', latin: 'Tagetes erecta', common: 'Cempasúchil',
+    origin: 'MEXICO CITY / OAXACA', categories: ['sacred', 'ornamental'],
+    description: 'Bright orange flowers that bloom in autumn. The petals scattered across paths during Día de los Muertos guide the ancestors home.',
+    tradition: 'Sacred to the Mexica. Petals laid in pathways from grave to home during Día de los Muertos. The smell, the color, and the season all carry meaning.',
+    use: 'Ceremonial paths and altars. Edible petals can dye rice and corn. Strong natural pest repellent in gardens.',
+    sacred: 'The bridge between the living and the dead. The brightest color in autumn before the dark.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <line x1="40" y1="60" x2="40" y2="78" stroke-width="2"/>
+      <path d="M 35,68 Q 28,65 26,72" fill="#5a8a47"/>
+      <path d="M 45,70 Q 53,67 54,75" fill="#5a8a47"/>
+      <circle cx="40" cy="38" r="22" fill="#ff8a1f"/>
+      <circle cx="40" cy="38" r="16" fill="#ffb347"/>
+      <circle cx="40" cy="38" r="10" fill="#ff6f0f"/>
+      <circle cx="40" cy="38" r="5" fill="#c44438"/>
+    </g></svg>`,
+  },
+  cacao: {
+    id: 'cacao', name: 'CACAO', latin: 'Theobroma cacao', common: 'kakaw',
+    origin: 'TULUM / YUCATÁN', categories: ['sacred', 'ceremonial'],
+    description: 'A small tree that grows pods directly on its trunk. Inside each pod, the seeds that become chocolate.',
+    tradition: 'Drunk warm and unsweetened by the Maya before war, marriage, and prayer. The Linnaean name "Theobroma" means "food of the gods" — literal translation.',
+    use: 'Ceremonial drink (cacao ceremony, still practiced). Modern dark chocolate. Beans were also currency in pre-Columbian Mesoamerica.',
+    sacred: 'Heart-opener. The cacao spirit is feminine in many traditions. Drink it warm, sit, and listen.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <line x1="40" y1="14" x2="40" y2="8" stroke-width="2"/>
+      <ellipse cx="40" cy="70" rx="6" ry="2" fill="#5a8a47"/>
+      <path d="M 28,22 Q 25,42 32,62 Q 40,72 48,62 Q 55,42 52,22 Q 40,14 28,22 Z" fill="#a04a1f"/>
+      <path d="M 32,26 Q 33,42 36,58" fill="none" stroke-width="1.2"/>
+      <path d="M 40,24 Q 40,42 40,60" fill="none" stroke-width="1.2"/>
+      <path d="M 48,26 Q 47,42 44,58" fill="none" stroke-width="1.2"/>
+    </g></svg>`,
+  },
+  maguey: {
+    id: 'maguey', name: 'MAGUEY', latin: 'Agave americana', common: 'agave',
+    origin: 'OAXACA', categories: ['ceremonial', 'culinary'],
+    description: 'A rosette of thick blue-green spears. Takes years — sometimes decades — to mature, then sends up a single flower stalk and dies. The heart is roasted to make mezcal.',
+    tradition: 'Mayahuel was the Aztec goddess of agave. Pulque, the fermented sap, was sacred and pre-dated the conquest by millennia. Mezcal is the smoke-roasted distillate.',
+    use: 'Mezcal, pulque, tequila (a specific blue agave). Fiber from leaves for rope, paper, cloth. Sap as sweetener.',
+    sacred: 'Patience and transformation. The plant gives everything at the moment it flowers, then is done. Maestros mezcaleros are guardians of this lineage.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="70" rx="22" ry="3" fill="#6b4d2a"/>
+      <polygon points="40,70 18,65 22,28" fill="#7a9882"/>
+      <polygon points="40,70 25,68 30,20" fill="#8aae8a"/>
+      <polygon points="40,70 38,16 45,16" fill="#9abea0"/>
+      <polygon points="40,70 50,20 55,28" fill="#8aae8a"/>
+      <polygon points="40,70 58,28 62,65" fill="#7a9882"/>
+    </g></svg>`,
+  },
+  tulsi: {
+    id: 'tulsi', name: 'TULSI', latin: 'Ocimum sanctum', common: 'Holy Basil',
+    origin: 'RISHIKESH / VARANASI', categories: ['sacred', 'healing'],
+    description: 'A small leafy herb planted in the courtyard of nearly every traditional Hindu home. Watered each morning with a prayer. The leaves are bitter, slightly clove-like.',
+    tradition: 'Considered an earthly form of the goddess Lakshmi. Daily prayers (tulsi puja) at sunrise and sunset. Beads from the woody stem are used for malas.',
+    use: 'Adaptogenic tea (excellent for stress). Daily ritual offering. Modern research confirms many traditional medicinal uses.',
+    sacred: 'The plant *is* divinity, not a symbol of it. Tending tulsi is itself a form of devotion. There are temples built around single plants.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="72" rx="12" ry="3" fill="#6b4d2a"/>
+      <line x1="40" y1="72" x2="40" y2="20" stroke-width="2"/>
+      <line x1="40" y1="45" x2="34" y2="38" stroke-width="1.5"/>
+      <line x1="40" y1="55" x2="46" y2="48" stroke-width="1.5"/>
+      <line x1="40" y1="35" x2="46" y2="28" stroke-width="1.5"/>
+      <line x1="40" y1="35" x2="34" y2="28" stroke-width="1.5"/>
+      <ellipse cx="32" cy="38" rx="6" ry="9" fill="#5a8a47" transform="rotate(-30 32 38)"/>
+      <ellipse cx="48" cy="48" rx="6" ry="9" fill="#5a8a47" transform="rotate(30 48 48)"/>
+      <ellipse cx="48" cy="28" rx="6" ry="9" fill="#5a8a47" transform="rotate(30 48 28)"/>
+      <ellipse cx="32" cy="28" rx="6" ry="9" fill="#5a8a47" transform="rotate(-30 32 28)"/>
+      <ellipse cx="40" cy="22" rx="5" ry="7" fill="#7a9c5a"/>
+    </g></svg>`,
+  },
+  sandalwood: {
+    id: 'sandalwood', name: 'SANDALWOOD', latin: 'Santalum album', common: 'chandan',
+    origin: 'MYSORE', categories: ['sacred', 'healing'],
+    description: 'A slow-growing parasitic tree that takes 30+ years for its heartwood to reach full fragrance. The wood is yellowish; the oil is one of the oldest perfumes on Earth.',
+    tradition: 'Mysore was the historic center of sandalwood; the royal court regulated harvest for centuries. Used as paste on the forehead (tilak), in incense, in funeral rites.',
+    use: 'Incense, essential oil, paste for ritual marks. Highly endangered now — most "sandalwood" oil sold today is something else. The real thing is precious and slow.',
+    sacred: 'Cooling, both physically and energetically. The fragrance is used to calm the mind before meditation. Burned for the dying.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="74" rx="14" ry="3" fill="#6b4d2a"/>
+      <path d="M 40,74 L 40,32 Q 38,28 35,26 Q 30,22 28,18" fill="none" stroke-width="3"/>
+      <path d="M 40,38 Q 44,32 48,28 Q 52,22 56,18" fill="none" stroke-width="2.5"/>
+      <path d="M 40,52 Q 36,48 32,46" fill="none" stroke-width="2"/>
+      <path d="M 40,58 Q 46,54 50,52" fill="none" stroke-width="2"/>
+      <ellipse cx="28" cy="18" rx="5" ry="6" fill="#7a9c5a"/>
+      <ellipse cx="56" cy="18" rx="5" ry="6" fill="#7a9c5a"/>
+      <ellipse cx="35" cy="26" rx="4" ry="5" fill="#8aae74"/>
+      <ellipse cx="46" cy="28" rx="4" ry="5" fill="#8aae74"/>
+      <ellipse cx="32" cy="46" rx="3" ry="4" fill="#5a8a47"/>
+      <ellipse cx="50" cy="52" rx="3" ry="4" fill="#5a8a47"/>
+    </g></svg>`,
+  },
+  lotus: {
+    id: 'lotus', name: 'LOTUS', latin: 'Nelumbo nucifera', common: 'kamal',
+    origin: 'VARANASI', categories: ['sacred', 'ornamental'],
+    description: 'A water plant that roots in mud and rises clean. The petals open at sunrise, close at dusk. Found on every sacred river of South and East Asia.',
+    tradition: 'The seat of Saraswati, Lakshmi, Brahma. In Buddhism, the symbol of enlightenment rising from the suffering of the world. Different colored lotuses for different deities.',
+    use: 'Sacred offering. Edible seeds and rhizomes in many Asian cuisines. The bloom itself in ceremony, never the cut flower.',
+    sacred: 'The first symbol students of yoga and Buddhism encounter. Rooted in mud, untouched by mud — the whole instruction in a single image.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <path d="M 22,68 Q 32,66 40,68 Q 48,66 58,68" stroke-width="1.5" fill="none"/>
+      <line x1="40" y1="50" x2="40" y2="68" stroke-width="2"/>
+      <path d="M 40,40 Q 22,38 22,28 Q 30,22 40,28 Z" fill="#ff9eb2"/>
+      <path d="M 40,40 Q 58,38 58,28 Q 50,22 40,28 Z" fill="#ff9eb2"/>
+      <path d="M 40,40 Q 28,36 30,22 Q 40,18 40,28 Z" fill="#ffc6d0"/>
+      <path d="M 40,40 Q 52,36 50,22 Q 40,18 40,28 Z" fill="#ffc6d0"/>
+      <ellipse cx="40" cy="42" rx="22" ry="8" fill="#ffb6c1"/>
+      <ellipse cx="40" cy="42" rx="14" ry="14" fill="#ffd0d8"/>
+      <ellipse cx="40" cy="42" rx="6" ry="6" fill="#ffd400"/>
+    </g></svg>`,
+  },
+  whitesage: {
+    id: 'whitesage', name: 'WHITE SAGE', latin: 'Salvia apiana', common: 'sacred sage',
+    origin: 'NORTH AMERICA (Indigenous lands)', categories: ['sacred', 'healing'],
+    description: 'A silver-leaved plant native to California and the Southwest. Sacred to many Indigenous nations. Currently over-harvested and at risk due to commercial demand.',
+    tradition: 'Smudging — burning the dried leaves — is a ceremony belonging to specific Indigenous traditions. Grown in the home garden, used responsibly, is one thing. Stripping wild populations for sale is another.',
+    use: 'Smudging in ceremony. Garden tea. Best to grow your own or buy from Indigenous-led farms, not from gas stations.',
+    sacred: 'Held by Indigenous peoples long before it became a wellness product. The honest relationship with this plant means knowing where yours came from.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="74" rx="12" ry="3" fill="#6b4d2a"/>
+      <line x1="40" y1="74" x2="40" y2="35" stroke-width="2"/>
+      <ellipse cx="32" cy="40" rx="6" ry="10" fill="#b8c5b0" transform="rotate(-30 32 40)"/>
+      <ellipse cx="48" cy="40" rx="6" ry="10" fill="#b8c5b0" transform="rotate(30 48 40)"/>
+      <ellipse cx="30" cy="28" rx="5" ry="9" fill="#a8b4a0" transform="rotate(-25 30 28)"/>
+      <ellipse cx="50" cy="28" rx="5" ry="9" fill="#a8b4a0" transform="rotate(25 50 28)"/>
+      <ellipse cx="40" cy="22" rx="5" ry="9" fill="#c8d4c0"/>
+      <ellipse cx="36" cy="52" rx="5" ry="8" fill="#a8b4a0" transform="rotate(-20 36 52)"/>
+      <ellipse cx="44" cy="52" rx="5" ry="8" fill="#a8b4a0" transform="rotate(20 44 52)"/>
+    </g></svg>`,
+  },
+  lavender: {
+    id: 'lavender', name: 'LAVENDER', latin: 'Lavandula angustifolia', common: 'true lavender',
+    origin: 'MADRID / MEDITERRANEAN', categories: ['healing', 'culinary'],
+    description: 'Silver stems with purple flower spikes. The Mediterranean answer to insomnia, cuts on the skin, and unwashed laundry. Bees love it.',
+    tradition: 'Roman bathwater. Medieval strewing herb. The French Provençal fields. The same plant has been doing the same job for two thousand years.',
+    use: 'Sleep pillows. Tea. Culinary (subtle, easy to overdo). Essential oil. The flowers dry better than they bloom.',
+    sacred: 'Cleansing in the practical sense — scent that resets the room. The gentle herb you reach for when you can\'t reach the others.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="74" rx="14" ry="3" fill="#6b4d2a"/>
+      <line x1="32" y1="74" x2="30" y2="35" stroke-width="1.5"/>
+      <line x1="40" y1="74" x2="40" y2="28" stroke-width="1.5"/>
+      <line x1="48" y1="74" x2="50" y2="35" stroke-width="1.5"/>
+      <ellipse cx="30" cy="32" rx="4" ry="9" fill="#a87bc8"/>
+      <ellipse cx="40" cy="25" rx="4" ry="11" fill="#9466b8"/>
+      <ellipse cx="50" cy="32" rx="4" ry="9" fill="#a87bc8"/>
+      <circle cx="30" cy="28" r="2" fill="#6e4d8c"/>
+      <circle cx="30" cy="34" r="2" fill="#6e4d8c"/>
+      <circle cx="40" cy="22" r="2" fill="#6e4d8c"/>
+      <circle cx="40" cy="28" r="2" fill="#6e4d8c"/>
+      <circle cx="50" cy="28" r="2" fill="#6e4d8c"/>
+      <circle cx="50" cy="34" r="2" fill="#6e4d8c"/>
+    </g></svg>`,
+  },
+  cherryblossom: {
+    id: 'cherryblossom', name: 'CHERRY BLOSSOM', latin: 'Prunus serrulata', common: 'sakura',
+    origin: 'TOKYO', categories: ['ornamental'],
+    description: 'A flowering tree that blooms for about a week each spring. The entire country pauses to watch. Then the petals fall.',
+    tradition: 'Hanami — the practice of sitting under blossoming trees with food and friends. Annual, communal, brief. The forecast for blossom progression is national news.',
+    use: 'Ornamental beyond all reason. Edible blossoms in sakuramochi and salted preserves. The wood is used for furniture.',
+    sacred: 'Mono no aware — the gentle sadness of impermanence. Beauty made more by ending soon. The whole Buddhist instruction in a falling petal.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <line x1="20" y1="50" x2="60" y2="40" stroke-width="3"/>
+      <line x1="35" y1="48" x2="40" y2="28" stroke-width="2"/>
+      <line x1="50" y1="44" x2="55" y2="30" stroke-width="2"/>
+      <line x1="25" y1="50" x2="20" y2="35" stroke-width="2"/>
+      <g fill="#ffc6d8">
+        <circle cx="22" cy="34" r="5"/>
+        <circle cx="18" cy="38" r="4"/>
+        <circle cx="38" cy="26" r="5"/>
+        <circle cx="42" cy="22" r="4"/>
+        <circle cx="56" cy="28" r="5"/>
+        <circle cx="52" cy="33" r="4"/>
+        <circle cx="60" cy="32" r="4"/>
+      </g>
+      <g fill="#ffd400">
+        <circle cx="22" cy="34" r="1.5"/>
+        <circle cx="38" cy="26" r="1.5"/>
+        <circle cx="56" cy="28" r="1.5"/>
+      </g>
+    </g></svg>`,
+  },
+  hops: {
+    id: 'hops', name: 'HOPS', latin: 'Humulus lupulus', common: 'lupulus',
+    origin: 'BERLIN / NORTHERN EUROPE', categories: ['culinary', 'healing'],
+    description: 'A climbing vine that produces papery green cones. The cones hold lupulin, the bitter resin that flavors beer and helps it keep.',
+    tradition: 'Replaced gruit as the dominant beer flavoring around the 8th century in Bavaria. Reinheitsgebot (1516) made hops legally mandatory. Beer and hops are now one identity.',
+    use: 'Beer (bittering, aroma, preservation). Hops pillows for sleep. Tinctures for anxiety. Edible young shoots in spring.',
+    sacred: 'Transformation of grain into drink, ordinary into ritual. Every brewery is a small temple. The bitterness exists so the rest can shine.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <path d="M 40,72 Q 38,55 42,40 Q 45,25 40,12" fill="none" stroke-width="2"/>
+      <ellipse cx="30" cy="50" rx="6" ry="10" fill="#a8c878" transform="rotate(-25 30 50)"/>
+      <ellipse cx="50" cy="35" rx="6" ry="10" fill="#a8c878" transform="rotate(20 50 35)"/>
+      <ellipse cx="28" cy="32" rx="6" ry="10" fill="#a8c878" transform="rotate(-15 28 32)"/>
+      <ellipse cx="48" cy="55" rx="6" ry="10" fill="#a8c878" transform="rotate(35 48 55)"/>
+      <g fill="none" stroke="#15110d" stroke-width="0.8">
+        <path d="M 30,42 L 30,58 M 26,46 L 34,46 M 26,50 L 34,50 M 26,54 L 34,54"/>
+        <path d="M 50,27 L 50,43 M 46,31 L 54,31 M 46,35 L 54,35 M 46,39 L 54,39"/>
+      </g>
+    </g></svg>`,
+  },
+  lemonverbena: {
+    id: 'lemonverbena', name: 'LEMON VERBENA', latin: 'Aloysia citrodora', common: 'verveine',
+    origin: 'PARIS (via South America)', categories: ['culinary', 'healing'],
+    description: 'A South American shrub brought to Europe in the 1780s. The leaves smell like a sharper, cleaner lemon than the fruit itself. Crush one between your fingers — that is the smell.',
+    tradition: 'Verveine became the classic French digestif tea. Adopted into Provençal gardens. The smell is summer in a glass of hot water.',
+    use: 'Tisane (herbal tea) after meals. Perfumery. Cocktails. Crushed in fingerbowls in old French restaurants.',
+    sacred: 'The plant that brightens whatever room it\'s in. Joy in herbal form. The kind of thing you bring back from a market in Provence and never quite re-find at home.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.5" stroke-linejoin="round">
+      <ellipse cx="40" cy="72" rx="12" ry="3" fill="#6b4d2a"/>
+      <line x1="40" y1="72" x2="40" y2="28" stroke-width="2"/>
+      <line x1="40" y1="55" x2="32" y2="48" stroke-width="1.2"/>
+      <line x1="40" y1="55" x2="48" y2="48" stroke-width="1.2"/>
+      <line x1="40" y1="40" x2="30" y2="32" stroke-width="1.2"/>
+      <line x1="40" y1="40" x2="50" y2="32" stroke-width="1.2"/>
+      <ellipse cx="28" cy="48" rx="6" ry="3" fill="#a8d088" transform="rotate(-25 28 48)"/>
+      <ellipse cx="52" cy="48" rx="6" ry="3" fill="#a8d088" transform="rotate(25 52 48)"/>
+      <ellipse cx="26" cy="32" rx="6" ry="3" fill="#a8d088" transform="rotate(-30 26 32)"/>
+      <ellipse cx="54" cy="32" rx="6" ry="3" fill="#a8d088" transform="rotate(30 54 32)"/>
+      <ellipse cx="40" cy="24" rx="6" ry="3" fill="#a8d088"/>
+      <g stroke="#3d6230" stroke-width="0.6" fill="none">
+        <line x1="22" y1="49" x2="34" y2="47"/>
+        <line x1="46" y1="47" x2="58" y2="49"/>
+      </g>
+    </g></svg>`,
+  },
+  bougainvillea: {
+    id: 'bougainvillea', name: 'BOUGAINVILLEA', latin: 'Bougainvillea spectabilis', common: 'paper flower',
+    origin: 'MEDELLÍN', categories: ['ornamental'],
+    description: 'A vine that covers walls and houses in entire neighborhoods of Medellín. The "flowers" are actually colored leaves — paper-thin, electric magenta, lasting all season.',
+    tradition: 'Named for an 18th-century French navigator who never saw it bloom right. Adopted into Latin America, the Mediterranean, anywhere warm. Climbing the walls of houses by mid-summer.',
+    use: 'Ornamental, structural — covers entire fences and pergolas. The thorns make it a security plant too. Bracts can be dried.',
+    sacred: 'Color as joy. The plant that decided the wall was boring and fixed it. Eternal spring in Medellín means bougainvillea never stops.',
+    svg: `<svg viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg"><g stroke="#15110d" stroke-width="1.2" stroke-linejoin="round">
+      <line x1="40" y1="72" x2="40" y2="20" stroke-width="2"/>
+      <line x1="40" y1="50" x2="22" y2="40" stroke-width="1.5"/>
+      <line x1="40" y1="40" x2="58" y2="28" stroke-width="1.5"/>
+      <line x1="40" y1="30" x2="28" y2="22" stroke-width="1.5"/>
+      <g fill="#d63384">
+        <polygon points="22,40 18,36 16,42 14,38 18,44"/>
+        <polygon points="58,28 62,24 64,30 66,26 62,32"/>
+        <polygon points="28,22 24,18 22,24 20,20 24,26"/>
+        <polygon points="40,18 36,14 34,20 38,22 42,16"/>
+      </g>
+      <g fill="#ff6ba8">
+        <polygon points="22,40 26,36 30,42 26,46 22,42"/>
+        <polygon points="58,28 54,24 50,30 54,34 58,30"/>
+        <polygon points="28,22 32,18 36,24 32,28 28,24"/>
+      </g>
+      <g fill="#ffd400">
+        <circle cx="22" cy="40" r="1.5"/>
+        <circle cx="58" cy="28" r="1.5"/>
+        <circle cx="28" cy="22" r="1.5"/>
+        <circle cx="40" cy="18" r="1.5"/>
+      </g>
+    </g></svg>`,
+  },
+};
+
+// ============ GROWTH STAGES (in seconds) ============
+const STAGES = [
+  { id: 'seed',      label: 'SEED',      until: 30  },
+  { id: 'sprout',    label: 'SPROUT',    until: 90  },
+  { id: 'growing',   label: 'GROWING',   until: 180 },
+  { id: 'flowering', label: 'FLOWERING', until: 300 },
+  { id: 'mature',    label: 'MATURE',    until: Infinity },
+];
+
+function getStageFor(plantedAt) {
+  const elapsed = (Date.now() - plantedAt) / 1000;
+  for (const s of STAGES) {
+    if (elapsed < s.until) return s;
+  }
+  return STAGES[STAGES.length - 1];
+}
+
+function progressTo(plantedAt) {
+  const elapsed = (Date.now() - plantedAt) / 1000;
+  const totalToMature = STAGES[STAGES.length - 2].until; // 300
+  return Math.min(1, elapsed / totalToMature);
+}
+
+function timeRemaining(plantedAt) {
+  const elapsed = (Date.now() - plantedAt) / 1000;
+  const stage = getStageFor(plantedAt);
+  if (stage.id === 'mature') return null;
+  const remaining = stage.until - elapsed;
+  if (remaining < 60) return Math.ceil(remaining) + 's';
+  return Math.ceil(remaining / 60) + 'm';
+}
+
+// ============ STATE ============
+const state = {
+  slots: [null, null, null, null, null, null],   // each: { plantId, plantedAt } or null
+  grown: 0,
+  knownIds: new Set(),
+  filter: 'all',
+  selectedPlantId: null,
+  selectedSlotIdx: null,
+};
+
+// ============ STORAGE ============
+async function loadState() {
+  try {
+    const r = await window.storage.get('garden_state');
+    if (r && r.value) {
+      const saved = JSON.parse(r.value);
+      state.slots = saved.slots || state.slots;
+      state.grown = saved.grown || 0;
+      state.knownIds = new Set(saved.knownIds || []);
+    }
+  } catch (e) { /* no save yet */ }
+}
+
+async function saveState() {
+  const data = {
+    slots: state.slots,
+    grown: state.grown,
+    knownIds: Array.from(state.knownIds),
+    gardenSkill: state.grown,
+  };
+  try {
+    await window.storage.set('garden_state', JSON.stringify(data));
+    // Also update drum_state for cross-app character chip
+    try {
+      const r = await window.storage.get('drum_state');
+      const existing = r && r.value ? JSON.parse(r.value) : {};
+      existing.gardenSkill = state.grown;
+      await window.storage.set('drum_state', JSON.stringify(existing));
+    } catch (e) { /* ok */ }
+  } catch (e) { /* ok */ }
+}
+
+// ============ RENDER ============
+function renderGarden() {
+  const grid = document.getElementById('gardenGrid');
+  grid.innerHTML = '';
+  state.slots.forEach((slot, idx) => {
+    const div = document.createElement('div');
+    div.className = 'plant-slot';
+    div.dataset.idx = idx;
+    if (!slot) {
+      div.classList.add('empty');
+      div.innerHTML = `
+        <div class="empty-mark">+</div>
+        <div class="empty-label">EMPTY</div>
+      `;
+    } else {
+      const plant = PLANTS[slot.plantId];
+      const stage = getStageFor(slot.plantedAt);
+      div.classList.add('stage-' + stage.id);
+      div.innerHTML = `
+        <div class="plant-stage-tag ${stage.id === 'mature' ? 'mature' : ''}">${stage.label}</div>
+        <div class="plant-svg-wrap">${plant.svg}</div>
+        <div class="plant-name">${plant.name}</div>
+      `;
+    }
+    div.addEventListener('click', () => onSlotClick(idx));
+    grid.appendChild(div);
+  });
+  // Stats
+  document.getElementById('gardenSkillVal').textContent = state.grown;
+  document.getElementById('grownVal').textContent = state.slots.filter(s => s && getStageFor(s.plantedAt).id === 'mature').length;
+  document.getElementById('knownVal').textContent = state.knownIds.size;
+}
+
+function renderCatalog() {
+  const grid = document.getElementById('catalogGrid');
+  grid.innerHTML = '';
+  Object.values(PLANTS).forEach(plant => {
+    if (state.filter !== 'all' && !plant.categories.includes(state.filter)) return;
+    // City filter from atlas deep-link
+    if (state.cityFilter && state.cityFilter.length > 0) {
+      const matches = state.cityFilter.some(kw => plant.origin.toUpperCase().includes(kw));
+      if (!matches) return;
+    }
+    const card = document.createElement('button');
+    card.className = 'catalog-card';
+    card.dataset.id = plant.id;
+    const tags = plant.categories.map(cat =>
+      `<span class="catalog-card-tag ${cat}">${cat.toUpperCase()}</span>`
+    ).join('');
+    card.innerHTML = `
+      <div class="catalog-card-img">${plant.svg}</div>
+      <div class="catalog-card-body">
+        <div class="catalog-card-name">${plant.name}</div>
+        <div class="catalog-card-origin">— ${plant.origin}</div>
+        <div class="catalog-card-tags">${tags}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => onCatalogClick(plant.id));
+    grid.appendChild(card);
+  });
+}
+
+// ============ INTERACTION ============
+function onSlotClick(idx) {
+  const slot = state.slots[idx];
+  state.selectedSlotIdx = idx;
+  if (!slot) {
+    // Empty — prompt to pick a plant
+    showPlantPickerModal(idx);
+  } else {
+    // Has plant — show info
+    showPlantInfo(slot.plantId, idx);
+  }
+}
+
+function onCatalogClick(plantId) {
+  // Find an empty slot
+  const emptyIdx = state.slots.findIndex(s => s === null);
+  if (emptyIdx === -1) {
+    showToast('NO EMPTY SLOTS — HARVEST FIRST');
+    return;
+  }
+  state.selectedPlantId = plantId;
+  state.selectedSlotIdx = emptyIdx;
+  showPlantInfo(plantId, null, true);  // true = "plant me" mode
+}
+
+function showPlantPickerModal(slotIdx) {
+  showToast('TAP A PLANT FROM THE CATALOG BELOW');
+  // Scroll to catalog
+  document.getElementById('catalogGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function showPlantInfo(plantId, slotIdx, plantingMode = false) {
+  const plant = PLANTS[plantId];
+  state.knownIds.add(plantId);
+
+  document.getElementById('modalEyebrow').textContent = '— FROM ' + plant.origin;
+  document.getElementById('modalTitle').textContent = plant.name;
+  document.getElementById('modalLatin').innerHTML = `<em>${plant.latin}</em> · ${plant.common}`;
+
+  const slot = slotIdx != null ? state.slots[slotIdx] : null;
+  const stage = slot ? getStageFor(slot.plantedAt) : null;
+  const progress = slot ? progressTo(slot.plantedAt) : 0;
+  const remaining = slot ? timeRemaining(slot.plantedAt) : null;
+  const tags = plant.categories.map(cat =>
+    `<span class="catalog-card-tag ${cat}">${cat.toUpperCase()}</span>`
+  ).join('');
+
+  let progressBlock = '';
+  if (slot) {
+    progressBlock = `
+      <div class="modal-progress">
+        <div class="modal-progress-row">
+          <span class="modal-progress-label">— GROWTH</span>
+          <span class="modal-progress-stage">${stage.label}</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill ${stage.id === 'mature' ? 'mature' : ''}" style="width: ${progress * 100}%"></div>
+        </div>
+        ${remaining ? `<div class="modal-progress-time">${remaining} until next stage</div>` : '<div class="modal-progress-time">fully mature</div>'}
+      </div>
+    `;
+  }
+
+  let actions = '';
+  if (plantingMode) {
+    actions = `
+      <div class="modal-actions">
+        <button class="modal-btn" id="cancelPlantBtn">CANCEL</button>
+        <button class="modal-btn primary" id="confirmPlantBtn">★ PLANT IT</button>
+      </div>
+    `;
+  } else if (slot && stage.id === 'mature') {
+    actions = `
+      <div class="modal-actions">
+        <button class="modal-btn" id="closeBtn">KEEP IT</button>
+        <button class="modal-btn danger" id="harvestBtn">★ HARVEST</button>
+      </div>
+    `;
+  } else if (slot) {
+    actions = `
+      <div class="modal-actions">
+        <button class="modal-btn" id="closeBtn">CLOSE</button>
+        <button class="modal-btn danger" id="uprootBtn">UPROOT</button>
+      </div>
+    `;
+  }
+
+  document.getElementById('modalBody').innerHTML = `
+    <div class="modal-illustration">
+      <div class="modal-illustration-tag">${plant.origin.split('/')[0].trim()}</div>
+      ${plant.svg}
+    </div>
+    <div class="modal-tags-row">${tags}</div>
+    <div class="modal-section-text">${plant.description}</div>
+    <div class="modal-section-label">— TRADITION</div>
+    <div class="modal-section-text">${plant.tradition}</div>
+    <div class="modal-section-label">— USE</div>
+    <div class="modal-section-text">${plant.use}</div>
+    <div class="modal-section-label">— SACRED MEANING</div>
+    <div class="modal-section-text"><em>${plant.sacred}</em></div>
+    ${progressBlock}
+    ${actions}
+  `;
+
+  // Wire up dynamic buttons
+  const confirmBtn = document.getElementById('confirmPlantBtn');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', () => {
+      plantInSlot(state.selectedSlotIdx, plantId);
+      closeModal();
+      showToast('PLANTED // CHECK BACK SOON');
+    });
+  }
+  const cancelBtn = document.getElementById('cancelPlantBtn');
+  if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+  const harvestBtn = document.getElementById('harvestBtn');
+  if (harvestBtn) {
+    harvestBtn.addEventListener('click', () => {
+      harvestSlot(slotIdx);
+      closeModal();
+      showToast('HARVESTED // GARDEN SKILL +1');
+    });
+  }
+  const uprootBtn = document.getElementById('uprootBtn');
+  if (uprootBtn) {
+    uprootBtn.addEventListener('click', () => {
+      if (confirm('Uproot this plant before maturity? You won\'t get garden skill.')) {
+        uprootSlot(slotIdx);
+        closeModal();
+      }
+    });
+  }
+  const closeBtn = document.getElementById('closeBtn');
+  if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+  document.getElementById('modalBackdrop').classList.add('visible');
+  document.getElementById('modal').classList.add('visible');
+  saveState();
+}
+
+function plantInSlot(idx, plantId) {
+  state.slots[idx] = { plantId, plantedAt: Date.now() };
+  saveState();
+  renderGarden();
+}
+
+function harvestSlot(idx) {
+  state.slots[idx] = null;
+  state.grown += 1;
+  saveState();
+  renderGarden();
+}
+
+function uprootSlot(idx) {
+  state.slots[idx] = null;
+  saveState();
+  renderGarden();
+}
+
+function closeModal() {
+  document.getElementById('modalBackdrop').classList.remove('visible');
+  document.getElementById('modal').classList.remove('visible');
+}
+
+document.getElementById('modalClose').addEventListener('click', closeModal);
+document.getElementById('modalBackdrop').addEventListener('click', closeModal);
+
+// Filter chips
+document.querySelectorAll('#filterChips .filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#filterChips .filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.filter = chip.dataset.filter;
+    renderCatalog();
+  });
+});
+
+// Toast
+let toastTimer = null;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2400);
+}
+
+// Growth ticker — re-render the garden every 5 seconds to show stage advancement
+setInterval(() => {
+  renderGarden();
+}, 5000);
+
+// ============ INIT ============
+async function init() {
+  await loadState();
+
+  // Atlas deep-link: ?city= filters catalog to that city's plants
+  const urlParams = new URLSearchParams(window.location.search);
+  const cityParam = urlParams.get('city');
+  if (cityParam) {
+    const CITY_KEYWORDS = {
+      brooklyn: [], stlouis: [], paris: ['PARIS'], madrid: ['MADRID'], berlin: ['BERLIN'],
+      mexico: ['MEXICO'], oaxaca: ['OAXACA'], tulum: ['TULUM', 'YUCAT'],
+      medellin: ['MEDELLÍN', 'MEDELLIN'], tokyo: ['TOKYO'],
+      rishikesh: ['RISHIKESH'], varanasi: ['VARANASI'], mysore: ['MYSORE'],
+    };
+    const CITY_NAMES = {
+      brooklyn: 'Brooklyn', stlouis: 'St. Louis', paris: 'Paris', madrid: 'Madrid',
+      berlin: 'Berlin', mexico: 'Mexico City', oaxaca: 'Oaxaca', tulum: 'Tulum',
+      medellin: 'Medellín', tokyo: 'Tokyo', rishikesh: 'Rishikesh',
+      varanasi: 'Varanasi', mysore: 'Mysore',
+    };
+    const keywords = CITY_KEYWORDS[cityParam];
+    if (keywords && keywords.length > 0) {
+      state.cityFilter = keywords;
+      state.cityFilterName = CITY_NAMES[cityParam];
+      injectCityBanner(state.cityFilterName);
+    }
+  }
+
+  renderGarden();
+  renderCatalog();
+}
+
+function injectCityBanner(cityName) {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    margin: 0 20px 12px;
+    background: var(--ink);
+    color: var(--paper);
+    padding: 14px 16px;
+    border: 2px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--green);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  `;
+  banner.innerHTML = `
+    <div>
+      <div style="font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.4px; color: var(--green-soft); margin-bottom: 4px;">— PLANTS FROM</div>
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 22px; letter-spacing: -0.02em; line-height: 1;">${cityName}<span style="font-family: 'Fraunces', serif; font-style: italic; color: var(--gold); font-weight: 500;">.</span></div>
+    </div>
+    <button id="clearCityFilter" style="background: var(--paper); color: var(--ink); border: 2px solid var(--paper); padding: 8px 12px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 1.3px; cursor: pointer;">SEE ALL</button>
+  `;
+  const catalogSection = document.querySelector('.catalog-section');
+  const sectionHead = catalogSection.querySelector('.section-head');
+  catalogSection.insertBefore(banner, sectionHead.nextSibling);
+  document.getElementById('clearCityFilter').addEventListener('click', () => {
+    state.cityFilter = null;
+    banner.remove();
+    renderCatalog();
+  });
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheSpacePit — Make Yourself</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&family=Noto+Sans+Devanagari:wght@500&family=Noto+Sans+JP:wght@500&family=Noto+Sans+Arabic:wght@500&family=Noto+Sans+SC:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ecd8;
+    --paper-2: #ebe2c8;
+    --paper-3: #e3d9bb;
+    --ink: #15110d;
+    --ink-2: #3a322a;
+    --ink-3: #6a5e4a;
+    --yellow: #ffd400;
+    --yellow-soft: #f0d480;
+    --terracotta: #c8743e;
+    --teal: #2a5556;
+    --red: #c44438;
+    --green: #5a8a47;
+    --plum: #5c2858;
+    --rose: #d96b7d;
+    --gold: #d4a32d;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  *:not(input):not(textarea) { user-select: none; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at top left, rgba(255,212,0,0.10), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(200,116,62,0.06), transparent 40%),
+      var(--paper);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--paper);
+    position: relative;
+    z-index: 2;
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+    padding-bottom: 88px;  /* room for save bar */
+  }
+
+  /* Header */
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 14px 20px 12px;
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 24px; height: 24px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    position: relative;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+  }
+  .brand-name em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--terracotta);
+  }
+  .practice-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    padding: 4px 9px;
+    background: var(--ink);
+    color: var(--yellow);
+    border-radius: 100px;
+  }
+  .title-block {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .title-block h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 38px;
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+  }
+  .title-block h1 em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--terracotta);
+  }
+  .subtitle {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    padding-bottom: 2px;
+  }
+  .subtitle strong { color: var(--ink); font-weight: 500; }
+  .subtitle em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* Avatar preview */
+  .avatar-block {
+    background: linear-gradient(180deg, var(--paper-2) 0%, var(--paper-3) 100%);
+    border-bottom: 2px solid var(--ink);
+    padding: 18px 20px 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .avatar-block::before {
+    content: '';
+    position: absolute;
+    left: -30px;
+    top: 30px;
+    width: 70px;
+    height: 70px;
+    background: var(--yellow);
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+    opacity: 0.35;
+    transform: rotate(-12deg);
+  }
+  .avatar-block::after {
+    content: '';
+    position: absolute;
+    right: -20px;
+    bottom: -10px;
+    width: 60px;
+    height: 60px;
+    background: var(--terracotta);
+    border-radius: 50%;
+    opacity: 0.18;
+  }
+  .avatar-stage {
+    width: 180px;
+    height: 220px;
+    margin: 0 auto;
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    box-shadow: 4px 4px 0 var(--ink);
+    position: relative;
+    overflow: hidden;
+    z-index: 2;
+  }
+  .avatar-svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    animation: gentleBob 4s ease-in-out infinite;
+  }
+  @keyframes gentleBob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+  }
+  .avatar-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-top: 12px;
+    position: relative;
+    z-index: 2;
+    line-height: 1;
+    min-height: 22px;
+  }
+  .avatar-name.empty { color: var(--ink-3); font-style: italic; font-family: 'Fraunces', serif; font-weight: 400; }
+  .avatar-pronouns {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--ink-3);
+    margin-top: 4px;
+    position: relative;
+    z-index: 2;
+  }
+  .avatar-pronouns em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* Sections */
+  .section {
+    padding: 18px 20px 6px;
+    border-bottom: 1.5px solid var(--paper-3);
+  }
+  .section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+  }
+  .section-num {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    font-size: 13px;
+    color: var(--terracotta);
+  }
+  .section-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+  }
+  .section-title em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* Name input */
+  .name-input {
+    width: 100%;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    padding: 12px 14px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    outline: none;
+    margin-bottom: 14px;
+  }
+  .name-input::placeholder {
+    color: var(--ink-3);
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+  .name-input:focus {
+    background: var(--paper);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+
+  /* Pronoun chips */
+  .chip-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .chip {
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    color: var(--ink);
+    padding: 6px 12px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform 0.08s, box-shadow 0.08s, background 0.15s, color 0.15s;
+  }
+  .chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .chip.active { background: var(--ink); color: var(--yellow); }
+
+  .custom-pronoun {
+    margin-top: 8px;
+    display: none;
+  }
+  .custom-pronoun.visible { display: block; }
+  .custom-pronoun-input {
+    width: 100%;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    padding: 8px 10px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    outline: none;
+  }
+  .custom-pronoun-input:focus { background: var(--paper-2); }
+
+  /* Swatch grid (skin, hair color, eye color, outfit color) */
+  .swatch-row {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+  }
+  .swatch-row.large { grid-template-columns: repeat(6, 1fr); }
+  .swatch {
+    aspect-ratio: 1;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform 0.08s, box-shadow 0.08s;
+    position: relative;
+  }
+  .swatch:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .swatch.active {
+    border-width: 3px;
+    box-shadow: 3px 3px 0 var(--terracotta);
+    transform: translate(-1px, -1px) scale(1.08);
+  }
+  .swatch.active::after {
+    content: '';
+    position: absolute;
+    inset: 4px;
+    border: 2px solid var(--paper);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  /* Sub-label */
+  .sub-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--ink-3);
+    margin: 10px 0 6px;
+    text-transform: uppercase;
+  }
+
+  /* Style tile grid (hair styles, outfit styles) */
+  .tile-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+  }
+  .tile {
+    aspect-ratio: 1;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    cursor: pointer;
+    transition: transform 0.08s, box-shadow 0.08s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    position: relative;
+  }
+  .tile:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .tile.active {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--terracotta);
+    transform: translate(-1px, -1px);
+  }
+  .tile svg { width: 70%; height: 70%; }
+  .tile-label {
+    position: absolute;
+    bottom: 3px;
+    left: 0; right: 0;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 7px;
+    letter-spacing: 1px;
+    color: var(--ink);
+    text-transform: uppercase;
+  }
+
+  /* Language chips (with scripts) */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .lang-chip {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 2px 2px 0 var(--ink);
+    cursor: pointer;
+    padding: 10px 12px;
+    text-align: left;
+    transition: transform 0.08s, box-shadow 0.08s, background 0.15s;
+  }
+  .lang-chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .lang-chip.active {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--terracotta);
+  }
+  .lang-script {
+    font-size: 18px;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .lang-script.latin {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+  }
+  .lang-script.devanagari { font-family: 'Noto Sans Devanagari', sans-serif; }
+  .lang-script.jp { font-family: 'Noto Sans JP', sans-serif; }
+  .lang-script.ar { font-family: 'Noto Sans Arabic', sans-serif; }
+  .lang-script.cn { font-family: 'Noto Sans SC', sans-serif; }
+  .lang-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--ink-3);
+    text-transform: uppercase;
+  }
+
+  /* City cards */
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+  .city-pick {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+    transition: transform 0.08s, box-shadow 0.08s;
+    overflow: hidden;
+    position: relative;
+  }
+  .city-pick:nth-child(odd) { transform: rotate(-0.4deg); }
+  .city-pick:nth-child(even) { transform: rotate(0.3deg); }
+  .city-pick:hover {
+    transform: rotate(0) translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .city-pick.active {
+    box-shadow: 3px 3px 0 var(--terracotta);
+    transform: rotate(0);
+  }
+  .city-pick-bar {
+    height: 6px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .city-pick.active .city-pick-bar { height: 10px; }
+  .city-pick-body { padding: 9px 11px 11px; }
+  .city-pick-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+  .city-pick-vibe {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.3;
+  }
+
+  /* Background "why" cards */
+  .why-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  .why-card {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--ink);
+    cursor: pointer;
+    padding: 10px 14px;
+    text-align: left;
+    transition: transform 0.08s, box-shadow 0.08s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .why-card:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .why-card.active {
+    background: var(--yellow);
+    box-shadow: 3px 3px 0 var(--terracotta);
+  }
+  .why-num {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    color: var(--terracotta);
+    line-height: 1;
+    width: 32px;
+    flex-shrink: 0;
+    text-align: center;
+  }
+  .why-card.active .why-num { color: var(--ink); }
+  .why-text { line-height: 1.3; }
+  .why-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    margin-bottom: 2px;
+  }
+  .why-desc {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 12px;
+    color: var(--ink-3);
+  }
+  .why-card.active .why-desc { color: var(--ink-2); }
+
+  /* Save bar (sticky bottom) */
+  .save-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 520px;
+    width: 100%;
+    background: var(--paper);
+    border-top: 2px solid var(--ink);
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+    padding: 14px 20px;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .save-progress {
+    flex: 1;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--ink-3);
+    line-height: 1.4;
+  }
+  .save-progress strong { color: var(--ink); font-weight: 500; }
+  .save-progress em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .save-btn {
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--ink);
+    padding: 13px 18px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  .save-btn:hover:not(:disabled) {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .save-btn:active:not(:disabled) {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .save-btn:disabled {
+    background: var(--paper-3);
+    color: var(--ink-3);
+    cursor: not-allowed;
+    box-shadow: 2px 2px 0 var(--ink-3);
+  }
+
+  /* Welcome modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(21,17,13,0.6);
+    z-index: 80;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .modal-backdrop.visible { opacity: 1; pointer-events: auto; }
+  .modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, calc(-50% + 20px));
+    max-width: 460px;
+    width: calc(100% - 32px);
+    background: var(--paper);
+    border: 2.5px solid var(--ink);
+    box-shadow: 8px 8px 0 var(--terracotta);
+    z-index: 90;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.35s cubic-bezier(0.2,0.8,0.2,1);
+    padding: 24px 24px 22px;
+    text-align: center;
+  }
+  .modal.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%);
+  }
+  .modal-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--terracotta);
+    margin-bottom: 6px;
+  }
+  .modal-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 16px;
+  }
+  .modal-title em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .modal-summary {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 15px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin-bottom: 18px;
+  }
+  .modal-summary strong {
+    color: var(--ink);
+    font-weight: 500;
+    font-style: normal;
+    font-family: 'Bricolage Grotesque', sans-serif;
+  }
+  .modal-btn-row {
+    display: flex;
+    gap: 8px;
+  }
+  .modal-btn {
+    flex: 1;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    padding: 11px 14px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.3px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+  }
+  .modal-btn.primary { background: var(--yellow); }
+  .modal-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">TheSpacePit<em>.</em></div>
+    </div>
+    <div class="practice-tag">★ CHARACTER</div>
+  </div>
+  <div class="title-block">
+    <h1>make<br><em>yourself.</em></h1>
+    <div class="subtitle">
+      WHO YOU ARE<br>
+      <strong>customize all of it</strong><br>
+      <em>before you begin</em>
+    </div>
+  </div>
+</header>
+
+<!-- Avatar Preview -->
+<div class="avatar-block">
+  <div class="avatar-stage" id="avatarStage">
+    <svg class="avatar-svg" id="avatarSvg" viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="avatar-name empty" id="avatarName">your name here</div>
+  <div class="avatar-pronouns" id="avatarPronouns">— <em>pick your pronouns</em></div>
+</div>
+
+<!-- Section 1: Identity -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">01</span>
+    <span class="section-title">name<em>.</em></span>
+  </div>
+  <input type="text" class="name-input" id="nameInput" placeholder="what should we call you?" maxlength="24">
+
+  <div class="sub-label">— PRONOUNS</div>
+  <div class="chip-row" id="pronounChips">
+    <button class="chip" data-pronoun="she/her">she/her</button>
+    <button class="chip" data-pronoun="he/him">he/him</button>
+    <button class="chip" data-pronoun="they/them">they/them</button>
+    <button class="chip" data-pronoun="custom">custom</button>
+  </div>
+  <div class="custom-pronoun" id="customPronounWrap">
+    <input type="text" class="custom-pronoun-input" id="customPronounInput" placeholder="e.g. ze/zir, fae/faer, ...">
+  </div>
+</div>
+
+<!-- Section 2: Skin -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">02</span>
+    <span class="section-title">skin<em>.</em></span>
+  </div>
+  <div class="swatch-row" id="skinSwatches"></div>
+</div>
+
+<!-- Section 3: Hair -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">03</span>
+    <span class="section-title">hair<em>.</em></span>
+  </div>
+  <div class="sub-label">— STYLE</div>
+  <div class="tile-row" id="hairStyles"></div>
+  <div class="sub-label">— COLOR</div>
+  <div class="swatch-row" id="hairColors"></div>
+</div>
+
+<!-- Section 4: Eyes -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">04</span>
+    <span class="section-title">eyes<em>.</em></span>
+  </div>
+  <div class="swatch-row large" id="eyeColors"></div>
+</div>
+
+<!-- Section 5: Outfit -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">05</span>
+    <span class="section-title">outfit<em>.</em></span>
+  </div>
+  <div class="sub-label">— VIBE</div>
+  <div class="tile-row" id="outfitStyles"></div>
+  <div class="sub-label">— COLOR</div>
+  <div class="swatch-row" id="outfitColors"></div>
+</div>
+
+<!-- Section 6: Language -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">06</span>
+    <span class="section-title">language to <em>learn.</em></span>
+  </div>
+  <div class="lang-grid" id="langGrid"></div>
+</div>
+
+<!-- Section 7: Starting City -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">07</span>
+    <span class="section-title">starting <em>city.</em></span>
+  </div>
+  <div class="city-grid" id="cityGrid"></div>
+</div>
+
+<!-- Section 8: Why -->
+<div class="section">
+  <div class="section-head">
+    <span class="section-num">08</span>
+    <span class="section-title">why <em>you're here.</em></span>
+  </div>
+  <div class="why-grid" id="whyGrid"></div>
+</div>
+
+</div>
+
+<!-- Sticky save bar -->
+<div class="save-bar">
+  <div class="save-progress" id="saveProgress">
+    — <strong>0/8</strong> filled // <em>keep going</em>
+  </div>
+  <button class="save-btn" id="saveBtn" disabled>★ SAVE</button>
+</div>
+
+<!-- Welcome modal -->
+<div class="modal-backdrop" id="modalBackdrop"></div>
+<div class="modal" id="modal">
+  <div class="modal-eyebrow">— READY</div>
+  <div class="modal-title" id="modalTitle">welcome<em>.</em></div>
+  <div class="modal-summary" id="modalSummary"></div>
+  <div class="modal-btn-row">
+    <button class="modal-btn" id="modalEdit">EDIT</button>
+    <button class="modal-btn primary" id="modalEnter">★ BEGIN</button>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+// ============ STORAGE SHIM ============
+// Maps window.storage (Claude artifact API) to localStorage when deployed to a real domain.
+if (!window.storage) {
+  window.storage = {
+    async get(key) { const v = localStorage.getItem(key); return v ? { key, value: v } : null; },
+    async set(key, value) { localStorage.setItem(key, value); return { key, value }; },
+    async delete(key) { localStorage.removeItem(key); return { key, deleted: true }; },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!prefix || (k && k.startsWith(prefix))) keys.push(k);
+      }
+      return { keys, prefix };
+    }
+  };
+}
+
+
+// ============ OPTION DATA ============
+const SKIN_TONES = [
+  { id: 's1', color: '#fbd5b5', name: 'tone 1' },
+  { id: 's2', color: '#e8b894', name: 'tone 2' },
+  { id: 's3', color: '#d29568', name: 'tone 3' },
+  { id: 's4', color: '#a87139', name: 'tone 4' },
+  { id: 's5', color: '#7a4f24', name: 'tone 5' },
+  { id: 's6', color: '#4e2f15', name: 'tone 6' },
+];
+
+const HAIR_COLORS = [
+  { id: 'h1', color: '#15110d', name: 'black' },
+  { id: 'h2', color: '#3d2415', name: 'dark brown' },
+  { id: 'h3', color: '#6b4423', name: 'brown' },
+  { id: 'h4', color: '#d4a35a', name: 'blonde' },
+  { id: 'h5', color: '#a83b1f', name: 'auburn' },
+  { id: 'h6', color: '#8e8a82', name: 'gray' },
+  { id: 'h7', color: '#d96b7d', name: 'pink' },
+  { id: 'h8', color: '#2a5556', name: 'teal' },
+];
+
+const EYE_COLORS = [
+  { id: 'e1', color: '#3d2415', name: 'dark brown' },
+  { id: 'e2', color: '#6b4423', name: 'brown' },
+  { id: 'e3', color: '#4a7e9c', name: 'blue' },
+  { id: 'e4', color: '#5a8a47', name: 'green' },
+  { id: 'e5', color: '#a87139', name: 'hazel' },
+  { id: 'e6', color: '#6a5e4a', name: 'gray' },
+];
+
+const HAIR_STYLES = [
+  { id: 'buzz',  name: 'BUZZ' },
+  { id: 'short', name: 'SHORT' },
+  { id: 'wavy',  name: 'WAVY' },
+  { id: 'long',  name: 'LONG' },
+  { id: 'afro',  name: 'AFRO' },
+  { id: 'locs',  name: 'LOCS' },
+  { id: 'bun',   name: 'BUN' },
+  { id: 'bald',  name: 'BALD' },
+];
+
+const OUTFIT_STYLES = [
+  { id: 'hoodie',   name: 'HOODIE' },
+  { id: 'tee',      name: 'TEE' },
+  { id: 'tank',     name: 'TANK' },
+  { id: 'button',   name: 'BUTTON' },
+  { id: 'tunic',    name: 'TUNIC' },
+  { id: 'sweater',  name: 'SWEATER' },
+];
+
+const OUTFIT_COLORS = [
+  { id: 'o1', color: '#15110d', name: 'ink' },
+  { id: 'o2', color: '#f3ecd8', name: 'cream' },
+  { id: 'o3', color: '#ffd400', name: 'yellow' },
+  { id: 'o4', color: '#c8743e', name: 'terracotta' },
+  { id: 'o5', color: '#2a5556', name: 'teal' },
+  { id: 'o6', color: '#c44438', name: 'red' },
+  { id: 'o7', color: '#5a8a47', name: 'green' },
+  { id: 'o8', color: '#5c2858', name: 'plum' },
+];
+
+const LANGUAGES = [
+  { id: 'es', script: 'á', name: 'Español',    scriptClass: 'latin' },
+  { id: 'pt', script: 'ã', name: 'Português',  scriptClass: 'latin' },
+  { id: 'fr', script: 'é', name: 'Français',   scriptClass: 'latin' },
+  { id: 'de', script: 'ü', name: 'Deutsch',    scriptClass: 'latin' },
+  { id: 'jp', script: '日本語', name: 'Japanese',  scriptClass: 'jp' },
+  { id: 'hi', script: 'हिन्दी', name: 'Hindi',  scriptClass: 'devanagari' },
+  { id: 'zh', script: '中文',  name: 'Mandarin', scriptClass: 'cn' },
+  { id: 'ar', script: 'العربية', name: 'Arabic', scriptClass: 'ar' },
+];
+
+const CITIES = [
+  { id: 'brooklyn',    name: 'BROOKLYN',     accent: '#c44438', vibe: 'TheSpacePit lives here' },
+  { id: 'stlouis',     name: 'ST. LOUIS',    accent: '#a83b1f', vibe: 'where it begins // arch of return' },
+  { id: 'mexico',      name: 'MEXICO CITY',  accent: '#ff8a1f', vibe: 'altitude and altars' },
+  { id: 'oaxaca',      name: 'OAXACA',       accent: '#7a4f24', vibe: 'mezcal and mole at dusk' },
+  { id: 'tulum',       name: 'TULUM',        accent: '#5a8a47', vibe: 'jungle, cenote, cacao' },
+  { id: 'medellin',    name: 'MEDELLÍN',     accent: '#d63384', vibe: 'eternal spring' },
+  { id: 'madrid',      name: 'MADRID',       accent: '#ffd400', vibe: 'the long siesta' },
+  { id: 'paris',       name: 'PARIS',        accent: '#d96b7d', vibe: 'cafés and Gaudí refs' },
+  { id: 'berlin',      name: 'BERLIN',       accent: '#3a3a42', vibe: 'concrete and bass' },
+  { id: 'tokyo',       name: 'TOKYO',        accent: '#c4291f', vibe: 'paper rain, neon temple' },
+  { id: 'mysore',      name: 'MYSORE',       accent: '#d4a32d', vibe: 'sandalwood at sunrise' },
+  { id: 'rishikesh',   name: 'RISHIKESH',    accent: '#5a8a47', vibe: 'ganges, ashrams, silence' },
+];
+
+const WHYS = [
+  { id: 'stuck',     name: 'STUCK',        desc: 'I need a way out of where I am.' },
+  { id: 'build',     name: 'BUILDING',     desc: "I'm making something and need the practice." },
+  { id: 'grief',     name: 'GRIEF',        desc: 'I lost someone and need to integrate it.' },
+  { id: 'stillness', name: 'STILLNESS',    desc: 'I want to learn how to be quiet.' },
+  { id: 'curious',   name: 'CURIOUS',      desc: "I'm just here to see what this is." },
+  { id: 'committed', name: 'COMMITTED',    desc: "I'm here for the long haul. Show me the work." },
+];
+
+// ============ STATE ============
+const state = {
+  name: '',
+  pronouns: '',
+  customPronoun: '',
+  skin: 's3',
+  hairStyle: 'short',
+  hairColor: 'h1',
+  eyeColor: 'e2',
+  outfitStyle: 'hoodie',
+  outfitColor: 'o1',
+  language: '',
+  city: '',
+  why: '',
+};
+
+// ============ AVATAR RENDERER ============
+function getColor(id, list) {
+  const item = list.find(x => x.id === id);
+  return item ? item.color : '#15110d';
+}
+
+function hairSVG(styleId, color) {
+  const c = color;
+  const ink = '#15110d';
+  switch (styleId) {
+    case 'buzz':
+      return `<path d="M 58,95 Q 60,82 100,80 Q 140,82 142,95 Q 138,88 100,88 Q 62,88 58,95 Z" fill="${c}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>`;
+    case 'short':
+      return `<path d="M 54,108 Q 54,72 100,67 Q 146,72 146,108 Q 142,85 130,80 Q 100,72 70,80 Q 58,85 54,108 Z" fill="${c}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M 60,90 Q 80,75 100,73 Q 120,75 140,90" fill="none" stroke="${ink}" stroke-width="1" opacity="0.4"/>`;
+    case 'wavy':
+      return `<path d="M 50,118 Q 48,68 100,62 Q 152,68 150,118 Q 156,148 144,165 Q 142,138 130,128 Q 100,80 70,128 Q 58,138 56,165 Q 44,148 50,118 Z" fill="${c}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M 60,100 Q 80,82 100,78 Q 120,82 140,100" fill="none" stroke="${ink}" stroke-width="1" opacity="0.4"/>`;
+    case 'long':
+      return `<path d="M 48,125 Q 46,65 100,58 Q 154,65 152,125 Q 162,200 148,235 Q 144,170 132,148 Q 100,82 68,148 Q 56,170 52,235 Q 38,200 48,125 Z" fill="${c}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+              <path d="M 56,150 Q 56,200 60,230" fill="none" stroke="${ink}" stroke-width="1" opacity="0.35"/>
+              <path d="M 144,150 Q 144,200 140,230" fill="none" stroke="${ink}" stroke-width="1" opacity="0.35"/>`;
+    case 'afro':
+      return `<circle cx="100" cy="78" r="42" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="60" cy="100" r="28" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="140" cy="100" r="28" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="76" cy="65" r="22" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="124" cy="65" r="22" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="100" cy="55" r="20" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="68" cy="120" r="20" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <circle cx="132" cy="120" r="20" fill="${c}" stroke="${ink}" stroke-width="2"/>`;
+    case 'locs':
+      return `<g fill="${c}" stroke="${ink}" stroke-width="1.5" stroke-linejoin="round">
+                <rect x="56" y="78" width="9" height="100" rx="4"/>
+                <rect x="68" y="72" width="9" height="106" rx="4"/>
+                <rect x="80" y="68" width="9" height="110" rx="4"/>
+                <rect x="92" y="66" width="9" height="112" rx="4"/>
+                <rect x="104" y="66" width="9" height="112" rx="4"/>
+                <rect x="116" y="68" width="9" height="110" rx="4"/>
+                <rect x="128" y="72" width="9" height="106" rx="4"/>
+                <rect x="140" y="78" width="9" height="100" rx="4"/>
+              </g>
+              <ellipse cx="100" cy="72" rx="48" ry="10" fill="${c}" stroke="${ink}" stroke-width="2"/>`;
+    case 'bun':
+      return `<path d="M 56,100 Q 56,82 100,75 Q 144,82 144,100 Q 130,85 100,82 Q 70,85 56,100 Z" fill="${c}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+              <ellipse cx="100" cy="55" rx="22" ry="18" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <ellipse cx="100" cy="55" rx="14" ry="10" fill="${c}" stroke="${ink}" stroke-width="1" opacity="0.5"/>`;
+    case 'bald':
+    default:
+      return '';
+  }
+}
+
+function outfitSVG(styleId, color, skinColor) {
+  const c = color;
+  const ink = '#15110d';
+  switch (styleId) {
+    case 'hoodie':
+      return `<path d="M 30,250 L 30,200 Q 35,170 70,165 Q 100,175 130,165 Q 165,170 170,200 L 170,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M 70,175 Q 60,160 70,135 Q 100,125 130,135 Q 140,160 130,175" fill="${c}" stroke="${ink}" stroke-width="2.5"/>
+              <line x1="100" y1="180" x2="100" y2="220" stroke="${ink}" stroke-width="1.5"/>
+              <circle cx="86" cy="195" r="2" fill="${ink}"/>
+              <circle cx="114" cy="195" r="2" fill="${ink}"/>`;
+    case 'tee':
+      return `<path d="M 30,250 L 30,205 Q 35,175 75,170 Q 88,180 100,180 Q 112,180 125,170 Q 165,175 170,205 L 170,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M 88,170 Q 100,182 112,170" fill="${skinColor}" stroke="${ink}" stroke-width="2"/>`;
+    case 'tank':
+      return `<path d="M 40,250 L 40,210 Q 50,185 78,175 L 78,165 Q 100,180 122,165 L 122,175 Q 150,185 160,210 L 160,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    case 'button':
+      return `<path d="M 30,250 L 30,205 Q 35,175 75,170 Q 88,180 100,180 Q 112,180 125,170 Q 165,175 170,205 L 170,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M 78,170 L 95,182 L 100,200 L 105,182 L 122,170" fill="${skinColor}" stroke="${ink}" stroke-width="2" stroke-linejoin="round"/>
+              <line x1="100" y1="200" x2="100" y2="245" stroke="${ink}" stroke-width="1.5"/>
+              <circle cx="100" cy="215" r="2" fill="${ink}"/>
+              <circle cx="100" cy="230" r="2" fill="${ink}"/>`;
+    case 'tunic':
+      return `<path d="M 25,250 L 28,200 Q 35,168 78,165 L 90,180 L 100,210 L 110,180 L 122,165 Q 165,168 172,200 L 175,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>`;
+    case 'sweater':
+      return `<path d="M 28,250 L 28,200 Q 32,170 68,165 Q 100,175 132,165 Q 168,170 172,200 L 172,250 Z" fill="${c}" stroke="${ink}" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M 70,170 Q 75,180 100,180 Q 125,180 130,170" fill="${c}" stroke="${ink}" stroke-width="2"/>
+              <path d="M 50,200 L 60,250 M 75,200 L 80,250 M 100,200 L 100,250 M 125,200 L 120,250 M 150,200 L 140,250" stroke="${ink}" stroke-width="1" opacity="0.3"/>`;
+    default:
+      return '';
+  }
+}
+
+function renderAvatar() {
+  const skin = getColor(state.skin, SKIN_TONES);
+  const hair = getColor(state.hairColor, HAIR_COLORS);
+  const eye = getColor(state.eyeColor, EYE_COLORS);
+  const outfit = getColor(state.outfitColor, OUTFIT_COLORS);
+  const ink = '#15110d';
+
+  // Slightly darker skin for shadow
+  const skinShadow = shadeColor(skin, -10);
+
+  const isHoodie = state.outfitStyle === 'hoodie';
+
+  let svg = '';
+
+  // Hood behind head (if hoodie)
+  if (isHoodie) {
+    svg += `<path d="M 38,180 Q 35,80 100,68 Q 165,80 162,180 Q 160,140 142,118 Q 100,72 58,118 Q 40,140 38,180 Z" fill="${outfit}" stroke="${ink}" stroke-width="2.5"/>`;
+  }
+
+  // Outfit body
+  svg += outfitSVG(state.outfitStyle, outfit, skin);
+
+  // Neck
+  svg += `<rect x="90" y="148" width="20" height="22" fill="${skin}" stroke="${ink}" stroke-width="2"/>`;
+  svg += `<path d="M 90,165 Q 100,170 110,165" fill="${skinShadow}" stroke="none"/>`;
+
+  // Head (oval)
+  svg += `<ellipse cx="100" cy="110" rx="48" ry="55" fill="${skin}" stroke="${ink}" stroke-width="2.5"/>`;
+  // Cheek shading hint
+  svg += `<ellipse cx="74" cy="130" rx="6" ry="4" fill="${skinShadow}" opacity="0.5"/>`;
+  svg += `<ellipse cx="126" cy="130" rx="6" ry="4" fill="${skinShadow}" opacity="0.5"/>`;
+
+  // Hair (after head, before eyes)
+  svg += hairSVG(state.hairStyle, hair);
+
+  // Eyebrows
+  svg += `<path d="M 73,103 Q 82,99 91,103" stroke="${hair}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  svg += `<path d="M 109,103 Q 118,99 127,103" stroke="${hair}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+
+  // Eyes
+  svg += `<ellipse cx="82" cy="116" rx="6" ry="6.5" fill="#fff" stroke="${ink}" stroke-width="1.8"/>`;
+  svg += `<ellipse cx="118" cy="116" rx="6" ry="6.5" fill="#fff" stroke="${ink}" stroke-width="1.8"/>`;
+  svg += `<circle cx="82" cy="117" r="3.2" fill="${eye}"/>`;
+  svg += `<circle cx="118" cy="117" r="3.2" fill="${eye}"/>`;
+  svg += `<circle cx="80.5" cy="115" r="1.2" fill="#fff"/>`;
+  svg += `<circle cx="116.5" cy="115" r="1.2" fill="#fff"/>`;
+
+  // Nose
+  svg += `<path d="M 100,125 Q 98,135 102,138" stroke="${ink}" stroke-width="1.5" fill="none" stroke-linecap="round"/>`;
+
+  // Mouth
+  svg += `<path d="M 90,148 Q 100,152 110,148" stroke="${ink}" stroke-width="2" fill="none" stroke-linecap="round"/>`;
+
+  document.getElementById('avatarSvg').innerHTML = svg;
+}
+
+function shadeColor(hex, percent) {
+  const f = parseInt(hex.slice(1), 16);
+  const t = percent < 0 ? 0 : 255;
+  const p = Math.abs(percent) / 100;
+  const R = f >> 16;
+  const G = (f >> 8) & 0x00FF;
+  const B = f & 0x0000FF;
+  const r = Math.round((t - R) * p) + R;
+  const g = Math.round((t - G) * p) + G;
+  const b = Math.round((t - B) * p) + B;
+  return '#' + ((r << 16) | (g << 8) | b).toString(16).padStart(6, '0');
+}
+
+// ============ UI WIRING ============
+
+// Skin
+const skinSwatchesEl = document.getElementById('skinSwatches');
+SKIN_TONES.forEach(t => {
+  const b = document.createElement('button');
+  b.className = 'swatch' + (t.id === state.skin ? ' active' : '');
+  b.style.background = t.color;
+  b.dataset.id = t.id;
+  b.title = t.name;
+  b.addEventListener('click', () => {
+    state.skin = t.id;
+    document.querySelectorAll('#skinSwatches .swatch').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+    updateProgress();
+  });
+  skinSwatchesEl.appendChild(b);
+});
+
+// Hair styles
+const hairStylesEl = document.getElementById('hairStyles');
+HAIR_STYLES.forEach(h => {
+  const b = document.createElement('button');
+  b.className = 'tile' + (h.id === state.hairStyle ? ' active' : '');
+  b.dataset.id = h.id;
+  // Mini preview: a small head with this hair style
+  const previewHair = hairSVG(h.id, '#15110d');
+  b.innerHTML = `<svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="100" cy="110" rx="48" ry="55" fill="#d29568" stroke="#15110d" stroke-width="2.5"/>
+    ${previewHair}
+  </svg><div class="tile-label">${h.name}</div>`;
+  b.addEventListener('click', () => {
+    state.hairStyle = h.id;
+    document.querySelectorAll('#hairStyles .tile').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+  });
+  hairStylesEl.appendChild(b);
+});
+
+// Hair colors
+const hairColorsEl = document.getElementById('hairColors');
+HAIR_COLORS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'swatch' + (c.id === state.hairColor ? ' active' : '');
+  b.style.background = c.color;
+  b.dataset.id = c.id;
+  b.title = c.name;
+  b.addEventListener('click', () => {
+    state.hairColor = c.id;
+    document.querySelectorAll('#hairColors .swatch').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+    // Update hair style previews to use new color? Keep them ink-colored for clarity.
+  });
+  hairColorsEl.appendChild(b);
+});
+
+// Eye colors
+const eyeColorsEl = document.getElementById('eyeColors');
+EYE_COLORS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'swatch' + (c.id === state.eyeColor ? ' active' : '');
+  b.style.background = c.color;
+  b.dataset.id = c.id;
+  b.title = c.name;
+  b.addEventListener('click', () => {
+    state.eyeColor = c.id;
+    document.querySelectorAll('#eyeColors .swatch').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+  });
+  eyeColorsEl.appendChild(b);
+});
+
+// Outfit styles
+const outfitStylesEl = document.getElementById('outfitStyles');
+OUTFIT_STYLES.forEach(o => {
+  const b = document.createElement('button');
+  b.className = 'tile' + (o.id === state.outfitStyle ? ' active' : '');
+  b.dataset.id = o.id;
+  const previewOutfit = outfitSVG(o.id, '#15110d', '#d29568');
+  let extra = '';
+  if (o.id === 'hoodie') {
+    extra = `<path d="M 38,180 Q 35,80 100,68 Q 165,80 162,180 Q 160,140 142,118 Q 100,72 58,118 Q 40,140 38,180 Z" fill="#15110d" stroke="#15110d" stroke-width="2.5"/>`;
+  }
+  b.innerHTML = `<svg viewBox="0 0 200 250" xmlns="http://www.w3.org/2000/svg">
+    ${extra}
+    ${previewOutfit}
+    <ellipse cx="100" cy="110" rx="40" ry="46" fill="#d29568" stroke="#15110d" stroke-width="2"/>
+  </svg><div class="tile-label">${o.name}</div>`;
+  b.addEventListener('click', () => {
+    state.outfitStyle = o.id;
+    document.querySelectorAll('#outfitStyles .tile').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+  });
+  outfitStylesEl.appendChild(b);
+});
+
+// Outfit colors
+const outfitColorsEl = document.getElementById('outfitColors');
+OUTFIT_COLORS.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'swatch' + (c.id === state.outfitColor ? ' active' : '');
+  b.style.background = c.color;
+  b.dataset.id = c.id;
+  b.title = c.name;
+  b.addEventListener('click', () => {
+    state.outfitColor = c.id;
+    document.querySelectorAll('#outfitColors .swatch').forEach(s => s.classList.remove('active'));
+    b.classList.add('active');
+    renderAvatar();
+  });
+  outfitColorsEl.appendChild(b);
+});
+
+// Pronouns
+document.querySelectorAll('#pronounChips .chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('#pronounChips .chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    state.pronouns = chip.dataset.pronoun;
+    const customWrap = document.getElementById('customPronounWrap');
+    customWrap.classList.toggle('visible', state.pronouns === 'custom');
+    updatePreviewName();
+    updateProgress();
+  });
+});
+document.getElementById('customPronounInput').addEventListener('input', (e) => {
+  state.customPronoun = e.target.value;
+  updatePreviewName();
+});
+
+// Name
+document.getElementById('nameInput').addEventListener('input', (e) => {
+  state.name = e.target.value.trim();
+  updatePreviewName();
+  updateProgress();
+});
+
+function updatePreviewName() {
+  const nameEl = document.getElementById('avatarName');
+  const pronEl = document.getElementById('avatarPronouns');
+  if (state.name) {
+    nameEl.textContent = state.name;
+    nameEl.classList.remove('empty');
+  } else {
+    nameEl.textContent = 'your name here';
+    nameEl.classList.add('empty');
+  }
+  if (state.pronouns === 'custom' && state.customPronoun) {
+    pronEl.innerHTML = `— <em>${state.customPronoun}</em>`;
+  } else if (state.pronouns && state.pronouns !== 'custom') {
+    pronEl.innerHTML = `— <em>${state.pronouns}</em>`;
+  } else {
+    pronEl.innerHTML = `— <em>pick your pronouns</em>`;
+  }
+}
+
+// Language
+const langGridEl = document.getElementById('langGrid');
+LANGUAGES.forEach(l => {
+  const b = document.createElement('button');
+  b.className = 'lang-chip';
+  b.dataset.id = l.id;
+  b.innerHTML = `
+    <div class="lang-script ${l.scriptClass}">${l.script}</div>
+    <div class="lang-name">${l.name}</div>
+  `;
+  b.addEventListener('click', () => {
+    state.language = l.id;
+    document.querySelectorAll('#langGrid .lang-chip').forEach(c => c.classList.remove('active'));
+    b.classList.add('active');
+    updateProgress();
+  });
+  langGridEl.appendChild(b);
+});
+
+// Cities
+const cityGridEl = document.getElementById('cityGrid');
+CITIES.forEach(c => {
+  const b = document.createElement('button');
+  b.className = 'city-pick';
+  b.dataset.id = c.id;
+  b.innerHTML = `
+    <div class="city-pick-bar" style="background: ${c.accent};"></div>
+    <div class="city-pick-body">
+      <div class="city-pick-name">${c.name}</div>
+      <div class="city-pick-vibe">${c.vibe}</div>
+    </div>
+  `;
+  b.addEventListener('click', () => {
+    state.city = c.id;
+    document.querySelectorAll('#cityGrid .city-pick').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    updateProgress();
+  });
+  cityGridEl.appendChild(b);
+});
+
+// Why
+const whyGridEl = document.getElementById('whyGrid');
+WHYS.forEach((w, i) => {
+  const b = document.createElement('button');
+  b.className = 'why-card';
+  b.dataset.id = w.id;
+  b.innerHTML = `
+    <div class="why-num">${String(i + 1).padStart(2, '0')}</div>
+    <div class="why-text">
+      <div class="why-name">${w.name}</div>
+      <div class="why-desc">${w.desc}</div>
+    </div>
+  `;
+  b.addEventListener('click', () => {
+    state.why = w.id;
+    document.querySelectorAll('#whyGrid .why-card').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    updateProgress();
+  });
+  whyGridEl.appendChild(b);
+});
+
+// ============ PROGRESS ============
+function updateProgress() {
+  const required = [
+    !!state.name,
+    !!state.pronouns && (state.pronouns !== 'custom' || !!state.customPronoun),
+    !!state.skin,            // always set
+    !!state.hairStyle,       // always set
+    !!state.outfitStyle,     // always set
+    !!state.language,
+    !!state.city,
+    !!state.why,
+  ];
+  const filled = required.filter(Boolean).length;
+  const total = required.length;
+  const progressEl = document.getElementById('saveProgress');
+  const saveBtn = document.getElementById('saveBtn');
+  if (filled === total) {
+    progressEl.innerHTML = `— <strong>ready</strong> // <em>save your character</em>`;
+    saveBtn.disabled = false;
+  } else {
+    progressEl.innerHTML = `— <strong>${filled}/${total}</strong> filled // <em>keep going</em>`;
+    saveBtn.disabled = true;
+  }
+}
+
+// ============ SAVE ============
+document.getElementById('saveBtn').addEventListener('click', async () => {
+  const character = {
+    ...state,
+    savedAt: Date.now(),
+  };
+  try {
+    await window.storage.set('character', JSON.stringify(character));
+  } catch (e) {
+    // storage might not exist in some contexts; that's fine for the prototype
+  }
+  // Show welcome modal
+  const city = CITIES.find(c => c.id === state.city);
+  const lang = LANGUAGES.find(l => l.id === state.language);
+  const why = WHYS.find(w => w.id === state.why);
+  const pronouns = state.pronouns === 'custom' ? state.customPronoun : state.pronouns;
+
+  document.getElementById('modalTitle').innerHTML = `welcome, <em>${state.name.toLowerCase()}.</em>`;
+  document.getElementById('modalSummary').innerHTML = `
+    <strong>${pronouns}</strong> · starting in <strong>${city.name}</strong> · learning <strong>${lang.name}</strong>.<br><br>
+    "${why.desc}"
+  `;
+  document.getElementById('modalBackdrop').classList.add('visible');
+  document.getElementById('modal').classList.add('visible');
+});
+
+document.getElementById('modalEdit').addEventListener('click', () => {
+  document.getElementById('modalBackdrop').classList.remove('visible');
+  document.getElementById('modal').classList.remove('visible');
+});
+document.getElementById('modalEnter').addEventListener('click', () => {
+  document.getElementById('modalBackdrop').classList.remove('visible');
+  document.getElementById('modal').classList.remove('visible');
+  // Navigate to the main app — works when deployed to a domain with all files in the same dir
+  window.location.href = 'index.html';
+});
+document.getElementById('modalBackdrop').addEventListener('click', () => {
+  document.getElementById('modalBackdrop').classList.remove('visible');
+  document.getElementById('modal').classList.remove('visible');
+});
+
+// ============ LOAD EXISTING ============
+async function loadExisting() {
+  try {
+    const r = await window.storage.get('character');
+    if (r && r.value) {
+      const saved = JSON.parse(r.value);
+      Object.assign(state, saved);
+      // Restore UI
+      document.getElementById('nameInput').value = state.name || '';
+      if (state.pronouns) {
+        const chip = document.querySelector(`#pronounChips .chip[data-pronoun="${state.pronouns}"]`);
+        if (chip) chip.classList.add('active');
+        if (state.pronouns === 'custom') {
+          document.getElementById('customPronounWrap').classList.add('visible');
+          document.getElementById('customPronounInput').value = state.customPronoun || '';
+        }
+      }
+      ['skin', 'hairColor', 'eyeColor', 'outfitColor'].forEach(key => {
+        const containerId = key === 'skin' ? 'skinSwatches'
+                          : key === 'hairColor' ? 'hairColors'
+                          : key === 'eyeColor' ? 'eyeColors'
+                          : 'outfitColors';
+        document.querySelectorAll(`#${containerId} .swatch`).forEach(s => {
+          s.classList.toggle('active', s.dataset.id === state[key]);
+        });
+      });
+      ['hairStyle', 'outfitStyle'].forEach(key => {
+        const containerId = key === 'hairStyle' ? 'hairStyles' : 'outfitStyles';
+        document.querySelectorAll(`#${containerId} .tile`).forEach(t => {
+          t.classList.toggle('active', t.dataset.id === state[key]);
+        });
+      });
+      if (state.language) {
+        const el = document.querySelector(`#langGrid .lang-chip[data-id="${state.language}"]`);
+        if (el) el.classList.add('active');
+      }
+      if (state.city) {
+        const el = document.querySelector(`#cityGrid .city-pick[data-id="${state.city}"]`);
+        if (el) el.classList.add('active');
+      }
+      if (state.why) {
+        const el = document.querySelector(`#whyGrid .why-card[data-id="${state.why}"]`);
+        if (el) el.classList.add('active');
+      }
+    }
+  } catch (e) {
+    // No saved character yet
+  }
+  updatePreviewName();
+  renderAvatar();
+  updateProgress();
+}
+
+loadExisting();
+</script>
+</body>
+</html>

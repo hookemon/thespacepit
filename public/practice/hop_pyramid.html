@@ -1,0 +1,2157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TheSpacePit — HOP // Mad Worlds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #f3ecd8;
+    --paper-2: #ebe2c8;
+    --paper-3: #e3d9bb;
+    --ink: #15110d;
+    --ink-2: #3a322a;
+    --ink-3: #6a5e4a;
+    --yellow: #ffd400;
+    --terracotta: #c8743e;
+    --teal: #2a5556;
+    --red: #c44438;
+    --green: #5a8a47;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+
+  html, body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.4;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at top left, rgba(255,212,0,0.10), transparent 40%),
+      radial-gradient(ellipse at bottom right, rgba(200,116,62,0.06), transparent 40%),
+      var(--paper);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.18;
+    pointer-events: none;
+    z-index: 1;
+    mix-blend-mode: multiply;
+  }
+
+  .app {
+    max-width: 520px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--paper);
+    position: relative;
+    z-index: 2;
+    border-left: 2px solid var(--ink);
+    border-right: 2px solid var(--ink);
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    border-bottom: 2px solid var(--ink);
+    padding: 14px 20px 12px;
+    background: var(--paper);
+  }
+  .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 24px; height: 24px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    box-shadow: 2px 2px 0 var(--ink);
+  }
+  .brand-mark::after {
+    content: '';
+    position: absolute;
+    inset: 5px;
+    background: var(--ink);
+    border-radius: 50%;
+  }
+  .brand-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .brand-name em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--terracotta);
+  }
+  .practice-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    padding: 4px 9px;
+    background: var(--ink);
+    color: var(--yellow);
+    border-radius: 100px;
+  }
+  .title-block {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .title-block h1 {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 44px;
+    line-height: 0.9;
+    letter-spacing: -0.025em;
+  }
+  .title-block h1 em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--terracotta);
+  }
+  .subtitle {
+    text-align: right;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.2px;
+    color: var(--ink-3);
+    line-height: 1.5;
+  }
+  .subtitle strong { color: var(--ink); font-weight: 500; }
+  .subtitle em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+
+  /* ====== World selector ====== */
+  .world-section {
+    padding: 12px 20px 14px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--paper);
+  }
+  .world-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .world-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    color: var(--ink-3);
+  }
+  .world-current-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .world-current-name em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+  }
+  .world-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    margin: 0 -20px;
+    padding: 0 20px 4px;
+  }
+  .world-scroll::-webkit-scrollbar { display: none; }
+
+  .world-card {
+    flex: 0 0 auto;
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    padding: 0;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.15s, box-shadow 0.15s;
+    width: 130px;
+    color: var(--ink);
+    font-family: inherit;
+    text-align: left;
+    overflow: hidden;
+    position: relative;
+  }
+  .world-card:nth-child(odd) { transform: rotate(-0.6deg); }
+  .world-card:nth-child(even) { transform: rotate(0.5deg); }
+  .world-card:hover {
+    transform: rotate(0deg) translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--ink);
+  }
+  .world-card.active {
+    background: var(--yellow);
+  }
+  .world-card.active::before {
+    content: '★';
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 11px;
+    color: var(--ink);
+  }
+
+  .world-card-swatch {
+    height: 30px;
+    width: 100%;
+    border-bottom: 2px solid var(--ink);
+    display: flex;
+  }
+  .world-card-swatch span { flex: 1; }
+
+  .world-card-body { padding: 8px 10px 10px; }
+  .world-card-name {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 13.5px;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin-bottom: 3px;
+  }
+  .world-card-region {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    color: var(--ink-3);
+    margin-bottom: 4px;
+  }
+  .world-card-mood {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--terracotta);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+  .world-card.active .world-card-mood { color: var(--ink-2); }
+
+  /* ====== Character card ====== */
+  .game-card {
+    color: var(--paper);
+    border-bottom: 2px solid var(--ink);
+    padding: 14px 20px;
+    position: relative;
+    overflow: hidden;
+    background: var(--ink);
+    transition: background 0.3s;
+  }
+  .game-card::before {
+    content: '';
+    position: absolute;
+    right: -28px;
+    top: -28px;
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    opacity: 0.95;
+    background: var(--yellow);
+    transition: background 0.3s;
+  }
+  .game-card-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    z-index: 2;
+  }
+  .game-card-left { flex: 1; }
+  .game-card-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 8.5px;
+    letter-spacing: 1.5px;
+    color: var(--yellow);
+    margin-bottom: 4px;
+    transition: color 0.3s;
+  }
+  .game-card-line {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 13.5px;
+    line-height: 1.25;
+  }
+  .game-card-line em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    color: var(--yellow);
+    transition: color 0.3s;
+  }
+  .game-card-stat {
+    color: var(--ink);
+    padding: 6px 12px;
+    text-align: center;
+    border: 2px solid var(--ink);
+    transform: rotate(-2deg);
+    flex-shrink: 0;
+    background: var(--yellow);
+    transition: background 0.3s;
+  }
+  .game-card-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.2px;
+    line-height: 1;
+    margin-bottom: 2px;
+  }
+  .game-card-stat-val {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  /* ====== Stats bar ====== */
+  .stats-bar {
+    background: var(--paper);
+    padding: 12px 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 8px;
+    border-bottom: 2px solid var(--ink);
+  }
+  .stat-block {
+    background: var(--paper-2);
+    border: 1.5px solid var(--ink);
+    padding: 8px 6px;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1.4px;
+    color: var(--ink-3);
+    margin-bottom: 3px;
+  }
+  .stat-val {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 20px;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .stat-val.flame { color: var(--terracotta); }
+  .lives-row {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+  }
+  .life-dot {
+    width: 12px; height: 12px;
+    background: var(--terracotta);
+    border: 1.5px solid var(--ink);
+    border-radius: 50%;
+    transform: rotate(45deg);
+    margin-top: 2px;
+  }
+  .life-dot.lost {
+    background: transparent;
+    border-color: var(--ink-3);
+  }
+
+  /* ====== Game stage ====== */
+  .game-wrap {
+    padding: 16px 20px;
+    background: var(--paper);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .stage-wrap {
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    transition: background 0.4s;
+  }
+  .stage {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .cube.bumped { animation: cubeBump 0.18s ease-out; }
+  @keyframes cubeBump {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3px); }
+  }
+  .player-group { will-change: transform; }
+
+  .note-fx {
+    position: absolute;
+    pointer-events: none;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--ink);
+    letter-spacing: 1px;
+    background: var(--paper);
+    border: 1.5px solid var(--ink);
+    padding: 2px 6px;
+    transform: translate(-50%, -50%);
+    animation: noteFx 0.7s ease-out forwards;
+    z-index: 5;
+    white-space: nowrap;
+  }
+  @keyframes noteFx {
+    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    20% { opacity: 1; transform: translate(-50%, -90%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -140%) scale(1); }
+  }
+
+  /* ====== Overlays ====== */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(21,17,13,0.93);
+    color: var(--paper);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    padding: 30px;
+    text-align: center;
+    transition: opacity 0.3s;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay-title {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 40px;
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+    line-height: 1;
+  }
+  .overlay-title em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--yellow);
+    font-weight: 500;
+  }
+  .overlay-world {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--yellow);
+    margin-bottom: 14px;
+  }
+  .overlay-sub {
+    font-family: 'DM Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 1.5px;
+    color: var(--paper);
+    opacity: 0.75;
+    margin-bottom: 22px;
+    line-height: 1.6;
+    max-width: 320px;
+  }
+  .overlay-keymap {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--yellow);
+    letter-spacing: 0.5px;
+    margin-bottom: 22px;
+    line-height: 1.9;
+    max-width: 280px;
+  }
+  .overlay-keymap span {
+    background: var(--paper);
+    color: var(--ink);
+    padding: 2px 6px;
+    margin: 0 3px;
+    border-radius: 3px;
+    font-weight: 500;
+  }
+  .overlay-btn {
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--yellow);
+    padding: 13px 30px;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 15px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 var(--terracotta);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .overlay-btn:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 var(--terracotta);
+  }
+  .overlay-summary {
+    background: var(--yellow);
+    color: var(--ink);
+    border: 2px solid var(--paper);
+    padding: 14px 22px;
+    margin-bottom: 22px;
+    transform: rotate(-1deg);
+    box-shadow: 4px 4px 0 var(--terracotta);
+  }
+  .overlay-summary-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin: 2px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+  .overlay-summary-row strong {
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+  }
+
+  /* ====== Controls / D-pad ====== */
+  .controls {
+    padding: 16px 20px 18px;
+    border-top: 2px solid var(--ink);
+    background: var(--paper);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 14px;
+    align-items: center;
+  }
+  .control-btn {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 10px 12px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+  }
+  .control-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0 var(--ink);
+  }
+  .control-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .control-btn.secondary { background: var(--ink); color: var(--paper); }
+
+  .dpad {
+    position: relative;
+    width: 130px;
+    height: 130px;
+    flex-shrink: 0;
+  }
+  .dpad-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: var(--yellow);
+    border: 2px solid var(--ink);
+    cursor: pointer;
+    transition: transform 0.06s, box-shadow 0.06s;
+    box-shadow: 3px 3px 0 var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bricolage Grotesque', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .dpad-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .dpad-btn.ul { top: 0; left: 0; }
+  .dpad-btn.ur { top: 0; right: 0; }
+  .dpad-btn.dl { bottom: 0; left: 0; }
+  .dpad-btn.dr { bottom: 0; right: 0; }
+  .dpad-center {
+    position: absolute;
+    inset: 50px;
+    width: 30px;
+    height: 30px;
+    background: var(--ink);
+    border-radius: 50%;
+    border: 2px solid var(--ink);
+  }
+  .key-hint {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1.3px;
+    color: var(--ink-3);
+    text-align: center;
+    line-height: 1.6;
+    flex: 1;
+  }
+  .key-hint strong {
+    color: var(--ink);
+    background: var(--paper-2);
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+
+  .progression {
+    padding: 12px 20px;
+    background: var(--paper-3);
+    border-top: 2px solid var(--ink);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9.5px;
+    letter-spacing: 1.2px;
+    color: var(--ink-2);
+  }
+  .progression strong { color: var(--ink); font-weight: 500; }
+  .progression em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    color: var(--terracotta);
+    font-weight: 500;
+    font-size: 11px;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--ink);
+    color: var(--yellow);
+    padding: 11px 18px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    border: 2px solid var(--ink);
+    box-shadow: 3px 3px 0 var(--terracotta);
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1);
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+<header>
+  <div class="brand-row">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div class="brand-name">TheSpacePit<em>.</em></div>
+    </div>
+    <div class="practice-tag">★ MAD WORLDS</div>
+  </div>
+  <div class="title-block">
+    <h1>Hop<em>.</em></h1>
+    <div class="subtitle">
+      Q*BERT TYPE<br>
+      <strong>6 WORLDS</strong> // 6 SCALES<br>
+      <em>each city its own logic</em>
+    </div>
+  </div>
+</header>
+
+<!-- World selector -->
+<div class="world-section">
+  <div class="world-head">
+    <span class="world-label">— PICK YOUR WORLD</span>
+    <span class="world-current-name" id="worldCurrentName">MADRID — <em>iberian gold</em></span>
+  </div>
+  <div class="world-scroll" id="worldScroll"></div>
+</div>
+
+<!-- Character card (theme-tinted) -->
+<div class="game-card" id="gameCard">
+  <div class="game-card-row">
+    <div class="game-card-left">
+      <div class="game-card-eyebrow" id="cardEyebrow">— YOUR CHARACTER // MADRID</div>
+      <div class="game-card-line" id="cardLine">Each cube plays a note in the <em>Phrygian dominant</em> scale. The pyramid is the city.</div>
+    </div>
+    <div class="game-card-stat" id="cardStat">
+      <div class="game-card-stat-label">MUSIC</div>
+      <div class="game-card-stat-val" id="musicSkillVal">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-block">
+    <div class="stat-label">LEVEL</div>
+    <div class="stat-val" id="levelVal">1</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">SCORE</div>
+    <div class="stat-val" id="scoreVal">0</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">EAR</div>
+    <div class="stat-val flame" id="earSkillVal">0</div>
+  </div>
+  <div class="stat-block">
+    <div class="stat-label">LIVES</div>
+    <div class="lives-row" id="livesRow"></div>
+  </div>
+</div>
+
+<!-- Game stage -->
+<div class="game-wrap">
+  <div class="stage-wrap" id="stageWrap">
+    <svg class="stage" id="stage" viewBox="0 0 460 500" xmlns="http://www.w3.org/2000/svg"></svg>
+
+    <div class="overlay" id="startOverlay">
+      <div class="overlay-title">HOP<em>.</em></div>
+      <div class="overlay-world" id="startWorld">— MADRID // IBERIAN GOLD</div>
+      <div class="overlay-sub">Hop every cube to clear the world. Each cube plays a pentatonic note. Don't fall off.</div>
+      <div class="overlay-keymap">
+        <span>Q</span>up-left &nbsp; <span>W</span>up-right<br>
+        <span>A</span>down-left &nbsp; <span>S</span>down-right<br>
+        — OR arrow keys / tap pad
+      </div>
+      <button class="overlay-btn" id="startBtn">★ START</button>
+    </div>
+
+    <div class="overlay hidden" id="levelOverlay">
+      <div class="overlay-title">LEVEL <em id="lvlNum">2</em></div>
+      <div class="overlay-summary">
+        <div class="overlay-summary-row"><span>SCORE</span><strong id="lvlScore">0</strong></div>
+        <div class="overlay-summary-row"><span>+EAR SKILL</span><strong id="lvlSkill">+0</strong></div>
+      </div>
+      <button class="overlay-btn" id="nextLvlBtn">★ CONTINUE</button>
+    </div>
+
+    <div class="overlay hidden" id="gameoverOverlay">
+      <div class="overlay-title">GAME <em>OVER</em></div>
+      <div class="overlay-summary">
+        <div class="overlay-summary-row"><span>SCORE</span><strong id="goScore">0</strong></div>
+        <div class="overlay-summary-row"><span>LEVEL</span><strong id="goLevel">1</strong></div>
+        <div class="overlay-summary-row"><span>+EAR SKILL</span><strong id="goSkill">+0</strong></div>
+      </div>
+      <button class="overlay-btn" id="retryBtn">★ RETRY</button>
+    </div>
+  </div>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="control-btn secondary" id="resetBtn">RESET</button>
+  <div class="dpad" id="dpad">
+    <div class="dpad-btn ul" data-dir="ul">↖</div>
+    <div class="dpad-btn ur" data-dir="ur">↗</div>
+    <div class="dpad-btn dl" data-dir="dl">↙</div>
+    <div class="dpad-btn dr" data-dir="dr">↘</div>
+    <div class="dpad-center"></div>
+  </div>
+  <div class="key-hint">
+    KEYS:<br>
+    <strong>Q W A S</strong><br>
+    or<br>
+    <strong>↖ ↗ ↙ ↘</strong>
+  </div>
+</div>
+
+<div class="progression">
+  <div>— <strong id="cubesProgress">0/21</strong> CUBES</div>
+  <div>WORLD: <em id="progWorld">MADRID</em></div>
+</div>
+
+</div>
+
+<script>
+'use strict';
+
+// ============ STORAGE SHIM ============
+// Maps window.storage (Claude artifact API) to localStorage when deployed to a real domain.
+if (!window.storage) {
+  window.storage = {
+    async get(key) { const v = localStorage.getItem(key); return v ? { key, value: v } : null; },
+    async set(key, value) { localStorage.setItem(key, value); return { key, value }; },
+    async delete(key) { localStorage.removeItem(key); return { key, deleted: true }; },
+    async list(prefix) {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!prefix || (k && k.startsWith(prefix))) keys.push(k);
+      }
+      return { keys, prefix };
+    }
+  };
+}
+
+
+// ============ WORLDS ============
+// Each world has palette, scale, decorations, character variant.
+const WORLDS = [
+  {
+    id: 'madrid',
+    name: 'MADRID',
+    region: 'IBERIA',
+    mood: 'iberian gold',
+    description: 'the long siesta and longer dinner',
+    scaleName: 'Phrygian dominant',
+    scale: [0, 1, 4, 7, 8],  // Spanish flamenco color
+    baseMidi: 50, // D3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #f0d896 0%, #e8b870 60%, #c87b4a 100%)',
+      cardBg: '#a04020',
+      cardAccent: '#ffd400',
+      cubeTop: '#ffd400',
+      cubeTopHopped: '#5a8a47',
+      cubeTopHopped2: '#2a5556',
+      cubeLeft: '#c8743e',
+      cubeRight: '#8b3e22',
+      ink: '#3a1a08',
+      noteFxBg: '#fff3d4',
+      playerBody: '#fff3d4',
+      playerSnout: '#c8743e',
+      playerEye: '#3a1a08',
+    },
+    decor: 'madrid',
+    djLine: '— el flamenco lives in the half-step from C to Db.',
+  },
+  {
+    id: 'paris',
+    name: 'PARIS',
+    region: 'FRANCE',
+    mood: 'cafés + Gaudí refs',
+    description: 'mosaic touches at the edges',
+    scaleName: 'Lydian',
+    scale: [0, 2, 4, 7, 11],  // Lydian (sharp 4) gives floaty modernist feel
+    baseMidi: 48, // C3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #d4a8b8 0%, #9a6890 50%, #4a3060 100%)',
+      cardBg: '#3a1840',
+      cardAccent: '#d96b7d',
+      cubeTop: '#d96b7d',
+      cubeTopHopped: '#2d8659',
+      cubeTopHopped2: '#d4a32d',
+      cubeLeft: '#5c2858',
+      cubeRight: '#1a4a52',
+      ink: '#1a0820',
+      noteFxBg: '#f0e0e8',
+      playerBody: '#d4a32d',
+      playerSnout: '#d96b7d',
+      playerEye: '#1a0820',
+      mosaicColors: ['#d96b7d','#2d8659','#d4a32d','#1a4a52','#5c2858','#f0e0e8'],
+    },
+    decor: 'paris',
+    djLine: '— a Gaudí trencadís fragment in a Parisian café window.',
+  },
+  {
+    id: 'medellin',
+    name: 'MEDELLÍN',
+    region: 'COLOMBIA',
+    mood: 'comuna color',
+    description: 'tropical magenta in the hills',
+    scaleName: 'major pentatonic',
+    scale: [0, 2, 4, 7, 9],  // bright, happy
+    baseMidi: 50, // D3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #b8d4a8 0%, #8aae74 60%, #c46850 100%)',
+      cardBg: '#7d2858',
+      cardAccent: '#ffd400',
+      cubeTop: '#d63384',
+      cubeTopHopped: '#9ec947',
+      cubeTopHopped2: '#ffd400',
+      cubeLeft: '#7d3a8f',
+      cubeRight: '#a83333',
+      ink: '#2a0a18',
+      noteFxBg: '#fde8f0',
+      playerBody: '#ffd400',
+      playerSnout: '#d63384',
+      playerEye: '#2a0a18',
+    },
+    decor: 'medellin',
+    djLine: '— bougainvillea purple against terra cotta brick.',
+  },
+  {
+    id: 'brooklyn',
+    name: 'BROOKLYN',
+    region: 'NYC',
+    mood: 'warehouse brick',
+    description: 'TheSpacePit lives here',
+    scaleName: 'minor pentatonic',
+    scale: [0, 3, 5, 7, 10],  // hip-hop, boom-bap
+    baseMidi: 45, // A2 — darker bass
+    palette: {
+      stageBg: 'linear-gradient(180deg, #b8c8d4 0%, #8a98a8 60%, #5a6068 100%)',
+      cardBg: '#2a3038',
+      cardAccent: '#d4732d',
+      cubeTop: '#a04638',
+      cubeTopHopped: '#d4732d',
+      cubeTopHopped2: '#e8c440',
+      cubeLeft: '#6b2f25',
+      cubeRight: '#3a3a42',
+      ink: '#15110d',
+      noteFxBg: '#e8e0d0',
+      playerBody: '#d4cab0',
+      playerSnout: '#a04638',
+      playerEye: '#15110d',
+    },
+    decor: 'brooklyn',
+    djLine: '— the boom-bap was born on these blocks.',
+  },
+  {
+    id: 'berlin',
+    name: 'BERLIN',
+    region: 'GERMANY',
+    mood: 'concrete brutalism',
+    description: 'Berghain at 6am',
+    scaleName: 'dark Phrygian',
+    scale: [0, 1, 5, 6, 8],  // moody techno minor
+    baseMidi: 43, // G2 — very dark
+    palette: {
+      stageBg: 'linear-gradient(180deg, #1a2030 0%, #2a3040 60%, #15181f 100%)',
+      cardBg: '#080a10',
+      cardAccent: '#d4f000',
+      cubeTop: '#e8e4d4',
+      cubeTopHopped: '#d4f000',
+      cubeTopHopped2: '#f04090',
+      cubeLeft: '#3a3a42',
+      cubeRight: '#1a1c22',
+      ink: '#080808',
+      noteFxBg: '#d4f000',
+      playerBody: '#e8e4d4',
+      playerSnout: '#f04090',
+      playerEye: '#080808',
+    },
+    decor: 'berlin',
+    djLine: '— hard concrete, soft soul, no daylight.',
+  },
+  {
+    id: 'tokyo',
+    name: 'TOKYO',
+    region: 'JAPAN',
+    mood: 'lantern hirajoshi',
+    description: 'paper rain, neon temple',
+    scaleName: 'hirajoshi',
+    scale: [0, 2, 3, 7, 8],  // iconic Japanese pentatonic
+    baseMidi: 50, // D3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #1a1a3a 0%, #3a1a4a 50%, #5c2858 100%)',
+      cardBg: '#1a0828',
+      cardAccent: '#ff4090',
+      cubeTop: '#f0e8d8',
+      cubeTopHopped: '#ff4090',
+      cubeTopHopped2: '#d4a82d',
+      cubeLeft: '#c4291f',
+      cubeRight: '#5a8048',
+      ink: '#0a0010',
+      noteFxBg: '#fde8a0',
+      playerBody: '#f0e8d8',
+      playerSnout: '#c4291f',
+      playerEye: '#0a0010',
+    },
+    decor: 'tokyo',
+    djLine: '— a koto figure repeats in the rain.',
+  },
+  {
+    id: 'stlouis',
+    name: 'ST. LOUIS',
+    region: 'MISSISSIPPI',
+    mood: 'arch of return',
+    description: 'blues across the river',
+    scaleName: 'blues mixolydian',
+    scale: [0, 3, 5, 6, 10],  // blues with flat-5 bend
+    baseMidi: 45, // A2 — deep
+    palette: {
+      stageBg: 'linear-gradient(180deg, #c8a880 0%, #8a8090 55%, #4a4858 100%)',
+      cardBg: '#3a2820',
+      cardAccent: '#d4a32d',
+      cubeTop: '#c46838',
+      cubeTopHopped: '#c8c8d4',
+      cubeTopHopped2: '#d4a32d',
+      cubeLeft: '#6b3220',
+      cubeRight: '#3a4858',
+      ink: '#15110d',
+      noteFxBg: '#f0e2c8',
+      playerBody: '#d4c8a0',
+      playerSnout: '#c46838',
+      playerEye: '#15110d',
+    },
+    decor: 'stlouis',
+    djLine: '— Chuck Berry and the muddy river kept the time.',
+  },
+  {
+    id: 'mexico',
+    name: 'MEXICO CITY',
+    region: 'CDMX',
+    mood: 'altitude + altars',
+    description: 'marigolds on every corner',
+    scaleName: 'major pentatonic',
+    scale: [0, 2, 4, 7, 9],
+    baseMidi: 52, // E3 — lifted, altitudinal
+    palette: {
+      stageBg: 'linear-gradient(180deg, #ffd4a8 0%, #e88858 50%, #8a3a5a 100%)',
+      cardBg: '#5c1828',
+      cardAccent: '#ff8a1f',
+      cubeTop: '#ff8a1f',
+      cubeTopHopped: '#5c2858',
+      cubeTopHopped2: '#f3ecd8',
+      cubeLeft: '#c44438',
+      cubeRight: '#7d2858',
+      ink: '#2a0820',
+      noteFxBg: '#fff3d8',
+      playerBody: '#f3ecd8',
+      playerSnout: '#ff8a1f',
+      playerEye: '#2a0820',
+    },
+    decor: 'mexico',
+    djLine: '— the city floats on lake-bed soil at 7,300 feet.',
+  },
+  {
+    id: 'oaxaca',
+    name: 'OAXACA',
+    region: 'OAXACA',
+    mood: 'mezcal and mole',
+    description: 'smoke on the agave',
+    scaleName: 'Aeolian pentatonic',
+    scale: [0, 2, 3, 7, 8],  // minor with flat 6
+    baseMidi: 46, // A#2
+    palette: {
+      stageBg: 'linear-gradient(180deg, #d4b890 0%, #9a6840 55%, #4a2820 100%)',
+      cardBg: '#3a1810',
+      cardAccent: '#d4a32d',
+      cubeTop: '#a04638',
+      cubeTopHopped: '#d4a32d',
+      cubeTopHopped2: '#5a8a47',
+      cubeLeft: '#5a2818',
+      cubeRight: '#6a5848',
+      ink: '#1a0808',
+      noteFxBg: '#f0dcb8',
+      playerBody: '#e8d4a0',
+      playerSnout: '#a04638',
+      playerEye: '#1a0808',
+    },
+    decor: 'oaxaca',
+    djLine: '— the maestro mezcalero waits for the agave to be ready.',
+  },
+  {
+    id: 'tulum',
+    name: 'TULUM',
+    region: 'YUCATÁN',
+    mood: 'jungle cenote',
+    description: 'turquoise pools under the canopy',
+    scaleName: 'Lydian pentatonic',
+    scale: [0, 2, 6, 7, 9],  // raised 4 — that dreamy lift
+    baseMidi: 50, // D3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #b8e8d8 0%, #5aa8a8 55%, #1a4858 100%)',
+      cardBg: '#0a2838',
+      cardAccent: '#ffc8a8',
+      cubeTop: '#3acac0',
+      cubeTopHopped: '#a8e468',
+      cubeTopHopped2: '#ff8aa8',
+      cubeLeft: '#1a4858',
+      cubeRight: '#7a4828',
+      ink: '#0a1820',
+      noteFxBg: '#e8f8e0',
+      playerBody: '#f3ecd8',
+      playerSnout: '#3acac0',
+      playerEye: '#0a1820',
+    },
+    decor: 'tulum',
+    djLine: '— the cenote is a wormhole, not a swimming pool.',
+  },
+  {
+    id: 'rishikesh',
+    name: 'RISHIKESH',
+    region: 'HIMALAYAN FOOTHILLS',
+    mood: 'ganges at dawn',
+    description: 'ashrams above the river',
+    scaleName: 'raga yaman',
+    scale: [0, 2, 6, 7, 11],  // sa re ga(tivra ma) pa ni — bright, devotional
+    baseMidi: 48, // C3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #ffd8b8 0%, #f0c890 50%, #a8a888 100%)',
+      cardBg: '#5c3818',
+      cardAccent: '#ff9038',
+      cubeTop: '#ff9038',
+      cubeTopHopped: '#5a8a78',
+      cubeTopHopped2: '#f3ecd8',
+      cubeLeft: '#7a4828',
+      cubeRight: '#6a8878',
+      ink: '#2a1808',
+      noteFxBg: '#fff3d8',
+      playerBody: '#f3ecd8',
+      playerSnout: '#ff9038',
+      playerEye: '#2a1808',
+    },
+    decor: 'rishikesh',
+    djLine: '— at sunrise the river hums in raga yaman.',
+  },
+  {
+    id: 'varanasi',
+    name: 'VARANASI',
+    region: 'GANGES',
+    mood: 'oldest city',
+    description: 'ghats at first light',
+    scaleName: 'raga bhairavi',
+    scale: [0, 1, 3, 6, 8],  // komal re, komal ga, tritone color, komal dha
+    baseMidi: 45, // A2
+    palette: {
+      stageBg: 'linear-gradient(180deg, #a8806a 0%, #7a4838 50%, #2a1818 100%)',
+      cardBg: '#1a0808',
+      cardAccent: '#d4a32d',
+      cubeTop: '#c8743e',
+      cubeTopHopped: '#d4a32d',
+      cubeTopHopped2: '#a83328',
+      cubeLeft: '#5a2818',
+      cubeRight: '#3a3038',
+      ink: '#0a0404',
+      noteFxBg: '#f0d8a8',
+      playerBody: '#e8c890',
+      playerSnout: '#a83328',
+      playerEye: '#0a0404',
+    },
+    decor: 'varanasi',
+    djLine: '— the older the city, the deeper the drone.',
+  },
+  {
+    id: 'mysore',
+    name: 'MYSORE',
+    region: 'KARNATAKA',
+    mood: 'sandalwood sunrise',
+    description: 'first asana at 4am',
+    scaleName: 'mohanam',
+    scale: [0, 2, 4, 7, 9],  // Carnatic major pentatonic
+    baseMidi: 50, // D3
+    palette: {
+      stageBg: 'linear-gradient(180deg, #ffe8b8 0%, #e8b870 55%, #8a5a3a 100%)',
+      cardBg: '#3a2008',
+      cardAccent: '#ffd400',
+      cubeTop: '#d4a32d',
+      cubeTopHopped: '#f3ecd8',
+      cubeTopHopped2: '#c44438',
+      cubeLeft: '#7a4828',
+      cubeRight: '#5a4838',
+      ink: '#1a0a04',
+      noteFxBg: '#fff3d4',
+      playerBody: '#f3ecd8',
+      playerSnout: '#d4a32d',
+      playerEye: '#1a0a04',
+    },
+    decor: 'mysore',
+    djLine: '— jasmine in the hair, sandalwood on the wrists.',
+  },
+];
+
+// ============ CONFIG ============
+const PYRAMID_ROWS = 6;
+const CUBE_W = 56;
+const CUBE_TOP_H = 28;
+const CUBE_SIDE_H = 28;
+const ROW_Y_OFFSET = 42;
+const STAGE_W = 460;
+const STAGE_H = 500;
+const PYRAMID_TOP_Y = 60;
+const PYRAMID_CENTER_X = STAGE_W / 2;
+const NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+
+// ============ STATE ============
+const state = {
+  audio: null,
+  cubes: [],
+  player: { row: 0, col: 0, hopping: false },
+  level: 1,
+  score: 0,
+  lives: 3,
+  hopsPerCube: 1,
+  cubesCompleted: 0,
+  earSkill: 0,
+  musicSkill: 0,
+  sessionEarGain: 0,
+  sessionMusicGain: 0,
+  comboBeat: 0,
+  isPlaying: false,
+  worldIdx: 0,
+};
+
+function currentWorld() { return WORLDS[state.worldIdx]; }
+
+// ============ ELEMENTS ============
+const stage = document.getElementById('stage');
+const stageWrap = document.getElementById('stageWrap');
+const levelVal = document.getElementById('levelVal');
+const scoreVal = document.getElementById('scoreVal');
+const earSkillVal = document.getElementById('earSkillVal');
+const musicSkillVal = document.getElementById('musicSkillVal');
+const livesRow = document.getElementById('livesRow');
+const cubesProgress = document.getElementById('cubesProgress');
+const startOverlay = document.getElementById('startOverlay');
+const startWorld = document.getElementById('startWorld');
+const startBtn = document.getElementById('startBtn');
+const levelOverlay = document.getElementById('levelOverlay');
+const lvlNum = document.getElementById('lvlNum');
+const lvlScore = document.getElementById('lvlScore');
+const lvlSkill = document.getElementById('lvlSkill');
+const nextLvlBtn = document.getElementById('nextLvlBtn');
+const gameoverOverlay = document.getElementById('gameoverOverlay');
+const goScore = document.getElementById('goScore');
+const goLevel = document.getElementById('goLevel');
+const goSkill = document.getElementById('goSkill');
+const retryBtn = document.getElementById('retryBtn');
+const resetBtn = document.getElementById('resetBtn');
+const dpad = document.getElementById('dpad');
+const worldScroll = document.getElementById('worldScroll');
+const worldCurrentName = document.getElementById('worldCurrentName');
+const gameCard = document.getElementById('gameCard');
+const cardEyebrow = document.getElementById('cardEyebrow');
+const cardLine = document.getElementById('cardLine');
+const cardStat = document.getElementById('cardStat');
+const progWorld = document.getElementById('progWorld');
+
+// ============ PERSISTENCE ============
+async function loadState() {
+  try {
+    const r = await window.storage.get('drum_state');
+    if (r && r.value) {
+      const saved = JSON.parse(r.value);
+      state.musicSkill = saved.musicSkill || 0;
+      state.earSkill = saved.earSkill || 0;
+      state.worldIdx = saved.hopWorld || 0;
+    }
+  } catch (e) {}
+}
+async function saveState() {
+  try {
+    let existing = {};
+    try {
+      const r = await window.storage.get('drum_state');
+      if (r && r.value) existing = JSON.parse(r.value);
+    } catch (e) {}
+    existing.musicSkill = state.musicSkill;
+    existing.earSkill = state.earSkill;
+    existing.hopWorld = state.worldIdx;
+    existing.hopHighScore = Math.max(existing.hopHighScore || 0, state.score);
+    existing.hopBestLevel = Math.max(existing.hopBestLevel || 1, state.level);
+    await window.storage.set('drum_state', JSON.stringify(existing));
+  } catch (e) {}
+}
+
+// ============ AUDIO ============
+function initAudio() {
+  if (state.audio) return;
+  const AC = window.AudioContext || window.webkitAudioContext;
+  state.audio = new AC();
+}
+function midiToFreq(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+
+function playNote(midi, t = null, vol = 0.32) {
+  if (!state.audio) return;
+  const ac = state.audio;
+  if (t === null) t = ac.currentTime;
+  const freq = midiToFreq(midi);
+  const world = currentWorld();
+
+  const carrier = ac.createOscillator();
+  const mod = ac.createOscillator();
+  const modGain = ac.createGain();
+  const outGain = ac.createGain();
+  const filter = ac.createBiquadFilter();
+
+  carrier.type = 'sine';
+  carrier.frequency.value = freq;
+  mod.type = 'sine';
+  mod.frequency.value = freq * 2;
+  modGain.gain.value = freq * 1.5;
+
+  filter.type = 'lowpass';
+  filter.Q.value = 0.5;
+
+  // World-specific synth tuning
+  let decay = 0.6;
+  if (world.id === 'brooklyn') {
+    filter.frequency.value = 1600;
+    decay = 0.45;
+  } else if (world.id === 'berlin') {
+    filter.frequency.value = 2400;
+    decay = 0.9;
+    carrier.type = 'triangle';
+  } else if (world.id === 'tokyo') {
+    filter.frequency.value = 5500;
+    decay = 0.5;
+    modGain.gain.value = freq * 2.5; // brighter overtones
+  } else if (world.id === 'paris') {
+    filter.frequency.value = 6500;
+    decay = 0.85;
+    modGain.gain.value = freq * 2;
+  } else if (world.id === 'medellin') {
+    filter.frequency.value = 4500;
+    decay = 0.4;
+  } else if (world.id === 'stlouis') {
+    filter.frequency.value = 1800;
+    filter.Q.value = 1.4;  // organ-like resonance
+    decay = 0.7;
+    carrier.type = 'sawtooth';
+    modGain.gain.value = freq * 0.8;
+  } else if (world.id === 'mexico') {
+    filter.frequency.value = 5800;
+    decay = 0.7;
+    modGain.gain.value = freq * 2.2; // bright bell
+  } else if (world.id === 'oaxaca') {
+    filter.frequency.value = 2200;
+    decay = 0.9;
+    carrier.type = 'triangle';
+    modGain.gain.value = freq * 1.2; // smoky/woody
+  } else if (world.id === 'tulum') {
+    filter.frequency.value = 4800;
+    decay = 0.6;
+    modGain.gain.value = freq * 1.8; // bright, watery
+  } else if (world.id === 'rishikesh') {
+    filter.frequency.value = 5200;
+    filter.Q.value = 1.2;
+    decay = 1.1; // long, devotional, sitar-like sustain
+    modGain.gain.value = freq * 2.4;
+  } else if (world.id === 'varanasi') {
+    filter.frequency.value = 1400;
+    filter.Q.value = 1.6;
+    decay = 1.3; // deep, resonant drone
+    carrier.type = 'sawtooth';
+    modGain.gain.value = freq * 1;
+  } else if (world.id === 'mysore') {
+    filter.frequency.value = 3800;
+    decay = 0.65;
+    modGain.gain.value = freq * 1.8; // warm, mid-bright tabla-like
+  } else {
+    filter.frequency.value = 4000;
+  }
+
+  mod.connect(modGain).connect(carrier.frequency);
+  carrier.connect(filter).connect(outGain).connect(ac.destination);
+
+  outGain.gain.setValueAtTime(0, t);
+  outGain.gain.linearRampToValueAtTime(vol, t + 0.005);
+  outGain.gain.exponentialRampToValueAtTime(0.001, t + decay);
+
+  carrier.start(t); mod.start(t);
+  carrier.stop(t + decay + 0.05);
+  mod.stop(t + decay + 0.05);
+}
+
+function playFanfare(midiArr, gap = 0.12) {
+  if (!state.audio) return;
+  const ac = state.audio;
+  const t0 = ac.currentTime;
+  midiArr.forEach((m, i) => playNote(m, t0 + i * gap, 0.35));
+}
+
+function playFall() {
+  if (!state.audio) return;
+  const ac = state.audio;
+  const t = ac.currentTime;
+  const o = ac.createOscillator();
+  const g = ac.createGain();
+  o.type = 'sawtooth';
+  o.frequency.setValueAtTime(400, t);
+  o.frequency.exponentialRampToValueAtTime(50, t + 0.6);
+  g.gain.setValueAtTime(0.25, t);
+  g.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+  o.connect(g).connect(ac.destination);
+  o.start(t); o.stop(t + 0.65);
+}
+
+// ============ PYRAMID BUILD ============
+function buildPyramid() {
+  const world = currentWorld();
+  state.cubes = [];
+  let noteIndex = 0;
+  for (let r = PYRAMID_ROWS - 1; r >= 0; r--) {
+    for (let c = 0; c <= r; c++) {
+      const scaleStep = world.scale[noteIndex % world.scale.length];
+      const octave = Math.floor(noteIndex / world.scale.length);
+      const midi = world.baseMidi + scaleStep + octave * 12;
+      noteIndex++;
+      const cx = PYRAMID_CENTER_X - (r * CUBE_W / 2) + c * CUBE_W;
+      const cy = PYRAMID_TOP_Y + r * ROW_Y_OFFSET;
+      state.cubes.push({
+        row: r, col: c,
+        hops: 0,
+        midi,
+        x: cx,
+        y: cy,
+        topX: cx + CUBE_W / 2,
+        topY: cy + CUBE_TOP_H / 2,
+      });
+    }
+  }
+}
+
+function cubeAt(row, col) {
+  return state.cubes.find(c => c.row === row && c.col === col);
+}
+
+function topColorFor(cube) {
+  const world = currentWorld();
+  if (cube.hops <= 0) return world.palette.cubeTop;
+  if (cube.hops === 1) return world.palette.cubeTopHopped;
+  return world.palette.cubeTopHopped2;
+}
+
+function isCubeComplete(cube) {
+  return cube.hops >= state.hopsPerCube;
+}
+
+// ============ THEME APPLICATION ============
+function applyTheme() {
+  const w = currentWorld();
+  stageWrap.style.background = w.palette.stageBg;
+  gameCard.style.background = w.palette.cardBg;
+  cardStat.style.background = w.palette.cardAccent;
+  cardEyebrow.style.color = w.palette.cardAccent;
+  const emEls = gameCard.querySelectorAll('em');
+  emEls.forEach(el => { el.style.color = w.palette.cardAccent; });
+  cardEyebrow.textContent = `— YOUR CHARACTER // ${w.name}`;
+  cardLine.innerHTML = `Each cube plays a note in the <em>${w.scaleName}</em> scale. ${w.djLine.replace(/^—\s*/, '')}`;
+  worldCurrentName.innerHTML = `${w.name} — <em>${w.mood}</em>`;
+  startWorld.textContent = `— ${w.name} // ${w.mood.toUpperCase()}`;
+  progWorld.textContent = w.name;
+  document.body.style.color = '';
+}
+
+// ============ DECORATIONS (background per world) ============
+function renderDecor() {
+  const w = currentWorld();
+  const ink = w.palette.ink;
+  const decorGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+  decorGroup.setAttribute('id', 'decor');
+
+  if (w.decor === 'madrid') {
+    // Sun
+    const sun = circle(380, 60, 28, '#ffd400', ink, 2);
+    decorGroup.appendChild(sun);
+    // Sun rays (thin lines)
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const x1 = 380 + Math.cos(angle) * 32;
+      const y1 = 60 + Math.sin(angle) * 32;
+      const x2 = 380 + Math.cos(angle) * 42;
+      const y2 = 60 + Math.sin(angle) * 42;
+      decorGroup.appendChild(line(x1, y1, x2, y2, ink, 2));
+    }
+    // Plaza balcony in back
+    decorGroup.appendChild(rect(30, 30, 60, 80, '#a04020', ink, 2));
+    decorGroup.appendChild(rect(40, 50, 14, 18, '#5a8a47', ink, 1.5));
+    decorGroup.appendChild(rect(64, 50, 14, 18, '#5a8a47', ink, 1.5));
+    decorGroup.appendChild(rect(40, 78, 14, 18, '#5a8a47', ink, 1.5));
+    decorGroup.appendChild(rect(64, 78, 14, 18, '#5a8a47', ink, 1.5));
+  }
+  else if (w.decor === 'paris') {
+    // Sagrada Familia spires (tapered shapes)
+    decorGroup.appendChild(triangle(70, 25, 90, 200, 50, 200, '#5c2858', ink, 2));
+    decorGroup.appendChild(triangle(105, 10, 125, 200, 85, 200, '#d4a32d', ink, 2));
+    decorGroup.appendChild(triangle(140, 30, 160, 200, 120, 200, '#2d8659', ink, 2));
+    // Spire tops (mosaic balls)
+    decorGroup.appendChild(circle(70, 25, 8, '#d96b7d', ink, 2));
+    decorGroup.appendChild(circle(105, 10, 7, '#1a4a52', ink, 2));
+    decorGroup.appendChild(circle(140, 30, 8, '#f0e0e8', ink, 2));
+    // Eiffel Tower silhouette
+    decorGroup.appendChild(triangle(395, 30, 425, 200, 365, 200, ink, ink, 1));
+    decorGroup.appendChild(line(370, 110, 420, 110, ink, 2));
+    decorGroup.appendChild(line(375, 160, 415, 160, ink, 2));
+    // Rose window
+    decorGroup.appendChild(circle(385, 80, 22, '#d96b7d', ink, 2));
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      decorGroup.appendChild(line(
+        385 + Math.cos(a) * 8, 80 + Math.sin(a) * 8,
+        385 + Math.cos(a) * 22, 80 + Math.sin(a) * 22,
+        ink, 1.5
+      ));
+    }
+  }
+  else if (w.decor === 'medellin') {
+    // Mountain layers
+    const m1 = polygon('0,150 60,80 130,140 200,90 280,130 360,70 460,120 460,200 0,200', '#7a3a8a', ink, 2);
+    decorGroup.appendChild(m1);
+    const m2 = polygon('0,180 80,130 180,170 270,140 380,180 460,160 460,200 0,200', '#a83333', ink, 2);
+    decorGroup.appendChild(m2);
+    // Cable car
+    decorGroup.appendChild(line(40, 40, 420, 30, ink, 2));
+    decorGroup.appendChild(rect(180, 40, 24, 14, '#ffd400', ink, 1.5));
+    decorGroup.appendChild(line(192, 30, 192, 40, ink, 2));
+    // Sun
+    decorGroup.appendChild(circle(60, 50, 18, '#ffd400', ink, 2));
+    // Small painted houses
+    decorGroup.appendChild(rect(420, 100, 16, 20, '#d63384', ink, 1.5));
+    decorGroup.appendChild(rect(420, 95, 16, 6, ink, ink, 1.5));
+    decorGroup.appendChild(rect(30, 110, 16, 20, '#5a8048', ink, 1.5));
+    decorGroup.appendChild(rect(30, 105, 16, 6, ink, ink, 1.5));
+  }
+  else if (w.decor === 'brooklyn') {
+    // Warehouse silhouettes
+    decorGroup.appendChild(rect(0, 60, 70, 140, '#3a3a42', ink, 2));
+    decorGroup.appendChild(rect(70, 90, 90, 110, '#5a4035', ink, 2));
+    decorGroup.appendChild(rect(160, 50, 80, 150, '#3a3a42', ink, 2));
+    decorGroup.appendChild(rect(240, 80, 100, 120, '#5a4035', ink, 2));
+    decorGroup.appendChild(rect(340, 60, 120, 140, '#3a3a42', ink, 2));
+    // Water tower
+    decorGroup.appendChild(rect(380, 30, 24, 30, '#a04638', ink, 2));
+    decorGroup.appendChild(polygon('378,30 426,30 422,12 382,12', '#6b2f25', ink, 2));
+    decorGroup.appendChild(line(380, 60, 380, 75, ink, 2));
+    decorGroup.appendChild(line(404, 60, 404, 75, ink, 2));
+    // Windows on warehouses
+    for (let i = 0; i < 4; i++) {
+      for (let j = 0; j < 3; j++) {
+        decorGroup.appendChild(rect(8 + j*18, 75 + i*18, 8, 10, '#d4732d', ink, 1));
+      }
+    }
+    // Fire escape diagonal
+    decorGroup.appendChild(line(220, 70, 240, 195, ink, 2));
+    for (let i = 0; i < 6; i++) {
+      decorGroup.appendChild(line(220 + i*4, 90 + i*18, 240 + i*4, 90 + i*18, ink, 1.5));
+    }
+  }
+  else if (w.decor === 'berlin') {
+    // Fernsehturm (TV tower)
+    decorGroup.appendChild(line(390, 0, 390, 200, ink, 3));
+    decorGroup.appendChild(circle(390, 50, 18, '#3a3a42', '#d4f000', 2));
+    decorGroup.appendChild(polygon('384,68 396,68 392,90 388,90', ink, ink, 1));
+    // Concrete blocks (stark rectangles)
+    decorGroup.appendChild(rect(0, 100, 80, 100, '#2a2c32', ink, 2));
+    decorGroup.appendChild(rect(80, 130, 100, 70, '#1a1c22', ink, 2));
+    decorGroup.appendChild(rect(180, 110, 90, 90, '#2a2c32', ink, 2));
+    decorGroup.appendChild(rect(270, 140, 80, 60, '#1a1c22', ink, 2));
+    // Acid yellow tag
+    decorGroup.appendChild(line(20, 150, 60, 150, '#d4f000', 3));
+    decorGroup.appendChild(line(50, 145, 55, 165, '#d4f000', 3));
+    // Pink slash
+    decorGroup.appendChild(line(200, 120, 260, 180, '#f04090', 4));
+    // Horizontal striations
+    for (let i = 0; i < 5; i++) {
+      decorGroup.appendChild(line(0, 200 + i * 4, 460, 200 + i * 4, 'rgba(255,255,255,0.04)', 1));
+    }
+  }
+  else if (w.decor === 'tokyo') {
+    // Tokyo Tower (red tapered)
+    decorGroup.appendChild(triangle(60, 20, 90, 200, 30, 200, '#c4291f', ink, 2));
+    decorGroup.appendChild(line(40, 100, 80, 100, ink, 1.5));
+    decorGroup.appendChild(line(45, 140, 75, 140, ink, 1.5));
+    decorGroup.appendChild(circle(60, 20, 5, '#ffd400', ink, 1.5));
+    // Hanging lanterns
+    [{x:160,y:30},{x:220,y:45},{x:300,y:35},{x:360,y:50}].forEach(p => {
+      decorGroup.appendChild(line(p.x, 0, p.x, p.y - 10, ink, 1.5));
+      decorGroup.appendChild(ellipse(p.x, p.y, 12, 16, '#c4291f', ink, 2));
+      decorGroup.appendChild(line(p.x - 9, p.y, p.x + 9, p.y, '#1a1a3a', 1.5));
+    });
+    // Cherry blossom petals
+    const petals = [[400,80],[420,120],[395,160],[180,90],[280,130],[100,170]];
+    petals.forEach(([x,y]) => {
+      decorGroup.appendChild(ellipse(x, y, 4, 3, '#ff9aae', '#c4291f', 1));
+    });
+    // Moon
+    decorGroup.appendChild(circle(420, 30, 14, '#fde8a0', ink, 1.5));
+  }
+
+  // Insert decor at the start so cubes draw on top
+  stage.insertBefore(decorGroup, stage.firstChild);
+}
+
+// SVG helpers
+function svgEl(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function rect(x, y, w, h, fill, stroke, sw) {
+  return svgEl('rect', { x, y, width: w, height: h, fill, stroke, 'stroke-width': sw });
+}
+function circle(cx, cy, r, fill, stroke, sw) {
+  return svgEl('circle', { cx, cy, r, fill, stroke, 'stroke-width': sw });
+}
+function ellipse(cx, cy, rx, ry, fill, stroke, sw) {
+  return svgEl('ellipse', { cx, cy, rx, ry, fill, stroke, 'stroke-width': sw });
+}
+function line(x1, y1, x2, y2, stroke, sw) {
+  return svgEl('line', { x1, y1, x2, y2, stroke, 'stroke-width': sw, 'stroke-linecap': 'round' });
+}
+function triangle(x1, y1, x2, y2, x3, y3, fill, stroke, sw) {
+  return svgEl('polygon', { points: `${x1},${y1} ${x2},${y2} ${x3},${y3}`, fill, stroke, 'stroke-width': sw, 'stroke-linejoin': 'round' });
+}
+function polygon(points, fill, stroke, sw) {
+  return svgEl('polygon', { points, fill, stroke, 'stroke-width': sw, 'stroke-linejoin': 'round' });
+}
+
+// ============ CUBE RENDERING (theme-aware) ============
+function renderStage() {
+  while (stage.firstChild) stage.removeChild(stage.firstChild);
+  renderDecor();
+  for (let r = 0; r < PYRAMID_ROWS; r++) {
+    for (let c = 0; c <= r; c++) {
+      renderCube(cubeAt(r, c));
+    }
+  }
+  renderPlayer();
+}
+
+function renderCube(cube) {
+  const w = currentWorld();
+  const p = w.palette;
+  const ink = p.ink;
+  const x = cube.x;
+  const y = cube.y;
+  const cw = CUBE_W;
+  const th = CUBE_TOP_H;
+  const sh = CUBE_SIDE_H;
+
+  const group = svgEl('g', { class: 'cube', id: `cube-${cube.row}-${cube.col}` });
+
+  // Shadow
+  const sxa = x + 4;
+  const sya = y + th + 3;
+  group.appendChild(polygon(
+    `${sxa},${sya} ${sxa + cw/2},${sya - th/2 + 2} ${sxa + cw},${sya} ${sxa + cw/2},${sya + th/2 + 1}`,
+    'rgba(21,17,13,0.20)', 'none', 0
+  ));
+
+  // Top face
+  const top = polygon(
+    `${x + cw/2},${y} ${x + cw},${y + th/2} ${x + cw/2},${y + th} ${x},${y + th/2}`,
+    topColorFor(cube), ink, 2
+  );
+  top.classList.add('top-face');
+  group.appendChild(top);
+
+  // Left face
+  group.appendChild(polygon(
+    `${x},${y + th/2} ${x + cw/2},${y + th} ${x + cw/2},${y + th + sh} ${x},${y + th/2 + sh}`,
+    p.cubeLeft, ink, 2
+  ));
+
+  // Right face
+  group.appendChild(polygon(
+    `${x + cw/2},${y + th} ${x + cw},${y + th/2} ${x + cw},${y + th/2 + sh} ${x + cw/2},${y + th + sh}`,
+    p.cubeRight, ink, 2
+  ));
+
+  // World-specific cube decorations
+  decorateCube(group, cube, w);
+
+  stage.appendChild(group);
+}
+
+function decorateCube(group, cube, world) {
+  const p = world.palette;
+  const ink = p.ink;
+  const x = cube.x;
+  const y = cube.y;
+  const cw = CUBE_W;
+  const th = CUBE_TOP_H;
+  const sh = CUBE_SIDE_H;
+
+  if (world.id === 'madrid') {
+    // Small azulejo cross pattern on top
+    const cx = x + cw/2;
+    const cy = y + th/2;
+    group.appendChild(polygon(
+      `${cx},${cy-5} ${cx+4},${cy} ${cx},${cy+5} ${cx-4},${cy}`,
+      'rgba(58,26,8,0.18)', 'none', 0
+    ));
+  }
+  else if (world.id === 'gaudi') {
+    // Trencadís mosaic chips on top face — deterministic per cube
+    const seed = cube.row * 7 + cube.col * 13;
+    const mc = p.mosaicColors;
+    const cx = x + cw/2;
+    const cy = y + th/2;
+    // Generate ~6 small chips
+    for (let i = 0; i < 6; i++) {
+      const s = (seed + i * 37) % 100;
+      const ax = (s * 7) % 100 / 100;  // 0..1
+      const ay = ((s * 13) % 100) / 100;
+      // Position within top face (diamond shape)
+      const offsetX = (ax - 0.5) * cw * 0.6;
+      const offsetY = (ay - 0.5) * th * 0.6;
+      // Skip if outside diamond
+      const inDiamond = Math.abs(offsetX)/cw + Math.abs(offsetY*2)/th < 0.45;
+      if (!inDiamond) continue;
+      const px = cx + offsetX;
+      const py = cy + offsetY;
+      const chipColor = mc[(seed + i) % mc.length];
+      const sizeBase = 3 + ((seed + i * 11) % 5);
+      // Irregular polygon chip
+      const pts = [];
+      const sides = 3 + ((seed + i) % 3);
+      for (let k = 0; k < sides; k++) {
+        const a = (k / sides) * Math.PI * 2;
+        const r1 = sizeBase * (0.7 + ((seed + i + k) % 4) * 0.1);
+        pts.push(`${px + Math.cos(a) * r1},${py + Math.sin(a) * r1 * 0.5}`);
+      }
+      group.appendChild(polygon(pts.join(' '), chipColor, ink, 0.5));
+    }
+  }
+  else if (world.id === 'medellin') {
+    // Painted door/window on side face
+    const sx = x + cw/2;
+    const sy = y + th + sh * 0.3;
+    group.appendChild(rect(sx + 6, sy + 2, 12, 14, '#ffd400', ink, 1.2));
+    group.appendChild(rect(sx + 8, sy + 4, 3, 4, ink, 'none', 0));
+  }
+  else if (world.id === 'brooklyn') {
+    // Brick mortar lines on side faces
+    const ly = y + th/2 + 8;
+    group.appendChild(line(x + 4, ly, x + cw/2 - 2, ly + cw/4 - 4, 'rgba(232,224,208,0.30)', 1));
+    group.appendChild(line(x + 4, ly + 8, x + cw/2 - 2, ly + cw/4 + 4, 'rgba(232,224,208,0.30)', 1));
+    const ry = y + th/2 + 8;
+    group.appendChild(line(x + cw/2 + 2, ry + cw/4 - 4, x + cw - 4, ry, 'rgba(232,224,208,0.25)', 1));
+    group.appendChild(line(x + cw/2 + 2, ry + cw/4 + 4, x + cw - 4, ry + 8, 'rgba(232,224,208,0.25)', 1));
+  }
+  else if (world.id === 'berlin') {
+    // Occasional graffiti tag — only on some cubes
+    const seed = cube.row * 7 + cube.col * 13;
+    if (seed % 5 === 0) {
+      const cx = x + cw/2;
+      const cy = y + th/2;
+      group.appendChild(line(cx - 8, cy - 2, cx + 8, cy + 2, '#d4f000', 1.5));
+      group.appendChild(line(cx + 6, cy - 4, cx + 8, cy + 4, '#d4f000', 1.5));
+    } else if (seed % 7 === 0) {
+      const cx = x + cw/2;
+      const cy = y + th/2;
+      group.appendChild(circle(cx - 4, cy, 2, '#f04090', 'none', 0));
+      group.appendChild(circle(cx + 4, cy + 1, 1.5, '#f04090', 'none', 0));
+    }
+  }
+  else if (world.id === 'tokyo') {
+    // Small red dot (hinomaru-esque) on top face
+    const cx = x + cw/2;
+    const cy = y + th/2;
+    group.appendChild(circle(cx, cy, 4, '#c4291f', 'rgba(10,0,16,0.6)', 0.5));
+    // Subtle paper rain line on side
+    group.appendChild(line(x + cw * 0.7, y + th + 4, x + cw * 0.75, y + th + sh - 2, 'rgba(255,255,255,0.25)', 1));
+  }
+}
+
+function updateCubeColor(cube) {
+  const top = stage.querySelector(`#cube-${cube.row}-${cube.col} .top-face`);
+  if (top) top.setAttribute('fill', topColorFor(cube));
+  const group = document.getElementById(`cube-${cube.row}-${cube.col}`);
+  if (group) {
+    group.classList.add('bumped');
+    setTimeout(() => group.classList.remove('bumped'), 180);
+  }
+}
+
+// ============ PLAYER ============
+function renderPlayer() {
+  const cube = cubeAt(state.player.row, state.player.col);
+  if (!cube) return;
+  const w = currentWorld();
+  const p = w.palette;
+  const px = cube.topX;
+  const py = cube.topY - 12;
+
+  // Remove old player if exists
+  const old = document.getElementById('player');
+  if (old) old.remove();
+
+  const g = svgEl('g', { id: 'player', class: 'player-group' });
+
+  // Shadow
+  g.appendChild(ellipse(0, 14, 14, 5, p.ink, 'none', 0));
+  // Body
+  g.appendChild(circle(0, 0, 11, p.playerBody, p.ink, 2));
+  // Snout
+  const snout = svgEl('polygon', {
+    points: '5,-2 13,3 5,4',
+    fill: p.playerSnout, stroke: p.ink, 'stroke-width': 1.5, 'stroke-linejoin': 'round'
+  });
+  g.appendChild(snout);
+  // Eye
+  g.appendChild(circle(2, -3, 2.2, p.playerEye, 'none', 0));
+  // Highlight
+  g.appendChild(circle(2.8, -3.6, 0.7, p.cardAccent || '#ffd400', 'none', 0));
+
+  g.setAttribute('transform', `translate(${px}, ${py})`);
+  stage.appendChild(g);
+}
+
+function animatePlayerHop(fromCube, toCube, onDone) {
+  state.player.hopping = true;
+  const g = document.getElementById('player');
+  if (!g) { onDone(); return; }
+  const fromX = fromCube.topX;
+  const fromY = fromCube.topY - 12;
+  const toX = toCube.topX;
+  const toY = toCube.topY - 12;
+  const duration = 280;
+  const start = performance.now();
+  function step(t) {
+    const elapsed = t - start;
+    const progress = Math.min(1, elapsed / duration);
+    const x = fromX + (toX - fromX) * progress;
+    const baseY = fromY + (toY - fromY) * progress;
+    const arcHeight = 22;
+    const y = baseY - Math.sin(progress * Math.PI) * arcHeight;
+    g.setAttribute('transform', `translate(${x}, ${y})`);
+    if (progress < 1) requestAnimationFrame(step);
+    else { state.player.hopping = false; onDone(); }
+  }
+  requestAnimationFrame(step);
+}
+
+function animatePlayerFall(fromCube, dir, onDone) {
+  state.player.hopping = true;
+  const g = document.getElementById('player');
+  if (!g) { onDone(); return; }
+  const fromX = fromCube.topX;
+  const fromY = fromCube.topY - 12;
+  let dxSign = 0, dySign = 1;
+  if (dir === 'ul') { dxSign = -1; dySign = -1; }
+  else if (dir === 'ur') { dxSign = 1; dySign = -1; }
+  else if (dir === 'dl') { dxSign = -1; dySign = 1; }
+  else if (dir === 'dr') { dxSign = 1; dySign = 1; }
+  const duration = 700;
+  const start = performance.now();
+  function step(t) {
+    const elapsed = t - start;
+    const progress = Math.min(1, elapsed / duration);
+    const x = fromX + dxSign * 40 * progress;
+    const y = fromY + dySign * 30 * progress + progress * progress * 350;
+    const rotate = progress * 540 * dxSign;
+    g.setAttribute('transform', `translate(${x}, ${y}) rotate(${rotate})`);
+    g.style.opacity = (1 - progress * 0.6);
+    if (progress < 1) requestAnimationFrame(step);
+    else { g.style.opacity = 1; state.player.hopping = false; onDone(); }
+  }
+  requestAnimationFrame(step);
+}
+
+// ============ NOTE FX ============
+function showNoteFx(cube) {
+  const noteName = NOTE_NAMES[cube.midi % 12];
+  const octave = Math.floor(cube.midi / 12) - 1;
+  const el = document.createElement('div');
+  el.className = 'note-fx';
+  el.textContent = `${noteName}${octave}`;
+  const rect = stage.getBoundingClientRect();
+  const scaleX = rect.width / STAGE_W;
+  const scaleY = rect.height / STAGE_H;
+  const px = (cube.topX * scaleX);
+  const py = (cube.topY * scaleY);
+  el.style.left = px + 'px';
+  el.style.top = py + 'px';
+  stageWrap.appendChild(el);
+  setTimeout(() => el.remove(), 700);
+}
+
+// ============ MOVEMENT ============
+function attemptMove(dir) {
+  if (state.player.hopping || !state.isPlaying) return;
+  const fromCube = cubeAt(state.player.row, state.player.col);
+  let targetRow = state.player.row;
+  let targetCol = state.player.col;
+  if (dir === 'ul') { targetRow -= 1; targetCol -= 1; }
+  else if (dir === 'ur') { targetRow -= 1; }
+  else if (dir === 'dl') { targetRow += 1; }
+  else if (dir === 'dr') { targetRow += 1; targetCol += 1; }
+  const targetCube = cubeAt(targetRow, targetCol);
+  if (!targetCube) {
+    playFall();
+    state.lives--;
+    state.comboBeat = 0;
+    updateLives();
+    animatePlayerFall(fromCube, dir, () => {
+      if (state.lives <= 0) gameOver();
+      else {
+        state.player.row = 0;
+        state.player.col = 0;
+        renderPlayer();
+      }
+    });
+    return;
+  }
+  animatePlayerHop(fromCube, targetCube, () => {
+    state.player.row = targetRow;
+    state.player.col = targetCol;
+    onLandCube(targetCube);
+  });
+}
+
+function onLandCube(cube) {
+  const wasComplete = isCubeComplete(cube);
+  if (!wasComplete) {
+    cube.hops += 1;
+    state.comboBeat += 1;
+    let points = 25;
+    if (state.comboBeat >= 5) points = 50;
+    if (isCubeComplete(cube)) {
+      state.cubesCompleted += 1;
+      points += 25;
+      state.sessionEarGain += 1;
+    }
+    state.score += points;
+    state.sessionMusicGain += 0.5;
+  } else {
+    state.comboBeat = 0;
+  }
+  playNote(cube.midi);
+  updateCubeColor(cube);
+  showNoteFx(cube);
+  updateStats();
+  checkLevelComplete();
+}
+
+function checkLevelComplete() {
+  const total = state.cubes.length;
+  if (state.cubesCompleted >= total) {
+    setTimeout(() => completeLevel(), 350);
+  }
+}
+
+function completeLevel() {
+  state.isPlaying = false;
+  const bonus = 500 + state.lives * 100;
+  state.score += bonus;
+  const skillAwarded = 5 + state.level * 2;
+  state.earSkill += skillAwarded + state.sessionEarGain;
+  state.musicSkill += Math.floor(state.sessionMusicGain) + state.level;
+  state.sessionEarGain = 0;
+  state.sessionMusicGain = 0;
+  saveState();
+  updateStats();
+  const sortedNotes = state.cubes.map(c => c.midi).sort((a, b) => a - b);
+  const fanfare = [
+    sortedNotes[0],
+    sortedNotes[Math.floor(sortedNotes.length / 3)],
+    sortedNotes[Math.floor(sortedNotes.length * 2 / 3)],
+    sortedNotes[sortedNotes.length - 1],
+    sortedNotes[Math.floor(sortedNotes.length * 2 / 3)],
+    sortedNotes[sortedNotes.length - 1],
+  ];
+  playFanfare(fanfare, 0.13);
+  lvlNum.textContent = state.level + 1;
+  lvlScore.textContent = state.score;
+  lvlSkill.textContent = '+' + (skillAwarded + state.sessionEarGain);
+  levelOverlay.classList.remove('hidden');
+}
+
+function gameOver() {
+  state.isPlaying = false;
+  state.earSkill += state.sessionEarGain;
+  state.musicSkill += Math.floor(state.sessionMusicGain);
+  saveState();
+  goScore.textContent = state.score;
+  goLevel.textContent = state.level;
+  goSkill.textContent = '+' + state.sessionEarGain;
+  gameoverOverlay.classList.remove('hidden');
+}
+
+// ============ LEVEL / RESET ============
+function startLevel(lvl) {
+  state.level = lvl;
+  state.hopsPerCube = Math.min(3, lvl);
+  state.cubesCompleted = 0;
+  state.comboBeat = 0;
+  state.player.row = 0;
+  state.player.col = 0;
+  state.sessionEarGain = 0;
+  state.sessionMusicGain = 0;
+  buildPyramid();
+  renderStage();
+  updateStats();
+  state.isPlaying = true;
+}
+
+function newGame() {
+  state.score = 0;
+  state.lives = 3;
+  startLevel(1);
+}
+
+function nextLevel() { startLevel(state.level + 1); }
+
+// ============ STATS ============
+function updateStats() {
+  levelVal.textContent = state.level;
+  scoreVal.textContent = state.score;
+  earSkillVal.textContent = state.earSkill;
+  musicSkillVal.textContent = state.musicSkill;
+  cubesProgress.textContent = `${state.cubesCompleted}/${state.cubes.length || 21}`;
+  updateLives();
+}
+
+function updateLives() {
+  livesRow.innerHTML = '';
+  for (let i = 0; i < 3; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'life-dot' + (i >= state.lives ? ' lost' : '');
+    livesRow.appendChild(dot);
+  }
+}
+
+// ============ INPUT ============
+const KEY_MAP = {
+  'q': 'ul', 'w': 'ur', 'a': 'dl', 's': 'dr',
+  'arrowleft': 'ul', 'arrowup': 'ur', 'arrowdown': 'dl', 'arrowright': 'dr',
+};
+window.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key]) {
+    if (!state.isPlaying && !startOverlay.classList.contains('hidden')) return;
+    attemptMove(KEY_MAP[key]);
+    e.preventDefault();
+  } else if (e.key === ' ' || e.key === 'Enter') {
+    if (!startOverlay.classList.contains('hidden')) {
+      startOverlay.classList.add('hidden');
+      initAudio();
+      newGame();
+    } else if (!levelOverlay.classList.contains('hidden')) {
+      levelOverlay.classList.add('hidden');
+      nextLevel();
+    } else if (!gameoverOverlay.classList.contains('hidden')) {
+      gameoverOverlay.classList.add('hidden');
+      newGame();
+    }
+    e.preventDefault();
+  }
+});
+
+dpad.addEventListener('pointerdown', (e) => {
+  const btn = e.target.closest('.dpad-btn');
+  if (!btn) return;
+  e.preventDefault();
+  attemptMove(btn.dataset.dir);
+});
+
+startBtn.addEventListener('click', () => {
+  startOverlay.classList.add('hidden');
+  initAudio();
+  if (state.audio.state === 'suspended') state.audio.resume();
+  newGame();
+});
+nextLvlBtn.addEventListener('click', () => {
+  levelOverlay.classList.add('hidden');
+  nextLevel();
+});
+retryBtn.addEventListener('click', () => {
+  gameoverOverlay.classList.add('hidden');
+  newGame();
+});
+resetBtn.addEventListener('click', () => {
+  levelOverlay.classList.add('hidden');
+  gameoverOverlay.classList.add('hidden');
+  newGame();
+});
+
+// ============ WORLD SELECTOR ============
+function renderWorldSelector() {
+  worldScroll.innerHTML = '';
+  WORLDS.forEach((w, i) => {
+    const card = document.createElement('button');
+    card.className = 'world-card' + (i === state.worldIdx ? ' active' : '');
+    const sw = w.palette;
+    card.innerHTML = `
+      <div class="world-card-swatch">
+        <span style="background:${sw.cubeTop}"></span>
+        <span style="background:${sw.cubeLeft}"></span>
+        <span style="background:${sw.cubeRight}"></span>
+        <span style="background:${sw.cubeTopHopped}"></span>
+      </div>
+      <div class="world-card-body">
+        <div class="world-card-name">${w.name}</div>
+        <div class="world-card-region">${w.region}</div>
+        <div class="world-card-mood">${w.mood}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => selectWorld(i));
+    worldScroll.appendChild(card);
+  });
+}
+
+function selectWorld(i) {
+  if (i === state.worldIdx) return;
+  state.worldIdx = i;
+  applyTheme();
+  renderWorldSelector();
+  showToast('★ ENTERED ' + currentWorld().name);
+  if (state.isPlaying) {
+    // Reset game when switching worlds
+    levelOverlay.classList.add('hidden');
+    gameoverOverlay.classList.add('hidden');
+    newGame();
+  } else {
+    buildPyramid();
+    renderStage();
+    updateStats();
+  }
+  saveState();
+}
+
+// ============ TOAST ============
+function showToast(text) {
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 2500);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ============ INIT ============
+(async function init() {
+  await loadState();
+
+  // Atlas deep-link: ?world=cityId selects that world on entry
+  const urlParams = new URLSearchParams(window.location.search);
+  const worldParam = urlParams.get('world');
+  if (worldParam) {
+    const idx = WORLDS.findIndex(w => w.id === worldParam);
+    if (idx !== -1) state.worldIdx = idx;
+  }
+
+  applyTheme();
+  renderWorldSelector();
+  buildPyramid();
+  renderStage();
+  updateStats();
+  if (worldParam) showToast('★ YOU ARE IN ' + currentWorld().name);
+})();
+
+</script>
+</body>
+</html>
