@@ -9,9 +9,12 @@ import {
   type OpParams,
 } from "../_lib/engineDX7";
 import { DX7_PRESETS } from "../_lib/presetsDX7";
+import { LESSONS_DX7, type LessonDX7State } from "../_lib/lessonsDX7";
 import { Knob } from "../_components/Knob";
 import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 import { RecorderBar } from "../_components/RecorderBar";
+import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 
 const KEY_TO_OFFSET: Record<string, number> = {
   a: 0, s: 2, d: 4, f: 5, g: 7, h: 9, j: 11, k: 12, l: 14, ";": 16, "'": 17,
@@ -30,16 +33,31 @@ function midiToName(midi: number) {
   return `${names[((midi%12)+12)%12]}${Math.floor(midi/12)-1}`;
 }
 
+// Wrapper provides the spotlight context to all children.
 export function LabDX7Client() {
+  return (
+    <LessonSpotlightProvider>
+      <LabDX7Inner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabDX7Inner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [params, setParams] = useState<DX7Params>({ ...DX7_DEFAULTS });
   const [presetId, setPresetId] = useState("bell");
   const [octaveBase, setOctaveBase] = useState(48);
   const [activeMidi, setActiveMidi] = useState<number | null>(null);
+  const [lastNoteMidi, setLastNoteMidi] = useState<number | null>(null);
+  const [lastNotePlayedAt, setLastNotePlayedAt] = useState<number>(0);
   const [mounted, setMounted] = useState(false);
   useEffect(() => { setMounted(true); }, []);
   const [midiInputs, setMidiInputs] = useState<MidiDevice[]>([]);
   const [midiInId, setMidiInId] = useState<string>("");
+  // Lesson state
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(-1);
 
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineDX7 | null>(null);
@@ -103,6 +121,8 @@ export function LabDX7Client() {
   const noteOn = useCallback((midi: number) => {
     ensureAudio();
     setActiveMidi(midi);
+    setLastNoteMidi(midi);
+    setLastNotePlayedAt(performance.now());
     engineRef.current?.noteOn(midiToHz(midi));
   }, [ensureAudio]);
   const noteOff = useCallback(() => {
@@ -174,6 +194,35 @@ export function LabDX7Client() {
 
   const activePreset = useMemo(() => DX7_PRESETS.find((p) => p.id === presetId)!, [presetId]);
 
+  // ---- Lesson handling ----
+  const lesson = useMemo(() => LESSONS_DX7.find((l) => l.id === lessonId) ?? null, [lessonId]);
+  const lessonState: LessonDX7State = useMemo(
+    () => ({ params, lastNoteMidi, lastNotePlayedAt }),
+    [params, lastNoteMidi, lastNotePlayedAt]
+  );
+  const lastLessonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lessonId && lessonId !== lastLessonRef.current) {
+      lastLessonRef.current = lessonId;
+      // start from init so the user actually builds
+      loadPreset("init");
+      setStepIdx(-1);
+    }
+    if (!lessonId) lastLessonRef.current = null;
+  }, [lessonId, loadPreset]);
+
+  const advanceLesson = useCallback(() => {
+    if (!lesson) return;
+    setStepIdx((i) => Math.min(i + 1, lesson.steps.length));
+  }, [lesson]);
+  const exitLesson = useCallback(() => {
+    setLessonId(null);
+    setStepIdx(-1);
+  }, []);
+  const onStepComplete = useCallback((completedIdx: number) => {
+    setStepIdx((cur) => (cur === completedIdx ? cur + 1 : cur));
+  }, []);
+
   return (
     <div className="relative">
       {!armed && (
@@ -187,6 +236,18 @@ export function LabDX7Client() {
             <div className="font-display font-bold uppercase text-[28px] tracking-[-0.01em]">tap to power on</div>
           </div>
         </button>
+      )}
+
+      {/* LESSON PANEL */}
+      {lesson && (
+        <LessonPanel
+          lesson={lesson}
+          state={lessonState}
+          stepIdx={stepIdx}
+          onAdvance={advanceLesson}
+          onExit={exitLesson}
+          onStepComplete={onStepComplete}
+        />
       )}
 
       <div className="border-2 border-paper overflow-hidden" style={{ background: "linear-gradient(180deg, #1a1a26 0%, #0e0e18 100%)" }}>
@@ -206,15 +267,32 @@ export function LabDX7Client() {
               </select>
             </div>
             <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">LESSON</span>
+              {LESSONS_DX7.map((l) => {
+                const active = lessonId === l.id;
+                return (
+                  <button key={l.id} onClick={() => setLessonId(active ? null : l.id)}
+                    className={`font-mono text-[10px] uppercase px-2 py-1.5 border transition-colors ${
+                      active ? "border-lamp bg-lamp text-ink" : "border-paper/50 text-paper-2 hover:border-paper hover:text-paper"
+                    }`}>
+                    {active ? "✓ " : ""}{l.title.toLowerCase()}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">ALG</span>
               <div className="flex border border-paper/50">
-                {ALGS.map((a) => (
-                  <button key={a.id} onClick={() => setAlgorithm(a.id)}
-                    className={`font-mono text-[10px] uppercase px-2 py-1 transition-colors border-r border-paper/30 last:border-r-0 ${
-                      params.algorithm === a.id ? "bg-lamp text-ink" : "text-paper-2 hover:bg-ink"
-                    }`}
-                    title={a.ascii}>{a.label}</button>
-                ))}
+                {ALGS.map((a) => {
+                  const spot = isActive(`dx7:alg:${a.id}`);
+                  return (
+                    <button key={a.id} onClick={() => setAlgorithm(a.id)}
+                      className={`font-mono text-[10px] uppercase px-2 py-1 transition-colors border-r border-paper/30 last:border-r-0 ${
+                        params.algorithm === a.id ? "bg-lamp text-ink" : "text-paper-2 hover:bg-ink"
+                      } ${spot ? "spotlight-on" : ""}`}
+                      title={a.ascii}>{a.label}</button>
+                  );
+                })}
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -257,13 +335,13 @@ export function LabDX7Client() {
               <div key={idx} className={`p-3 ${idx < 3 ? "border-r border-paper/40" : ""}`}>
                 <div className="font-mono text-[9px] tracking-[.16em] uppercase text-lamp mb-2">OP{idx+1}</div>
                 <div className="flex flex-wrap gap-2">
-                  <Knob label="RATIO" value={Math.min(1, op.ratio / 16)} onChange={(v) => setOp(i, "ratio", Math.max(0.25, Math.round(v * 16 * 4) / 4))}
+                  <Knob label="RATIO" spotlightId={`dx7:op:${idx}:ratio`} value={Math.min(1, op.ratio / 16)} onChange={(v) => setOp(i, "ratio", Math.max(0.25, Math.round(v * 16 * 4) / 4))}
                     size={42} defaultValue={1/16} format={(v) => `${(v * 16).toFixed(2)}`} />
-                  <Knob label="LEVEL" value={op.level} onChange={(v) => setOp(i, "level", v)} size={42} defaultValue={0.6} format={(v) => `${Math.round(v*100)}`} />
-                  <Knob label="A" value={op.attack} onChange={(v) => setOp(i, "attack", v)} size={36} defaultValue={0.01} />
-                  <Knob label="D" value={op.decay} onChange={(v) => setOp(i, "decay", v)} size={36} defaultValue={0.4} />
-                  <Knob label="S" value={op.sustain} onChange={(v) => setOp(i, "sustain", v)} size={36} defaultValue={0.4} />
-                  <Knob label="R" value={op.release} onChange={(v) => setOp(i, "release", v)} size={36} defaultValue={0.3} />
+                  <Knob label="LEVEL" spotlightId={`dx7:op:${idx}:level`} value={op.level} onChange={(v) => setOp(i, "level", v)} size={42} defaultValue={0.6} format={(v) => `${Math.round(v*100)}`} />
+                  <Knob label="A" spotlightId={`dx7:op:${idx}:attack`} value={op.attack} onChange={(v) => setOp(i, "attack", v)} size={36} defaultValue={0.01} />
+                  <Knob label="D" spotlightId={`dx7:op:${idx}:decay`} value={op.decay} onChange={(v) => setOp(i, "decay", v)} size={36} defaultValue={0.4} />
+                  <Knob label="S" spotlightId={`dx7:op:${idx}:sustain`} value={op.sustain} onChange={(v) => setOp(i, "sustain", v)} size={36} defaultValue={0.4} />
+                  <Knob label="R" spotlightId={`dx7:op:${idx}:release`} value={op.release} onChange={(v) => setOp(i, "release", v)} size={36} defaultValue={0.3} />
                 </div>
               </div>
             );

@@ -13,6 +13,9 @@ import { SequencerSP, type StepRowSP } from "../_lib/sequencerSP";
 import { seedSP1200WithDrums } from "../_lib/sp1200-seed";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
+import { LESSONS_SP1200, type LessonSP1200State } from "../_lib/lessonsSP1200";
 
 // keyboard: 1..8 → pad
 const KEY_TO_PAD: Record<string, PadId> = {
@@ -37,6 +40,15 @@ function emptyRows(): StepRowSP[] {
 }
 
 export function LabSP1200Client() {
+  return (
+    <LessonSpotlightProvider>
+      <LabSP1200Inner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabSP1200Inner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [bpm, setBpm] = useState(92);
@@ -58,6 +70,10 @@ export function LabSP1200Client() {
   const flashTimer = useRef<number | null>(null);
   const [seeded, setSeeded] = useState(false);
   const [dragOverPad, setDragOverPad] = useState<PadId | null>(null);
+  const [lastTriggerAt, setLastTriggerAt] = useState(0);
+  // Lesson state
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(-1);
 
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineSP1200 | null>(null);
@@ -129,6 +145,7 @@ export function LabSP1200Client() {
     const ctx = ensureAudio();
     if (!ctx) return;
     engineRef.current?.trigger(pad, ctx.currentTime, 1);
+    setLastTriggerAt(performance.now());
     flashFor(pad);
   }, [ensureAudio, flashFor]);
 
@@ -199,6 +216,32 @@ export function LabSP1200Client() {
 
   const activeParams = pads[activePad];
 
+  // ---- Lesson ----
+  const lesson = useMemo(() => LESSONS_SP1200.find((l) => l.id === lessonId) ?? null, [lessonId]);
+  const lessonState: LessonSP1200State = useMemo(
+    () => ({ pads, activePad, lastTriggerAt }),
+    [pads, activePad, lastTriggerAt]
+  );
+  const advanceLesson = useCallback(() => {
+    if (!lesson) return;
+    setStepIdx((i) => Math.min(i + 1, lesson.steps.length));
+  }, [lesson]);
+  const exitLesson = useCallback(() => { setLessonId(null); setStepIdx(-1); }, []);
+  const onStepComplete = useCallback((completedIdx: number) => {
+    setStepIdx((cur) => (cur === completedIdx ? cur + 1 : cur));
+  }, []);
+  // Reset to step 0 when lesson selected (don't clear loaded samples — we
+  // want the user to play with what's seeded).
+  const lastLessonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lessonId && lessonId !== lastLessonRef.current) {
+      lastLessonRef.current = lessonId;
+      setStepIdx(-1);
+      setActivePad("P1");
+    }
+    if (!lessonId) lastLessonRef.current = null;
+  }, [lessonId]);
+
   return (
     <div className="relative">
       {!armed && (
@@ -215,6 +258,17 @@ export function LabSP1200Client() {
             </div>
           </div>
         </button>
+      )}
+
+      {lesson && (
+        <LessonPanel
+          lesson={lesson}
+          state={lessonState}
+          stepIdx={stepIdx}
+          onAdvance={advanceLesson}
+          onExit={exitLesson}
+          onStepComplete={onStepComplete}
+        />
       )}
 
       <div className="border-2 border-paper bg-ink-2 overflow-hidden">
@@ -267,6 +321,20 @@ export function LabSP1200Client() {
             >
               clear grid
             </button>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">LESSON</span>
+              {LESSONS_SP1200.map((l) => {
+                const active = lessonId === l.id;
+                return (
+                  <button key={l.id} onClick={() => setLessonId(active ? null : l.id)}
+                    className={`font-mono text-[10px] uppercase px-2 py-1.5 border transition-colors ${
+                      active ? "border-lamp bg-lamp text-ink" : "border-paper/50 text-paper-2 hover:border-paper hover:text-paper"
+                    }`}>
+                    {active ? "✓ " : ""}{l.title.toLowerCase()}
+                  </button>
+                );
+              })}
+            </div>
             <div className="font-mono text-[9px] tracking-[.14em] uppercase text-collect">
               {seeded ? "● 4 starter samples loaded · drop wav onto any pad to replace" : "○ booting starter kit…"}
             </div>
@@ -344,11 +412,12 @@ export function LabSP1200Client() {
             </div>
             <div className="grid grid-cols-4 gap-3">
               {PAD_ORDER.map((p) => {
-                const isActive = activePad === p;
+                const isActivePad = activePad === p;
                 const isFlash = flash === p;
                 const isDragOver = dragOverPad === p;
                 const padState = pads[p];
                 const color = PAD_COLOR[p];
+                const spot = isActive(`sp1200:pad:${p}`);
                 return (
                   <button
                     key={p}
@@ -358,8 +427,8 @@ export function LabSP1200Client() {
                     onDrop={(e) => onPadDrop(e, p)}
                     className={`relative aspect-[3/2] border-2 transition-all flex flex-col items-stretch justify-end pb-2 pt-1 px-2 ${
                       isDragOver ? "border-lamp bg-lamp/20"
-                        : isActive ? "border-lamp" : "border-paper/40 hover:border-paper"
-                    }`}
+                        : isActivePad ? "border-lamp" : "border-paper/40 hover:border-paper"
+                    } ${spot ? "spotlight-on" : ""}`}
                     style={{
                       background: isFlash ? color : `linear-gradient(180deg, ${color}26 0%, ${color}11 100%)`,
                       boxShadow: isFlash ? `0 0 24px ${color}` : undefined,
@@ -403,6 +472,7 @@ export function LabSP1200Client() {
               />
               <Knob
                 label="PITCH"
+                spotlightId="sp1200:knob:pitch"
                 value={(activeParams.pitch + 24) / 48}
                 onChange={(v) => setPadParam(activePad, "pitch", Math.round(v * 48 - 24))}
                 color={PAD_COLOR[activePad]}

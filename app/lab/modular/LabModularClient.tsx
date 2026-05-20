@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineModular, MOD_DEFAULTS, type ModularParams, type PatchProgram } from "../_lib/engineModular";
+import { LESSONS_MODULAR, type LessonModularState } from "../_lib/lessonsModular";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 
 const KEY_TO_OFFSET: Record<string, number> = {
@@ -29,10 +32,24 @@ function midiToName(midi: number) {
 }
 
 export function LabModularClient() {
+  return (
+    <LessonSpotlightProvider>
+      <LabModularInner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabModularInner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [params, setParams] = useState<ModularParams>({ ...MOD_DEFAULTS });
   const [octaveBase, setOctaveBase] = useState(48);
   const [activeMidi, setActiveMidi] = useState<number | null>(null);
+  const [lastNoteMidi, setLastNoteMidi] = useState<number | null>(null);
+  const [lastNotePlayedAt, setLastNotePlayedAt] = useState(0);
+  // Lesson
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(-1);
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineModular | null>(null);
   const heldRef = useRef<Set<string>>(new Set());
@@ -65,6 +82,8 @@ export function LabModularClient() {
   const noteOn = useCallback((midi: number) => {
     ensureAudio();
     setActiveMidi(midi);
+    setLastNoteMidi(midi);
+    setLastNotePlayedAt(performance.now());
     engineRef.current?.noteOn(midiToHz(midi));
   }, [ensureAudio]);
   const noteOff = useCallback(() => {
@@ -131,6 +150,31 @@ export function LabModularClient() {
 
   const activeProgram = useMemo(() => PROGRAMS.find((p) => p.id === params.program)!, [params.program]);
 
+  // ---- Lesson ----
+  const lesson = useMemo(() => LESSONS_MODULAR.find((l) => l.id === lessonId) ?? null, [lessonId]);
+  const lessonState: LessonModularState = useMemo(
+    () => ({ params, lastNoteMidi, lastNotePlayedAt }),
+    [params, lastNoteMidi, lastNotePlayedAt]
+  );
+  const lastLessonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lessonId && lessonId !== lastLessonRef.current) {
+      lastLessonRef.current = lessonId;
+      // Start from basic patch so user has to switch
+      setParam("program", "basic");
+      setStepIdx(-1);
+    }
+    if (!lessonId) lastLessonRef.current = null;
+  }, [lessonId, setParam]);
+  const advanceLesson = useCallback(() => {
+    if (!lesson) return;
+    setStepIdx((i) => Math.min(i + 1, lesson.steps.length));
+  }, [lesson]);
+  const exitLesson = useCallback(() => { setLessonId(null); setStepIdx(-1); }, []);
+  const onStepComplete = useCallback((completedIdx: number) => {
+    setStepIdx((cur) => (cur === completedIdx ? cur + 1 : cur));
+  }, []);
+
   return (
     <div className="relative">
       {!armed && (
@@ -140,6 +184,17 @@ export function LabModularClient() {
             <div className="font-display font-bold uppercase text-[28px] tracking-[-0.01em]">tap to power on</div>
           </div>
         </button>
+      )}
+
+      {lesson && (
+        <LessonPanel
+          lesson={lesson}
+          state={lessonState}
+          stepIdx={stepIdx}
+          onAdvance={advanceLesson}
+          onExit={exitLesson}
+          onStepComplete={onStepComplete}
+        />
       )}
 
       <div className="border-2 border-paper overflow-hidden" style={{ background: "linear-gradient(180deg, #1a1812 0%, #0c0a06 100%)" }}>
@@ -153,13 +208,30 @@ export function LabModularClient() {
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">PATCH</span>
               <div className="flex border border-paper/50">
-                {PROGRAMS.map((p) => (
-                  <button key={p.id} onClick={() => setParam("program", p.id)}
-                    className={`font-mono text-[10px] uppercase px-2 py-1 transition-colors border-r border-paper/30 last:border-r-0 ${
-                      params.program === p.id ? "bg-lamp text-ink" : "text-paper-2 hover:bg-ink"
-                    }`} title={p.flow}>{p.label}</button>
-                ))}
+                {PROGRAMS.map((p) => {
+                  const spot = isActive(`modular:patch:${p.id}`);
+                  return (
+                    <button key={p.id} onClick={() => setParam("program", p.id)}
+                      className={`font-mono text-[10px] uppercase px-2 py-1 transition-colors border-r border-paper/30 last:border-r-0 ${
+                        params.program === p.id ? "bg-lamp text-ink" : "text-paper-2 hover:bg-ink"
+                      } ${spot ? "spotlight-on" : ""}`} title={p.flow}>{p.label}</button>
+                  );
+                })}
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">LESSON</span>
+              {LESSONS_MODULAR.map((l) => {
+                const active = lessonId === l.id;
+                return (
+                  <button key={l.id} onClick={() => setLessonId(active ? null : l.id)}
+                    className={`font-mono text-[10px] uppercase px-2 py-1.5 border transition-colors ${
+                      active ? "border-lamp bg-lamp text-ink" : "border-paper/50 text-paper-2 hover:border-paper hover:text-paper"
+                    }`}>
+                    {active ? "✓ " : ""}{l.title.toLowerCase()}
+                  </button>
+                );
+              })}
             </div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">OCT</span>
@@ -216,8 +288,8 @@ export function LabModularClient() {
               ))}
             </div>
             <div className="flex gap-2">
-              <Knob label="RATIO" value={Math.log2(params.vco2Ratio + 0.5) / 4} onChange={(v) => setParam("vco2Ratio", Math.max(0.25, Math.round(Math.pow(2, v*4 - 0.5) * 4) / 4))} size={42} defaultValue={0.5} format={(v) => `${Math.pow(2, v*4-0.5).toFixed(2)}x`} />
-              <Knob label="LEVEL" value={params.vco2Level} onChange={(v) => setParam("vco2Level", v)} size={42} defaultValue={0} format={(v) => `${Math.round(v*100)}`} />
+              <Knob label="RATIO" spotlightId="modular:knob:vco2ratio" value={Math.log2(params.vco2Ratio + 0.5) / 4} onChange={(v) => setParam("vco2Ratio", Math.max(0.25, Math.round(Math.pow(2, v*4 - 0.5) * 4) / 4))} size={42} defaultValue={0.5} format={(v) => `${Math.pow(2, v*4-0.5).toFixed(2)}x`} />
+              <Knob label="LEVEL" spotlightId="modular:knob:vco2level" value={params.vco2Level} onChange={(v) => setParam("vco2Level", v)} size={42} defaultValue={0} format={(v) => `${Math.round(v*100)}`} />
             </div>
           </div>
           {/* LFO */}

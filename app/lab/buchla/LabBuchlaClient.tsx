@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineBuchla, BUCHLA_DEFAULTS, type BuchlaParams, type PlateShape } from "../_lib/engineBuchla";
+import { LESSONS_BUCHLA, type LessonBuchlaState } from "../_lib/lessonsBuchla";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 
 const PLATES: { id: PlateShape; label: string; color: string; story: string }[] = [
@@ -27,10 +30,24 @@ const PRESETS: { id: string; name: string; origin: string; story: string; params
 ];
 
 export function LabBuchlaClient() {
+  return (
+    <LessonSpotlightProvider>
+      <LabBuchlaInner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabBuchlaInner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [params, setParams] = useState<BuchlaParams>({ ...BUCHLA_DEFAULTS });
   const [presetId, setPresetId] = useState("silver-apples");
   const [activePlate, setActivePlate] = useState<PlateShape | null>(null);
+  const [lastPlate, setLastPlate] = useState<PlateShape | null>(null);
+  const [lastPlateAt, setLastPlateAt] = useState(0);
+  // Lesson
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(-1);
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineBuchla | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -72,6 +89,8 @@ export function LabBuchlaClient() {
   const tap = useCallback((plate: PlateShape) => {
     ensureAudio();
     setActivePlate(plate);
+    setLastPlate(plate);
+    setLastPlateAt(performance.now());
     engineRef.current?.trigger(plate);
     if (plate !== "drone") {
       setTimeout(() => setActivePlate((p) => (p === plate ? null : p)), 200);
@@ -133,6 +152,30 @@ export function LabBuchlaClient() {
 
   const activePreset = useMemo(() => PRESETS.find((p) => p.id === presetId)!, [presetId]);
 
+  // ---- Lesson ----
+  const lesson = useMemo(() => LESSONS_BUCHLA.find((l) => l.id === lessonId) ?? null, [lessonId]);
+  const lessonState: LessonBuchlaState = useMemo(
+    () => ({ params, lastPlate, lastPlateAt }),
+    [params, lastPlate, lastPlateAt]
+  );
+  const lastLessonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lessonId && lessonId !== lastLessonRef.current) {
+      lastLessonRef.current = lessonId;
+      loadPreset("silver-apples");
+      setStepIdx(-1);
+    }
+    if (!lessonId) lastLessonRef.current = null;
+  }, [lessonId, loadPreset]);
+  const advanceLesson = useCallback(() => {
+    if (!lesson) return;
+    setStepIdx((i) => Math.min(i + 1, lesson.steps.length));
+  }, [lesson]);
+  const exitLesson = useCallback(() => { setLessonId(null); setStepIdx(-1); }, []);
+  const onStepComplete = useCallback((completedIdx: number) => {
+    setStepIdx((cur) => (cur === completedIdx ? cur + 1 : cur));
+  }, []);
+
   return (
     <div className="relative">
       {!armed && (
@@ -142,6 +185,17 @@ export function LabBuchlaClient() {
             <div className="font-display font-bold uppercase text-[28px] tracking-[-0.01em]">tap to power on</div>
           </div>
         </button>
+      )}
+
+      {lesson && (
+        <LessonPanel
+          lesson={lesson}
+          state={lessonState}
+          stepIdx={stepIdx}
+          onAdvance={advanceLesson}
+          onExit={exitLesson}
+          onStepComplete={onStepComplete}
+        />
       )}
 
       <div className="border-2 border-paper overflow-hidden" style={{ background: "linear-gradient(180deg, #2a1f3a 0%, #14081e 100%)" }}>
@@ -157,6 +211,20 @@ export function LabBuchlaClient() {
               <select value={presetId} onChange={(e) => loadPreset(e.target.value)} className="bg-ink border border-paper px-2 py-1 font-mono text-[12px] text-paper">
                 {PRESETS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">LESSON</span>
+              {LESSONS_BUCHLA.map((l) => {
+                const active = lessonId === l.id;
+                return (
+                  <button key={l.id} onClick={() => setLessonId(active ? null : l.id)}
+                    className={`font-mono text-[10px] uppercase px-2 py-1.5 border transition-colors ${
+                      active ? "border-lamp bg-lamp text-ink" : "border-paper/50 text-paper-2 hover:border-paper hover:text-paper"
+                    }`}>
+                    {active ? "✓ " : ""}{l.title.toLowerCase()}
+                  </button>
+                );
+              })}
             </div>
             {mounted && isMidiSupported() && (
               <div className="flex items-center gap-2">
@@ -206,7 +274,7 @@ export function LabBuchlaClient() {
             <div className="font-mono text-[9px] tracking-[.16em] uppercase text-lamp mb-2">SOURCE OF UNCERTAINTY</div>
             <div className="font-mono text-[9px] text-on-dark leading-snug max-w-[260px] mb-3">slow random voltage. patches itself into TIMBRE — turn this up to hear the patch evolve while you hold a drone.</div>
             <div className="flex flex-wrap gap-3">
-              <Knob label="RANDOM" value={params.randomAmt} onChange={(v) => setParam("randomAmt", v)} color="#7AFB0D" defaultValue={0.3} format={(v) => `${Math.round(v*100)}`} />
+              <Knob label="RANDOM" spotlightId="buchla:knob:random" value={params.randomAmt} onChange={(v) => setParam("randomAmt", v)} color="#7AFB0D" defaultValue={0.3} format={(v) => `${Math.round(v*100)}`} />
               <Knob label="VOLUME" value={params.volume} onChange={(v) => setParam("volume", v)} defaultValue={0.6} format={(v) => `${Math.round(v*100)}`} />
             </div>
           </div>
@@ -220,6 +288,7 @@ export function LabBuchlaClient() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {PLATES.map((p) => {
               const active = activePlate === p.id;
+              const spot = isActive(`buchla:plate:${p.id}`);
               return (
                 <button
                   key={p.id}
@@ -227,7 +296,7 @@ export function LabBuchlaClient() {
                   onPointerUp={() => { if (p.id === "drone") return; /* otherwise auto-release in engine */ }}
                   className={`relative aspect-[3/2] border-2 transition-all flex flex-col items-stretch justify-center p-3 ${
                     active ? "border-lamp" : "border-paper/40 hover:border-paper"
-                  }`}
+                  } ${spot ? "spotlight-on" : ""}`}
                   style={{
                     background: active ? p.color : `linear-gradient(180deg, ${p.color}26 0%, ${p.color}11 100%)`,
                     boxShadow: active ? `0 0 30px ${p.color}` : undefined,

@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineSID, SID_DEFAULTS, type SidParams, type SidVoiceParams, type SidWave, type FilterMode } from "../_lib/engineSID";
+import { LESSONS_SID, type LessonSidState } from "../_lib/lessonsSID";
 import { Knob } from "../_components/Knob";
 import { RecorderBar } from "../_components/RecorderBar";
+import { LessonPanel } from "../_components/LessonPanel";
+import { LessonSpotlightProvider, useSpotlight } from "../_components/LessonSpotlight";
 import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
 
 const KEY_TO_OFFSET: Record<string, number> = {
@@ -56,11 +59,25 @@ function midiToName(midi: number) {
 }
 
 export function LabSIDClient() {
+  return (
+    <LessonSpotlightProvider>
+      <LabSIDInner />
+    </LessonSpotlightProvider>
+  );
+}
+
+function LabSIDInner() {
+  const { isActive } = useSpotlight();
   const [armed, setArmed] = useState(false);
   const [params, setParams] = useState<SidParams>({ ...SID_DEFAULTS });
   const [presetId, setPresetId] = useState("hubbard-lead");
   const [octaveBase, setOctaveBase] = useState(48);
   const [activeMidi, setActiveMidi] = useState<number | null>(null);
+  const [lastNoteMidi, setLastNoteMidi] = useState<number | null>(null);
+  const [lastNotePlayedAt, setLastNotePlayedAt] = useState<number>(0);
+  // Lesson state
+  const [lessonId, setLessonId] = useState<string | null>(null);
+  const [stepIdx, setStepIdx] = useState(-1);
   const ctxRef = useRef<AudioContext | null>(null);
   const engineRef = useRef<EngineSID | null>(null);
   const heldRef = useRef<Set<string>>(new Set());
@@ -129,6 +146,8 @@ export function LabSIDClient() {
   const noteOn = useCallback((midi: number) => {
     ensureAudio();
     setActiveMidi(midi);
+    setLastNoteMidi(midi);
+    setLastNotePlayedAt(performance.now());
     engineRef.current?.noteOn(midi);
   }, [ensureAudio]);
   const noteOff = useCallback(() => {
@@ -195,6 +214,30 @@ export function LabSIDClient() {
 
   const activePreset = useMemo(() => PRESETS.find((p) => p.id === presetId)!, [presetId]);
 
+  // ---- Lesson ----
+  const lesson = useMemo(() => LESSONS_SID.find((l) => l.id === lessonId) ?? null, [lessonId]);
+  const lessonState: LessonSidState = useMemo(
+    () => ({ params, lastNoteMidi, lastNotePlayedAt }),
+    [params, lastNoteMidi, lastNotePlayedAt]
+  );
+  const lastLessonRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (lessonId && lessonId !== lastLessonRef.current) {
+      lastLessonRef.current = lessonId;
+      loadPreset("init");
+      setStepIdx(-1);
+    }
+    if (!lessonId) lastLessonRef.current = null;
+  }, [lessonId, loadPreset]);
+  const advanceLesson = useCallback(() => {
+    if (!lesson) return;
+    setStepIdx((i) => Math.min(i + 1, lesson.steps.length));
+  }, [lesson]);
+  const exitLesson = useCallback(() => { setLessonId(null); setStepIdx(-1); }, []);
+  const onStepComplete = useCallback((completedIdx: number) => {
+    setStepIdx((cur) => (cur === completedIdx ? cur + 1 : cur));
+  }, []);
+
   return (
     <div className="relative">
       {!armed && (
@@ -204,6 +247,17 @@ export function LabSIDClient() {
             <div className="font-display font-bold uppercase text-[28px] tracking-[-0.01em]">tap to power on</div>
           </div>
         </button>
+      )}
+
+      {lesson && (
+        <LessonPanel
+          lesson={lesson}
+          state={lessonState}
+          stepIdx={stepIdx}
+          onAdvance={advanceLesson}
+          onExit={exitLesson}
+          onStepComplete={onStepComplete}
+        />
       )}
 
       <div className="border-2 border-paper overflow-hidden" style={{ background: "linear-gradient(180deg, #0a1a2a 0%, #04081a 100%)" }}>
@@ -219,6 +273,20 @@ export function LabSIDClient() {
               <select value={presetId} onChange={(e) => loadPreset(e.target.value)} className="bg-ink border border-paper px-2 py-1 font-mono text-[12px] text-paper">
                 {PRESETS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">LESSON</span>
+              {LESSONS_SID.map((l) => {
+                const active = lessonId === l.id;
+                return (
+                  <button key={l.id} onClick={() => setLessonId(active ? null : l.id)}
+                    className={`font-mono text-[10px] uppercase px-2 py-1.5 border transition-colors ${
+                      active ? "border-lamp bg-lamp text-ink" : "border-paper/50 text-paper-2 hover:border-paper hover:text-paper"
+                    }`}>
+                    {active ? "✓ " : ""}{l.title.toLowerCase()}
+                  </button>
+                );
+              })}
             </div>
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">OCT</span>
@@ -271,7 +339,7 @@ export function LabSIDClient() {
           </div>
           <div className="p-3">
             <div className="font-mono text-[9px] tracking-[.16em] uppercase text-lamp mb-2">ARP · chip-tune chord trick</div>
-            <Knob label="RATE" value={params.arpRate} onChange={(v) => setTopParam("arpRate", v)} size={48} defaultValue={0} format={(v) => v < 0.01 ? "off" : `${Math.round(v*50)}Hz`} />
+            <Knob label="RATE" spotlightId="sid:knob:arpRate" value={params.arpRate} onChange={(v) => setTopParam("arpRate", v)} size={48} defaultValue={0} format={(v) => v < 0.01 ? "off" : `${Math.round(v*50)}Hz`} />
             <div className="font-mono text-[9px] text-on-dark mt-2 max-w-[300px] leading-snug">when rate &gt; 0, voice 1 cycles through itself + voice 2&apos;s detune interval + voice 3&apos;s — too fast to hear individual notes, sounds like a chord</div>
           </div>
         </div>
@@ -295,7 +363,7 @@ export function LabSIDClient() {
                 <div className="flex flex-wrap gap-2">
                   <Knob label="LEVEL" value={v.level} onChange={(x) => setVoiceParam(i, "level", x)} size={36} defaultValue={0.5} />
                   <Knob label="DETUNE" value={(v.detune + 24) / 48} onChange={(x) => setVoiceParam(i, "detune", Math.round(x*48-24))} size={36} defaultValue={0.5} format={(x) => `${Math.round(x*48-24)}st`} />
-                  <Knob label="ARP" value={(v.arpOffset) / 24} onChange={(x) => setVoiceParam(i, "arpOffset", Math.round(x*24))} size={36} defaultValue={0} format={(x) => `+${Math.round(x*24)}st`} />
+                  <Knob label="ARP" spotlightId={`sid:voice:${i}:arp`} value={(v.arpOffset) / 24} onChange={(x) => setVoiceParam(i, "arpOffset", Math.round(x*24))} size={36} defaultValue={0} format={(x) => `+${Math.round(x*24)}st`} />
                   <Knob label="A" value={v.attack} onChange={(x) => setVoiceParam(i, "attack", x)} size={30} />
                   <Knob label="D" value={v.decay} onChange={(x) => setVoiceParam(i, "decay", x)} size={30} />
                   <Knob label="S" value={v.sustain} onChange={(x) => setVoiceParam(i, "sustain", x)} size={30} />
