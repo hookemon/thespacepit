@@ -9,15 +9,17 @@
     paris: 'fr', berlin: 'de',
     rishikesh: 'hi', varanasi: 'hi', bombay: 'hi',
     tokyo: 'jp',
+    ethiopia: 'am',
   };
   // Reverse map for landing on language.html?lang=xx with no city context.
-  var LANG_TO_CITY = { es: 'madrid', fr: 'paris', de: 'berlin', hi: 'bombay', jp: 'tokyo' };
+  var LANG_TO_CITY = { es: 'madrid', fr: 'paris', de: 'berlin', hi: 'bombay', jp: 'tokyo', am: 'ethiopia' };
 
   var CITY_NAMES = {
     brooklyn: 'Brooklyn', stlouis: 'St. Louis', mexico: 'Mexico City',
     oaxaca: 'Oaxaca', tulum: 'Tulum', medellin: 'Medellín',
     paris: 'Paris', madrid: 'Madrid', berlin: 'Berlin',
     rishikesh: 'Rishikesh', varanasi: 'Varanasi', bombay: 'Bombay', tokyo: 'Tokyo',
+    ethiopia: 'Addis Ababa',
   };
 
   var MODULES = [

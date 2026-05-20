@@ -6,7 +6,7 @@
 <title>TheSpacePit — Language</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@500;700;900&family=Noto+Sans+Devanagari:wght@500;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700;800;900&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=DM+Mono:wght@300;400;500&family=Noto+Sans+JP:wght@500;700;900&family=Noto+Sans+Devanagari:wght@500;700;900&family=Noto+Sans+Ethiopic:wght@500;700;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="nav.css">
 <script src="nav.js" defer></script>
 <style>
@@ -186,6 +186,7 @@
   }
   .phrase.lang-jp { font-family: 'Noto Sans JP', sans-serif; font-weight: 900; }
   .phrase.lang-hi { font-family: 'Noto Sans Devanagari', sans-serif; font-weight: 900; }
+  .phrase.lang-am { font-family: 'Noto Sans Ethiopic', sans-serif; font-weight: 900; }
   .phrase.long { font-size: 28px; }
   .phrase.very-long { font-size: 22px; }
   .pronounce {
@@ -353,6 +354,9 @@
   @keyframes garlandSway { 0%,100% { transform: translateX(0); } 50% { transform: translateX(4px); } }
   .lang-bg-bombay .rickshaw { animation: rickshawBob 1.9s ease-in-out infinite; transform-origin: center; }
   .lang-bg-bombay .garland  { animation: garlandSway 5.5s ease-in-out infinite; transform-origin: center; }
+  /* Ethiopia: coffee pot subtly steams; the cross-church holds steady */
+  .lang-bg-ethiopia .rickshaw { animation: rickshawBob 3s ease-in-out infinite; transform-origin: center; }
+  .lang-bg-ethiopia .garland  { animation: garlandSway 9s ease-in-out infinite; transform-origin: center; }
 
   /* ============ MUSIC BED CONTROL ============
      Small bar between banner and category chips. Toggle + volume slider.
@@ -685,6 +689,95 @@
   </svg>
 </div>
 
+<div class="lang-bg-layer lang-bg-ethiopia" data-lang="am" aria-hidden="true">
+  <svg viewBox="0 0 400 800" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="lang-eth-sky" cx="50%" cy="20%" r="60%">
+        <stop offset="0%"   stop-color="#d4a32d" stop-opacity="0.45"/>
+        <stop offset="55%"  stop-color="#c8743e" stop-opacity="0.15"/>
+        <stop offset="100%" stop-color="#c8743e" stop-opacity="0"/>
+      </radialGradient>
+    </defs>
+    <!-- Ochre saffron sky -->
+    <rect width="400" height="800" fill="url(#lang-eth-sky)"/>
+    <!-- Ethiopian flag horizontal bands at the very top, subtle -->
+    <g opacity="0.45">
+      <rect x="0" y="0"  width="400" height="22" fill="#5a8a47"/>
+      <rect x="0" y="22" width="400" height="22" fill="#ffd400"/>
+      <rect x="0" y="44" width="400" height="22" fill="#c44438"/>
+      <!-- centered star/cross hint -->
+      <circle cx="200" cy="33" r="8" fill="#2a5556" opacity="0.7"/>
+    </g>
+    <!-- Bete Giyorgis (Lalibela rock-hewn cross-church) — center -->
+    <g class="garland" opacity="0.55" transform="translate(200, 430)">
+      <!-- rock pit shadow -->
+      <ellipse cx="0" cy="80" rx="90" ry="10" fill="#15110d" opacity="0.3"/>
+      <!-- cross outline (top-down view of the cruciform roof) -->
+      <g stroke="#15110d" stroke-width="3" fill="#c8743e">
+        <path d="M -22 -60 L 22 -60 L 22 -20 L 60 -20 L 60 20 L 22 20 L 22 60 L -22 60 L -22 20 L -60 20 L -60 -20 L -22 -20 Z"/>
+      </g>
+      <!-- inner cross detail -->
+      <g stroke="#15110d" stroke-width="1.5" fill="none" opacity="0.7">
+        <path d="M -14 -50 L 14 -50 L 14 -14 L 50 -14 L 50 14 L 14 14 L 14 50 L -14 50 L -14 14 L -50 14 L -50 -14 L -14 -14 Z"/>
+        <circle r="6" fill="#ffd400" stroke="#15110d" stroke-width="1.5"/>
+      </g>
+    </g>
+    <!-- Jebena (long-necked coffee pot) — lower-left -->
+    <g class="rickshaw" opacity="0.75" transform="translate(100, 600)">
+      <!-- pot body (round bottom) -->
+      <ellipse cx="0" cy="0" rx="28" ry="22" fill="#3a322a" stroke="#15110d" stroke-width="2.5"/>
+      <!-- neck -->
+      <rect x="-6" y="-44" width="12" height="32" fill="#3a322a" stroke="#15110d" stroke-width="2.5"/>
+      <!-- spout -->
+      <path d="M 4 -38 Q 18 -36 22 -28" stroke="#15110d" stroke-width="2.5" fill="none"/>
+      <!-- top cap -->
+      <ellipse cx="0" cy="-46" rx="9" ry="3" fill="#15110d"/>
+      <!-- handle -->
+      <path d="M -28 -8 Q -42 -2 -38 12 Q -34 22 -22 18" stroke="#15110d" stroke-width="2.5" fill="none"/>
+      <!-- steam wisps -->
+      <g stroke="#15110d" stroke-width="1.5" fill="none" opacity="0.6">
+        <path d="M 4 -50 Q 8 -68 0 -84 Q -8 -100 4 -116"/>
+        <path d="M 20 -34 Q 26 -52 18 -68"/>
+      </g>
+    </g>
+    <!-- Coffee beans scattered -->
+    <g fill="#5c2858" stroke="#15110d" stroke-width="0.8">
+      <ellipse cx="160" cy="660" rx="5" ry="3.5" transform="rotate(20 160 660)"/>
+      <ellipse cx="180" cy="675" rx="5" ry="3.5" transform="rotate(-30 180 675)"/>
+      <ellipse cx="200" cy="668" rx="5" ry="3.5" transform="rotate(50 200 668)"/>
+      <ellipse cx="220" cy="680" rx="5" ry="3.5" transform="rotate(-10 220 680)"/>
+      <ellipse cx="240" cy="665" rx="5" ry="3.5" transform="rotate(35 240 665)"/>
+    </g>
+    <g stroke="#15110d" stroke-width="0.8" fill="none">
+      <line x1="156" y1="660" x2="164" y2="660"/>
+      <line x1="176" y1="675" x2="184" y2="675"/>
+      <line x1="196" y1="668" x2="204" y2="668"/>
+      <line x1="216" y1="680" x2="224" y2="680"/>
+      <line x1="236" y1="665" x2="244" y2="665"/>
+    </g>
+    <!-- Krar (lyre) — right side, simplified silhouette -->
+    <g opacity="0.5" transform="translate(330, 580)" stroke="#15110d" stroke-width="2">
+      <!-- sound box (bowl) -->
+      <ellipse cx="0" cy="20" rx="22" ry="18" fill="#6a5e4a"/>
+      <!-- yoke arms -->
+      <line x1="-16" y1="10" x2="-26" y2="-50"/>
+      <line x1="16"  y1="10" x2="26"  y2="-50"/>
+      <!-- crossbar -->
+      <line x1="-30" y1="-50" x2="30" y2="-50"/>
+      <!-- strings -->
+      <g stroke="#d4a32d" stroke-width="1" opacity="0.8">
+        <line x1="-12" y1="-46" x2="-8"  y2="20"/>
+        <line x1="-6"  y1="-46" x2="-3"  y2="20"/>
+        <line x1="0"   y1="-46" x2="0"   y2="20"/>
+        <line x1="6"   y1="-46" x2="3"   y2="20"/>
+        <line x1="12"  y1="-46" x2="8"   y2="20"/>
+      </g>
+    </g>
+    <!-- Amharic stamp አ in soft terracotta -->
+    <text x="20" y="755" font-family="serif" font-size="56" fill="#c8743e" opacity="0.32" font-weight="900" font-style="italic">አማርኛ.</text>
+  </svg>
+</div>
+
 <div class="app">
 
 <header>
@@ -937,6 +1030,39 @@ const DECKS = {
       { cat: 'directions', phrase: 'कितना', pronounce: 'KIT-nah', en: 'How much?', ctx: 'For markets and rickshaws. Negotiate from there.', cities: ['rishikesh','varanasi','bombay'] },
     ],
   },
+
+  am: {
+    name: 'አማርኛ',
+    nativeName: 'Amharic',
+    voiceLocale: 'am-ET',
+    accent: '#c8743e',
+    dj: 'ቡና ጊዜ።',
+    cards: [
+      // GREETINGS
+      { cat: 'greetings', phrase: 'ሰላም', pronounce: 'seh-LAHM', en: 'Hello / peace', ctx: 'Universal greeting. Lit. "peace." Hold eye contact, slight bow.', cities: ['ethiopia'] },
+      { cat: 'greetings', phrase: 'ታዲያስ', pronounce: 'tah-DEE-yahs', en: "What's up? (informal)", ctx: 'Between friends. Like "wassup."', cities: ['ethiopia'] },
+      { cat: 'greetings', phrase: 'አመሰግናለሁ', pronounce: 'ah-meh-seh-gee-NAH-leh-hu', en: 'Thank you', ctx: 'The full formal. Casual: "amesegnalo" works too.', cities: ['ethiopia'] },
+      { cat: 'greetings', phrase: 'እንዴት ነህ?', pronounce: 'in-DET neh', en: 'How are you? (m)', ctx: 'To a male. "nesh" for female: "indet nesh?"', cities: ['ethiopia'] },
+      // FOOD + COFFEE
+      { cat: 'food', phrase: 'ቡና', pronounce: 'BOO-nah', en: 'Coffee', ctx: 'Coffee originated here. The ceremony is sacred — never rushed.', cities: ['ethiopia'] },
+      { cat: 'food', phrase: 'እንጀራ', pronounce: 'in-JEH-rah', en: 'Injera (sourdough flatbread)', ctx: 'Base of every meal. Fermented teff. Tear with your right hand, scoop, eat.', cities: ['ethiopia'] },
+      { cat: 'food', phrase: 'ውሃ', pronounce: 'WOO-hah', en: 'Water', ctx: 'Bottled. Always bottled.', cities: ['ethiopia'] },
+      { cat: 'food', phrase: 'ጥሩ ነው', pronounce: 'tee-ROO new', en: "It's good", ctx: 'Praise the food. Use often.', cities: ['ethiopia'] },
+      // MUSIC
+      { cat: 'music', phrase: 'ሙዚቃ', pronounce: 'moo-ZEE-kah', en: 'Music', ctx: 'Foundational. Ethio-jazz, Mulatu Astatke, Mahmoud Ahmed.', cities: ['ethiopia'] },
+      { cat: 'music', phrase: 'ክራር', pronounce: 'KRAHR', en: 'Krar (lyre)', ctx: '5-6 stringed Ethiopian lyre. Modal, dronal, fingerpicked.', cities: ['ethiopia'] },
+      { cat: 'music', phrase: 'መሰንቆ', pronounce: 'meh-SEN-koh', en: 'Masinko (1-string bow)', ctx: 'Single-string bowed lyre. Storyteller\'s instrument.', cities: ['ethiopia'] },
+      { cat: 'music', phrase: 'ቴዜታ', pronounce: 'teh-ZEH-tah', en: 'Tezeta (nostalgia)', ctx: 'The melancholic pentatonic scale. The Mulatu mood.', cities: ['ethiopia'] },
+      // STREET
+      { cat: 'street', phrase: 'ይቅርታ', pronounce: 'yih-KIR-tah', en: 'Excuse me / sorry', ctx: 'Multi-use. Apology, polite interjection, getting attention.', cities: ['ethiopia'] },
+      { cat: 'street', phrase: 'እሺ', pronounce: 'eh-SHEE', en: 'OK / sure', ctx: 'Soft confirmation. Used constantly in conversation.', cities: ['ethiopia'] },
+      // DIRECTIONS
+      { cat: 'directions', phrase: 'የት ነው?', pronounce: 'yeht new', en: 'Where is it?', ctx: 'Add a noun: bunna bet (coffee house), shilte bet (bathroom).', cities: ['ethiopia'] },
+      { cat: 'directions', phrase: 'ስንት ነው?', pronounce: 'sint new', en: 'How much?', ctx: 'For markets and taxis. Numbers help.', cities: ['ethiopia'] },
+      // FEELINGS
+      { cat: 'feelings', phrase: 'ደክሞኛል', pronounce: 'dehk-MOH-nyahl', en: "I'm tired", ctx: 'After a 6am Lalibela hike or a long studio session.', cities: ['ethiopia'] },
+    ],
+  },
 };
 
 // ============ STATE ============
@@ -1030,6 +1156,7 @@ function renderCard() {
   phrase.className = 'phrase';
   if (state.lang === 'jp') phrase.classList.add('lang-jp');
   if (state.lang === 'hi') phrase.classList.add('lang-hi');
+  if (state.lang === 'am') phrase.classList.add('lang-am');
   if (c.phrase.length > 18) phrase.classList.add('long');
   if (c.phrase.length > 26) phrase.classList.add('very-long');
   pronounce.textContent = c.pronounce;
@@ -1202,9 +1329,12 @@ const CITY_MUSIC = {
   rishikesh: { root: 73.42, fifth: 110.00, padWave: 'square',   detune: 5,  filterType: 'lowpass',  filterFreq: 1100, filterQ: 1.1, lfoRate: 0.12, lfoDepth: 240, label: 'harmonium drone' },
   // Bombay: Bilawal in D — sitar bandpass shimmer over a warm root drone
   bombay:    { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 7,  filterType: 'bandpass', filterFreq: 1900, filterQ: 4.8, lfoRate: 0.32, lfoDepth: 480, label: 'sitar bed' },
+  // Ethiopia: Tezeta pentatonic in E — warm brass-ish pad with slow filter
+  // wow. Mulatu/Ethio-jazz territory: lazy nostalgic drone.
+  ethiopia:  { root: 82.41, fifth: 123.47, padWave: 'sawtooth', detune: 5,  filterType: 'lowpass',  filterFreq: 1100, filterQ: 1.8, lfoRate: 0.10, lfoDepth: 260, label: 'tezeta drone' },
 };
 
-const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'bombay' };
+const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'bombay', am: 'ethiopia' };
 
 let audioCtx = null;
 let masterGain = null;
