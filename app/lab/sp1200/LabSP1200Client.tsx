@@ -12,6 +12,7 @@ import {
 import { SequencerSP, type StepRowSP } from "../_lib/sequencerSP";
 import { seedSP1200WithDrums } from "../_lib/sp1200-seed";
 import { Knob } from "../_components/Knob";
+import { RecorderBar } from "../_components/RecorderBar";
 
 // keyboard: 1..8 → pad
 const KEY_TO_PAD: Record<string, PadId> = {
@@ -268,6 +269,13 @@ export function LabSP1200Client() {
             </button>
             <div className="font-mono text-[9px] tracking-[.14em] uppercase text-collect">
               {seeded ? "● 4 starter samples loaded · drop wav onto any pad to replace" : "○ booting starter kit…"}
+            </div>
+            <div className="ml-auto">
+              <RecorderBar
+                getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
+                roomSlug="sp1200"
+                filenameSuffix={`${bpm}bpm`}
+              />
             </div>
           </div>
         </div>

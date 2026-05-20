@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineModular, MOD_DEFAULTS, type ModularParams, type PatchProgram } from "../_lib/engineModular";
 import { Knob } from "../_components/Knob";
+import { RecorderBar } from "../_components/RecorderBar";
 
 const KEY_TO_OFFSET: Record<string, number> = {
   a: 0, s: 2, d: 4, f: 5, g: 7, h: 9, j: 11, k: 12, l: 14, ";": 16, "'": 17,
@@ -131,6 +132,13 @@ export function LabModularClient() {
               <button onClick={() => setOctaveBase((o) => Math.max(24, o-12))} className="font-mono text-[12px] text-paper border border-paper/60 px-2">−</button>
               <span className="font-mono text-[11px] text-paper">{midiToName(octaveBase)}</span>
               <button onClick={() => setOctaveBase((o) => Math.min(96, o+12))} className="font-mono text-[12px] text-paper border border-paper/60 px-2">+</button>
+            </div>
+            <div className="ml-auto">
+              <RecorderBar
+                getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
+                roomSlug="modular"
+                filenameSuffix={params.program}
+              />
             </div>
           </div>
         </div>

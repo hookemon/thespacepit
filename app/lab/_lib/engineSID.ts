@@ -54,7 +54,7 @@ type VoiceNodes = {
 export class EngineSID {
   ctx: BaseAudioContext;
   params: SidParams = JSON.parse(JSON.stringify(SID_DEFAULTS));
-  private master: GainNode;
+  master: GainNode;
   private filter: BiquadFilterNode;
   private voices: VoiceNodes[] = [];
   private noiseBuf: AudioBuffer;

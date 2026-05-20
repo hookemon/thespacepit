@@ -48,7 +48,7 @@ type OpNodes = {
 export class EngineDX7 {
   ctx: BaseAudioContext;
   params: DX7Params = JSON.parse(JSON.stringify(DX7_DEFAULTS));
-  private master: GainNode;
+  master: GainNode;
   private ops: OpNodes[];
   private mixToMaster: GainNode; // output mix
   private gateOpen = false;

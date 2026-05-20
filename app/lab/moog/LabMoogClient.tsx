@@ -20,6 +20,7 @@ import {
 } from "../_lib/midi";
 import { Knob } from "../_components/Knob";
 import { LessonPanel } from "../_components/LessonPanel";
+import { RecorderBar } from "../_components/RecorderBar";
 
 // computer-keyboard → midi offset (relative to base octave * 12 + 60)
 // row asdfghjk = white keys, wetyu = black keys, ; and ' extend.
@@ -338,8 +339,15 @@ export function LabMoogClient() {
               })}
             </div>
 
+            <div className="ml-auto">
+              <RecorderBar
+                getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
+                roomSlug="moog"
+                filenameSuffix={presetId}
+              />
+            </div>
             {mounted && isMidiSupported() && (
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">MIDI IN</span>
                 <select
                   value={midiInId}

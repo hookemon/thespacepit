@@ -11,6 +11,7 @@ import {
 import { DX7_PRESETS } from "../_lib/presetsDX7";
 import { Knob } from "../_components/Knob";
 import { bindInput, isMidiSupported, listInputs, onMidiStateChange, type MidiDevice } from "../_lib/midi";
+import { RecorderBar } from "../_components/RecorderBar";
 
 const KEY_TO_OFFSET: Record<string, number> = {
   a: 0, s: 2, d: 4, f: 5, g: 7, h: 9, j: 11, k: 12, l: 14, ";": 16, "'": 17,
@@ -222,8 +223,15 @@ export function LabDX7Client() {
               <span className="font-mono text-[11px] text-paper">{midiToName(octaveBase)}</span>
               <button onClick={() => setOctaveBase((o) => Math.min(96, o+12))} className="font-mono text-[12px] text-paper border border-paper/60 px-2">+</button>
             </div>
+            <div className="ml-auto">
+              <RecorderBar
+                getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
+                roomSlug="dx7"
+                filenameSuffix={presetId}
+              />
+            </div>
             {mounted && isMidiSupported() && (
-              <div className="flex items-center gap-2 ml-auto">
+              <div className="flex items-center gap-2">
                 <span className="font-mono text-[10px] tracking-[.14em] uppercase text-on-dark">MIDI IN</span>
                 <select value={midiInId} onChange={(e) => setMidiInId(e.target.value)}
                   className="bg-ink border border-paper px-2 py-1 font-mono text-[11px] text-paper max-w-[140px]">

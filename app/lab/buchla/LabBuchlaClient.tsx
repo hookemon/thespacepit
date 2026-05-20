@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EngineBuchla, BUCHLA_DEFAULTS, type BuchlaParams, type PlateShape } from "../_lib/engineBuchla";
 import { Knob } from "../_components/Knob";
+import { RecorderBar } from "../_components/RecorderBar";
 
 const PLATES: { id: PlateShape; label: string; color: string; story: string }[] = [
   { id: "bonk", label: "BONK", color: "#E83A1C", story: "fast attack, fast decay — the classic LPG percussion sound." },
@@ -124,6 +125,13 @@ export function LabBuchlaClient() {
               <select value={presetId} onChange={(e) => loadPreset(e.target.value)} className="bg-ink border border-paper px-2 py-1 font-mono text-[12px] text-paper">
                 {PRESETS.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
+            </div>
+            <div className="ml-auto">
+              <RecorderBar
+                getEngine={() => engineRef.current && ctxRef.current ? { ctx: ctxRef.current, master: engineRef.current.master } : null}
+                roomSlug="buchla"
+                filenameSuffix={presetId}
+              />
             </div>
           </div>
         </div>

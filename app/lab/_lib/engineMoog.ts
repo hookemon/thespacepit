@@ -75,7 +75,7 @@ export class EngineMoog {
   private filter1: BiquadFilterNode;
   private filter2: BiquadFilterNode;
   private vca: GainNode;
-  private master: GainNode;
+  master: GainNode;
 
   private currentNoteHz = 220;
   private gateOpen = false;

@@ -62,7 +62,7 @@ export class EngineModular {
   private vcf: BiquadFilterNode;
   private vcfEnvGain: GainNode; // env → cutoff modulation
   private vca: GainNode;
-  private master: GainNode;
+  master: GainNode;
   private currentHz = 220;
   private gateOpen = false;
 

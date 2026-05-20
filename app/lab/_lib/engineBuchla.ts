@@ -55,7 +55,7 @@ export class EngineBuchla {
   private shaper: WaveShaperNode;
   private lpgFilter: BiquadFilterNode;
   private lpgAmp: GainNode;
-  private master: GainNode;
+  master: GainNode;
 
   // Source of Uncertainty
   private sou = 0;
