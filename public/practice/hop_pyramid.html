@@ -763,6 +763,9 @@
   <button class="bed-toggle" id="bedToggle" type="button" onclick="toggleBed()" aria-pressed="false">
     <span class="bed-note">♪</span><span id="bedLabel">BED OFF</span>
   </button>
+  <button class="bed-toggle" id="autoToggle" type="button" onclick="toggleAuto()" aria-pressed="false" title="auto-walk the pyramid — ambient music for the house">
+    <span class="bed-note">★</span><span id="autoLabel">AUTO OFF</span>
+  </button>
   <div class="bed-vol-row">
     <span class="bed-vol-label">— vol</span>
     <input class="bed-vol" id="bedVol" type="range" min="0" max="100" value="35" oninput="setBedVol(this.value/100)">
@@ -1279,6 +1282,8 @@ const state = {
   // Music bed
   bedOn: false,
   bedVol: 0.35,
+  // Auto-walk ambient mode — pyramid plays itself in beautiful patterns
+  autoMode: false,
 };
 
 function currentWorld() { return WORLDS[state.worldIdx]; }
@@ -2321,6 +2326,96 @@ function setBedVol(v) {
 
 window.toggleBed = toggleBed;
 window.setBedVol = setBedVol;
+
+// ============ AUTO-WALK AMBIENT MODE ============
+// Pyramid walks itself, picking valid next hops in a slow drift. Combined
+// with the music bed this turns hop_pyramid into a "music for the house"
+// player you can leave running.
+let _autoInterval = null;
+function pickAutoDirection() {
+  // Score each direction by (a) validity and (b) recency of the target
+  // cube so the player avoids retracing the same path.
+  const dirs = ['ul', 'ur', 'dl', 'dr'];
+  const valid = [];
+  for (const d of dirs) {
+    let r = state.player.row, c = state.player.col;
+    if (d === 'ul') { r -= 1; c -= 1; }
+    else if (d === 'ur') { r -= 1; }
+    else if (d === 'dl') { r += 1; }
+    else if (d === 'dr') { r += 1; c += 1; }
+    const target = cubeAt(r, c);
+    if (target) {
+      // Prefer cubes with fewer hops (less recently visited) — bias toward
+      // exploration so the player drifts rather than getting stuck.
+      const weight = 5 - Math.min(target.hops || 0, 4);
+      valid.push({ d, weight });
+    }
+  }
+  if (valid.length === 0) return null;
+  // Weighted random pick — exploration favored without being deterministic.
+  const total = valid.reduce((s, v) => s + v.weight, 0);
+  let pick = Math.random() * total;
+  for (const v of valid) {
+    pick -= v.weight;
+    if (pick <= 0) return v.d;
+  }
+  return valid[valid.length - 1].d;
+}
+function autoHop() {
+  if (!state.autoMode) return;
+  if (state.player.hopping) return;
+  // If pyramid is "complete" or player has fallen, reset gently.
+  if (!state.isPlaying) {
+    state.player.row = 0; state.player.col = 0;
+    state.isPlaying = true;
+    renderPlayer();
+  }
+  const dir = pickAutoDirection();
+  if (!dir) {
+    // Stuck — soft reset to apex
+    state.player.row = 0; state.player.col = 0;
+    renderPlayer();
+    return;
+  }
+  attemptMove(dir);
+}
+function startAutoWalk() {
+  stopAutoWalk();
+  // Hop every ~2 beats — feels lazy & musical, not frantic.
+  const bpm = state.bpm || 90;
+  const beatMs = 60000 / bpm;
+  const hopMs = beatMs * 2;
+  _autoInterval = setInterval(autoHop, hopMs);
+  // Trigger first hop immediately so toggling on doesn't feel laggy
+  autoHop();
+}
+function stopAutoWalk() {
+  if (_autoInterval) { clearInterval(_autoInterval); _autoInterval = null; }
+}
+async function toggleAuto() {
+  ensureBedCtx();
+  if (bedCtx && bedCtx.state === 'suspended') {
+    try { await bedCtx.resume(); } catch (e) {}
+  }
+  state.autoMode = !state.autoMode;
+  const btn = document.getElementById('autoToggle');
+  const lbl = document.getElementById('autoLabel');
+  if (btn && lbl) {
+    btn.classList.toggle('on', state.autoMode);
+    btn.setAttribute('aria-pressed', state.autoMode ? 'true' : 'false');
+    lbl.textContent = state.autoMode ? 'AUTO ON' : 'AUTO OFF';
+  }
+  if (state.autoMode) {
+    // Light the bed too — full ambient package
+    if (!state.bedOn) await toggleBed();
+    if (typeof newGame === 'function' && !state.isPlaying) newGame();
+    startAutoWalk();
+  } else {
+    stopAutoWalk();
+  }
+  saveState();
+}
+window.toggleAuto = toggleAuto;
 
 function selectWorld(i) {
   if (i === state.worldIdx) return;
