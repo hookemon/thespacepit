@@ -1068,9 +1068,18 @@
 <div class="fx-panel">
   <div class="fx-head">
     <div class="fx-title">FX <em>+ ambient.</em></div>
-    <button class="fx-toggle" id="ambientToggle" type="button" onclick="toggleAmbient()" aria-pressed="false">
-      <span class="fx-dot"></span><span id="ambientLabel">AMBIENT OFF</span>
-    </button>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button class="fx-toggle" id="rollBtn" type="button" onclick="rollPatch()" title="randomize the whole patch — new vibe in one tap">
+        <span class="fx-dot"></span><span>★ ROLL</span>
+      </button>
+      <button class="fx-toggle" id="ambientToggle" type="button" onclick="toggleAmbient()" aria-pressed="false">
+        <span class="fx-dot"></span><span id="ambientLabel">AMBIENT OFF</span>
+      </button>
+    </div>
+  </div>
+  <div class="fx-row" style="margin-bottom:10px;">
+    <span class="fx-label">— PATCH</span>
+    <span class="fx-val" id="patchName" style="font-family:'Fraunces',serif; font-style:italic; color:var(--terracotta); font-size:12px; opacity:0.9;">tap roll for a new patch</span>
   </div>
   <div class="fx-row">
     <span class="fx-label">— DELAY <span class="fx-val" id="delayVal">14%</span></span>
@@ -2607,6 +2616,68 @@ function setGateMul(v) {
 window.setFilterMul = setFilterMul;
 window.setReleaseMul = setReleaseMul;
 window.setGateMul = setGateMul;
+
+// ============ ★ ROLL — randomize the whole patch in one tap ============
+// Pulls from curated ranges (not pure random) so every roll lands on
+// something playable. Style is weighted toward variety; HARP fires
+// 12% of the time and brings strum with it.
+const PATCH_NAMES = [
+  'late night drift', 'trap stab', 'harp roll forever', 'phantom radio',
+  'analog snowdrift', 'soft bossa', 'tape hiss church', 'cartoon dream',
+  'subway lullaby', 'cherry blossom mpc', 'arcade ghost', 'bedroom vinyl',
+  'after-rain piano', 'cocoa room', 'cassette gospel', 'midnight pool',
+  '8-bit lounge', 'sandalwood haze', 'denim afternoon', 'pretty knife',
+];
+function rollPatch() {
+  ensureAudio();
+  // Style: weighted — heavier toward the more flavorful ones
+  const styleIds = ['pure', 'nbaJam', 'sonic', 'madlib', 'gta'];
+  state.gameStyle = styleIds[Math.floor(Math.random() * styleIds.length)];
+  // Strum: 0-50 ms — natural to mid-roll territory
+  state.strumMs = Math.round(Math.random() * 50);
+  // Harp ~12% of rolls (and bumps strum if too low so harp sounds harp-y)
+  state.harpMode = Math.random() < 0.12;
+  if (state.harpMode && state.strumMs < 18) state.strumMs = 20 + Math.round(Math.random() * 18);
+  // Filter, release, gate — curated ranges, biased toward useful settings
+  state.filterMul  = 0.55 + Math.random() * 1.6;   // 0.55-2.15
+  state.releaseMul = 0.20 + Math.random() * 1.8;   // 0.20-2.0
+  state.gateMul    = 0.20 + Math.random() * 0.8;   // 0.20-1.0
+  // Delay + reverb wet
+  state.delayMix   = 0.05 + Math.random() * 0.30;  // 0.05-0.35
+  state.reverbMix  = 0.10 + Math.random() * 0.45;  // 0.10-0.55
+
+  // Apply audio param changes via the existing setters
+  if (fxDelayWet) { const t = audioCtx.currentTime; fxDelayWet.gain.cancelScheduledValues(t); fxDelayWet.gain.linearRampToValueAtTime(state.delayMix, t + 0.2); }
+  if (fxReverbWet) { const t = audioCtx.currentTime; fxReverbWet.gain.cancelScheduledValues(t); fxReverbWet.gain.linearRampToValueAtTime(state.reverbMix, t + 0.2); }
+
+  // Reflect on UI
+  document.querySelectorAll('#styleChips .style-chip').forEach(x => x.classList.toggle('active', x.dataset.style === state.gameStyle));
+  document.getElementById('styleVal').textContent = (GAME_STYLES[state.gameStyle] || GAME_STYLES.pure).label;
+  const sets = [
+    ['strumSlider', state.strumMs, 'strumVal', state.strumMs + ' ms'],
+    ['delaySlider', Math.round(state.delayMix * 100), 'delayVal', Math.round(state.delayMix * 100) + '%'],
+    ['reverbSlider', Math.round(state.reverbMix * 100), 'reverbVal', Math.round(state.reverbMix * 100) + '%'],
+    ['filterSlider', Math.round(state.filterMul * 100), 'filterVal', state.filterMul.toFixed(2) + '×'],
+    ['releaseSlider', Math.round(state.releaseMul * 100), 'releaseVal', state.releaseMul.toFixed(2) + '×'],
+    ['gateSlider', Math.round(state.gateMul * 100), 'gateVal', Math.round(state.gateMul * 100) + '%'],
+  ];
+  for (const [sId, sV, vId, vT] of sets) {
+    const el = document.getElementById(sId); if (el) el.value = sV;
+    const lbl = document.getElementById(vId); if (lbl) lbl.textContent = vT;
+  }
+  const hBtn = document.getElementById('harpToggle');
+  if (hBtn) {
+    hBtn.classList.toggle('on', state.harpMode);
+    hBtn.setAttribute('aria-pressed', state.harpMode ? 'true' : 'false');
+    document.getElementById('harpLabel').textContent = state.harpMode ? 'HARP ON' : 'HARP OFF';
+  }
+  // Patch name — random + a touch of style hinting
+  const baseName = PATCH_NAMES[Math.floor(Math.random() * PATCH_NAMES.length)];
+  const nameEl = document.getElementById('patchName');
+  if (nameEl) nameEl.textContent = baseName;
+  saveState();
+}
+window.rollPatch = rollPatch;
 
 // Style chip wiring — flips state.gameStyle which is read inside createVoice
 document.querySelectorAll('#styleChips .style-chip').forEach(b => {
