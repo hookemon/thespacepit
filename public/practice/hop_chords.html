@@ -161,6 +161,47 @@
   .midi-select:focus { background: var(--paper-2); }
   .footer { padding: 18px 20px 8px; font-family: 'Fraunces', serif; font-style: italic; font-size: 12px; color: var(--ink-3); text-align: center; line-height: 1.5; }
   .footer em { color: var(--terracotta); }
+
+  /* ============ ARPEGGIATOR PANEL ============
+     Lives between .controls and .midi-panel. When ARP is on, each chord
+     gets unrolled per the chosen pattern at the chosen rate. */
+  .arp-panel {
+    background: var(--paper-2); border: 2px solid var(--ink); box-shadow: 4px 4px 0 var(--terracotta);
+    padding: 14px 16px; margin: 14px 20px 0; position: relative; overflow: hidden;
+  }
+  .arp-panel::before { content: ''; position: absolute; left: -16px; bottom: -16px; width: 60px; height: 60px; background: var(--terracotta); border-radius: 50%; border: 2px solid var(--ink); opacity: 0.35; }
+  .arp-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; position: relative; z-index: 2; }
+  .arp-title { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 14px; letter-spacing: -0.01em; }
+  .arp-title em { font-family: 'Fraunces', serif; font-style: italic; color: var(--terracotta); font-weight: 500; }
+  .arp-toggle {
+    background: var(--paper); border: 2px solid var(--ink); box-shadow: 2px 2px 0 var(--ink);
+    padding: 5px 11px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 11px; letter-spacing: 1.3px; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: transform 0.08s, box-shadow 0.08s, background 0.18s, color 0.18s;
+  }
+  .arp-toggle:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .arp-toggle.on { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--terracotta); }
+  .arp-toggle .arp-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); border: 1.5px solid var(--ink); }
+  .arp-toggle.on .arp-dot { background: var(--yellow); animation: arpDotPulse 0.35s ease-in-out infinite alternate; }
+  @keyframes arpDotPulse { from { transform: scale(1); } to { transform: scale(1.35); } }
+
+  .arp-row { margin-bottom: 10px; position: relative; z-index: 2; }
+  .arp-row:last-child { margin-bottom: 0; }
+  .arp-label { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 1.3px; color: var(--ink-3); margin-bottom: 6px; text-transform: uppercase; display: flex; justify-content: space-between; }
+  .arp-label-val { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 12px; color: var(--ink); letter-spacing: -0.01em; }
+  .arp-chips { display: flex; gap: 5px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding: 2px 0; }
+  .arp-chips::-webkit-scrollbar { display: none; }
+  .arp-chip {
+    flex-shrink: 0; background: var(--paper); border: 1.5px solid var(--ink);
+    color: var(--ink); padding: 6px 10px;
+    font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800;
+    font-size: 10.5px; letter-spacing: 1px; cursor: pointer;
+    box-shadow: 2px 2px 0 var(--ink); text-transform: uppercase;
+    transition: transform 0.08s, box-shadow 0.08s, background 0.15s, color 0.15s;
+  }
+  .arp-chip:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+  .arp-chip.active { background: var(--ink); color: var(--yellow); box-shadow: 2px 2px 0 var(--terracotta); }
 </style>
 </head>
 <body>
@@ -208,6 +249,14 @@
     <div class="gen-opt-group">
       <span class="gen-opt-label">— LOOP</span>
       <button class="gen-chip" id="loopChip">OFF</button>
+    </div>
+    <div class="gen-opt-group">
+      <span class="gen-opt-label">— TIME</span>
+      <button class="gen-chip" id="doubleTimeChip" title="chord-per-beat instead of chord-per-bar">BAR</button>
+    </div>
+    <div class="gen-opt-group">
+      <span class="gen-opt-label">— HOP</span>
+      <button class="gen-chip" id="fastHopChip" title="snap the avatar between cubes">SLOW</button>
     </div>
     <div class="gen-tempo">
       <span class="gen-opt-label">— BPM</span>
@@ -258,6 +307,42 @@
     <div class="control-label">— VELOCITY <span class="control-label-val" id="velocityVal">96</span></div>
     <div class="slider-row">
       <input type="range" class="slider" id="velocitySlider" min="20" max="127" value="96">
+    </div>
+  </div>
+</div>
+
+<!-- Arpeggiator panel — when ON, splits each landed chord into a stepped
+     pattern at the chosen rate. 10 patterns ranging from standard
+     (UP/DOWN/UP-DOWN/RANDOM) to producer-style (PENDULUM bassline,
+     CASCADE build, STAB rest, GHOST accent, STUTTER, OCTAVE). -->
+<div class="arp-panel">
+  <div class="arp-head">
+    <div class="arp-title">ARP <em>out.</em></div>
+    <button class="arp-toggle" id="arpToggle" type="button" aria-pressed="false">
+      <span class="arp-dot"></span><span id="arpLabel">OFF</span>
+    </button>
+  </div>
+  <div class="arp-row">
+    <div class="arp-label">— PATTERN <span class="arp-label-val" id="arpPatternVal">PENDULUM</span></div>
+    <div class="arp-chips" id="arpPatternChips"></div>
+  </div>
+  <div class="arp-row">
+    <div class="arp-label">— RATE <span class="arp-label-val" id="arpRateVal">1/16</span></div>
+    <div class="arp-chips" id="arpRateChips">
+      <button class="arp-chip" data-rate="1">1/4</button>
+      <button class="arp-chip" data-rate="2">1/8</button>
+      <button class="arp-chip" data-rate="3">1/8T</button>
+      <button class="arp-chip active" data-rate="4">1/16</button>
+      <button class="arp-chip" data-rate="6">1/16T</button>
+      <button class="arp-chip" data-rate="8">1/32</button>
+    </div>
+  </div>
+  <div class="arp-row">
+    <div class="arp-label">— OCT <span class="arp-label-val" id="arpOctVal">1</span></div>
+    <div class="arp-chips" id="arpOctChips">
+      <button class="arp-chip active" data-oct="1">1</button>
+      <button class="arp-chip" data-oct="2">2</button>
+      <button class="arp-chip" data-oct="3">3</button>
     </div>
   </div>
 </div>
@@ -699,6 +784,18 @@ const SYNTHS = {
     filter: { type: 'bandpass', freq: 2300, Q: 2.5, envAmt: 900, envTime: 0.07 },
     env: { a: 0.001, d: 0.4, s: 0.0, r: 0.55 },
   },
+  sitar: {
+    // Plucked sitar with sympathetic-string shimmer — sharp attack, bright
+    // bandpass with strong env, slight detune between voices for ring.
+    osc: [
+      { type: 'sawtooth', gain: 0.5,  detune: 0 },
+      { type: 'triangle', gain: 0.32, detune: 7 },
+      { type: 'sine',     gain: 0.18, detune: 1907, octave: 1 },
+    ],
+    noiseBurst: { gain: 0.38, duration: 0.004 },
+    filter: { type: 'bandpass', freq: 1700, Q: 4.2, envAmt: 1100, envTime: 0.06 },
+    env: { a: 0.001, d: 0.5, s: 0.05, r: 0.7 },
+  },
 };
 
 const NOTE_NAMES = ['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
@@ -723,6 +820,15 @@ const state = {
   midiOutputId: '',
   midiChannel: 0,
   chordSkill: 0,  // total chords played across all sessions
+  // Arpeggiator — splits each landed chord into a stepped pattern via MIDI
+  // + internal synth. Patterns are defined in ARP_PATTERNS below.
+  arpOn: false,
+  arpPattern: 'pendulum',  // default to a non-standard one
+  arpRate: 4,              // steps per beat (1=quarter, 2=eighth, 4=sixteenth, 3=triplet eighth)
+  arpOctaves: 1,
+  // Move-faster toggles
+  doubleTime: false,       // chord-per-beat instead of chord-per-bar
+  fastHop: false,          // snappier hop animation
 };
 function currentWorld() { return WORLDS[state.worldIdx]; }
 
@@ -949,7 +1055,7 @@ function attemptHop(dir) {
   else if (dir === 'dr') { dr = 1; dc = 1; }
   const target = cubeAt(from.row + dr, from.col + dc);
   if (!target) { edgeBump(); return; }
-  animateHop(from, target, 240, () => {
+  animateHop(from, target, state.fastHop ? 120 : 240, () => {
     state.player.cubeIdx = target.idx;
     onLandCube(target);
   });
@@ -984,6 +1090,116 @@ function edgeBump() {
   }, 35);
 }
 
+// ============ ARPEGGIATOR ============
+// Each pattern is a builder: takes the chord notes + octave count, returns
+// an array of steps. A step is { notes: [midi...], velMul?: 0..1 }. The
+// scheduler loops the pattern at arpRate while a chord is held.
+const ARP_PATTERNS = {
+  up:     { label: 'UP', build: (n, oct) => {
+    const s = [];
+    for (let o = 0; o < oct; o++) for (const m of n) s.push({ notes: [m + 12*o] });
+    return s;
+  }},
+  down:   { label: 'DOWN', build: (n, oct) => {
+    const s = [];
+    for (let o = oct - 1; o >= 0; o--) for (let i = n.length - 1; i >= 0; i--) s.push({ notes: [n[i] + 12*o] });
+    return s;
+  }},
+  updown: { label: 'UP-DOWN', build: (n, oct) => {
+    const up = [];
+    for (let o = 0; o < oct; o++) for (const m of n) up.push(m + 12*o);
+    const down = [];
+    for (let i = up.length - 2; i > 0; i--) down.push(up[i]);
+    return [...up, ...down].map(m => ({ notes: [m] }));
+  }},
+  pendulum: { label: 'PENDULUM', build: (n) => {
+    // Root bounces against each chord tone — bassline territory
+    const root = n[0];
+    const others = n.slice(1);
+    const arc = [...others, ...others.slice(0, -1).reverse()];
+    const s = [];
+    for (const o of arc) { s.push({ notes: [root] }); s.push({ notes: [o] }); }
+    return s.length ? s : [{ notes: [root] }];
+  }},
+  cascade: { label: 'CASCADE', build: (n) => {
+    // Build the chord one note at a time, then rest — gradual swell
+    const s = [];
+    for (let len = 1; len <= n.length; len++) s.push({ notes: n.slice(0, len) });
+    s.push({ notes: [] });
+    return s;
+  }},
+  octave: { label: 'OCTAVE', build: (n) => {
+    // Each chord tone alternates with its octave above — wide pattern
+    const s = [];
+    for (const m of n) { s.push({ notes: [m] }); s.push({ notes: [m + 12] }); }
+    return s;
+  }},
+  stab:   { label: 'STAB', build: (n) => [
+    { notes: n.slice() }, { notes: [] }, { notes: n.slice() }, { notes: [] },
+  ]},
+  ghost:  { label: 'GHOST', build: (n, oct) => {
+    // Walking line with hard accent on the root each time, ghost notes between
+    const s = [];
+    for (let o = 0; o < oct; o++) {
+      for (let i = 0; i < n.length; i++) {
+        s.push({ notes: [n[i] + 12*o], velMul: i === 0 ? 1.0 : 0.45 });
+      }
+    }
+    return s;
+  }},
+  stutter: { label: 'STUTTER', build: (n) => {
+    // Hammer the root 4 times then climb the chord — trap-roll energy
+    const s = [];
+    for (let i = 0; i < 4; i++) s.push({ notes: [n[0]] });
+    for (const m of n.slice(1)) s.push({ notes: [m] });
+    return s;
+  }},
+  random: { label: 'RANDOM', build: (n, oct) => {
+    const pool = [];
+    for (let o = 0; o < oct; o++) for (const m of n) pool.push(m + 12*o);
+    return Array.from({ length: 8 }, () => ({ notes: [pool[Math.floor(Math.random() * pool.length)]] }));
+  }},
+};
+const ARP_PATTERN_ORDER = ['up', 'down', 'updown', 'pendulum', 'cascade', 'octave', 'stab', 'ghost', 'stutter', 'random'];
+const ARP_RATE_LABELS = { 1: '1/4', 2: '1/8', 3: '1/8T', 4: '1/16', 6: '1/16T', 8: '1/32' };
+
+let _arpInterval = null;
+function stopArp() {
+  if (_arpInterval) { clearInterval(_arpInterval); _arpInterval = null; }
+}
+function startArp(notes, velocity) {
+  stopArp();
+  const pattern = ARP_PATTERNS[state.arpPattern] || ARP_PATTERNS.up;
+  const steps = pattern.build(notes, state.arpOctaves);
+  if (!steps.length) return;
+  const beatMs = 60000 / state.tempo;
+  const stepMs = beatMs / state.arpRate;
+  const gateSec = (stepMs / 1000) * 0.85;
+  let idx = 0;
+  function tick() {
+    const step = steps[idx % steps.length];
+    if (step.notes && step.notes.length > 0) {
+      const vel = Math.max(1, Math.min(127, Math.round(velocity * (step.velMul ?? 1))));
+      playChord(step.notes, vel, gateSec);
+      sendChordMIDI(step.notes, vel, gateSec * 1000 * 0.92);
+    }
+    idx++;
+  }
+  tick();
+  _arpInterval = setInterval(tick, stepMs);
+}
+
+/** Single entry point for "play this chord" — branches arp vs block-chord. */
+function emitChord(notes, velocity, durSec) {
+  stopArp();
+  if (state.arpOn) {
+    startArp(notes, velocity);
+  } else {
+    playChord(notes, velocity, durSec);
+    sendChordMIDI(notes, velocity, durSec * 1000 * 0.92);
+  }
+}
+
 // ============ CORE — HOP LANDS, NEW CHORD ============
 function onLandCube(cube, providedChord = null, duration = null) {
   // Pull fresh chord (or use provided one from auto-play queue)
@@ -999,8 +1215,7 @@ function onLandCube(cube, providedChord = null, duration = null) {
   const notes = buildChordNotes(chord, world);
   const velocity = state.velocity;
   const dur = duration || sustainDuringPlay();
-  playChord(notes, velocity, dur);
-  sendChordMIDI(notes, velocity, dur * 1000 * 0.92);
+  emitChord(notes, velocity, dur);
 
   state.history.push({ chord, notes });
   if (state.history.length > 32) state.history.shift();
@@ -1032,8 +1247,8 @@ async function saveChordSkill() {
 function sustainDuringPlay() {
   if (state.playing) {
     const beatMs = 60000 / state.tempo;
-    const barMs = beatMs * 4;
-    return (barMs * 0.95) / 1000;
+    const chordMs = state.doubleTime ? beatMs : (beatMs * 4);
+    return (chordMs * 0.95) / 1000;
   }
   return 1.0;
 }
@@ -1071,7 +1286,7 @@ function play() {
   document.querySelectorAll('.cube').forEach(c => c.classList.remove('hoppable'));
 
   const beatMs = 60000 / state.tempo;
-  const barMs = beatMs * 4;
+  const chordMs = state.doubleTime ? beatMs : (beatMs * 4);
 
   function next() {
     if (!state.playing) return;
@@ -1088,14 +1303,16 @@ function play() {
     const chord = state.queue[state.queueIdx];
     const player = state.cubes[state.player.cubeIdx];
     const target = pickAutoHopTarget(player);
-    const hopDur = Math.min(180, barMs * 0.18);
+    const baseHopMax = state.fastHop ? 90 : 180;
+    const hopFrac = state.fastHop ? 0.10 : 0.18;
+    const hopDur = Math.min(baseHopMax, chordMs * hopFrac);
     renderQueueStrip();
 
     animateHop(player, target, hopDur, () => {
       state.player.cubeIdx = target.idx;
-      onLandCube(target, chord, (barMs * 0.95) / 1000);
+      onLandCube(target, chord, (chordMs * 0.95) / 1000);
       state.queueIdx++;
-      setTimeout(next, barMs - hopDur);
+      setTimeout(next, chordMs - hopDur);
     });
   }
   next();
@@ -1121,6 +1338,7 @@ function stop() {
   state.playing = false;
   state.queueIdx = 0;
   updatePlayBtn();
+  stopArp();
   releaseHeld();
   updateHoppable();
   renderHistoryStrip();
@@ -1447,6 +1665,63 @@ document.getElementById('loopChip').addEventListener('click', (e) => {
   e.target.textContent = state.looping ? 'ON' : 'OFF';
   saveState();
 });
+document.getElementById('doubleTimeChip').addEventListener('click', (e) => {
+  state.doubleTime = !state.doubleTime;
+  e.target.classList.toggle('active', state.doubleTime);
+  e.target.textContent = state.doubleTime ? 'BEAT' : 'BAR';
+  saveState();
+});
+document.getElementById('fastHopChip').addEventListener('click', (e) => {
+  state.fastHop = !state.fastHop;
+  e.target.classList.toggle('active', state.fastHop);
+  e.target.textContent = state.fastHop ? 'FAST' : 'SLOW';
+  saveState();
+});
+
+// Arp panel handlers
+function renderArpPatternChips() {
+  const wrap = document.getElementById('arpPatternChips');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  ARP_PATTERN_ORDER.forEach(id => {
+    const btn = document.createElement('button');
+    btn.className = 'arp-chip' + (state.arpPattern === id ? ' active' : '');
+    btn.dataset.pattern = id;
+    btn.textContent = ARP_PATTERNS[id].label;
+    btn.addEventListener('click', () => {
+      state.arpPattern = id;
+      document.querySelectorAll('#arpPatternChips .arp-chip').forEach(b => b.classList.toggle('active', b.dataset.pattern === id));
+      document.getElementById('arpPatternVal').textContent = ARP_PATTERNS[id].label;
+      saveState();
+    });
+    wrap.appendChild(btn);
+  });
+}
+document.getElementById('arpToggle').addEventListener('click', () => {
+  state.arpOn = !state.arpOn;
+  const btn = document.getElementById('arpToggle');
+  btn.classList.toggle('on', state.arpOn);
+  btn.setAttribute('aria-pressed', state.arpOn ? 'true' : 'false');
+  document.getElementById('arpLabel').textContent = state.arpOn ? 'ON' : 'OFF';
+  if (!state.arpOn) stopArp();
+  saveState();
+});
+document.querySelectorAll('#arpRateChips .arp-chip').forEach(b => {
+  b.addEventListener('click', () => {
+    state.arpRate = +b.dataset.rate;
+    document.querySelectorAll('#arpRateChips .arp-chip').forEach(x => x.classList.toggle('active', +x.dataset.rate === state.arpRate));
+    document.getElementById('arpRateVal').textContent = ARP_RATE_LABELS[state.arpRate] || state.arpRate;
+    saveState();
+  });
+});
+document.querySelectorAll('#arpOctChips .arp-chip').forEach(b => {
+  b.addEventListener('click', () => {
+    state.arpOctaves = +b.dataset.oct;
+    document.querySelectorAll('#arpOctChips .arp-chip').forEach(x => x.classList.toggle('active', +x.dataset.oct === state.arpOctaves));
+    document.getElementById('arpOctVal').textContent = state.arpOctaves;
+    saveState();
+  });
+});
 document.getElementById('genBtn').addEventListener('click', () => { generate(); });
 document.getElementById('playBtn').addEventListener('click', () => { ensureAudio(); play(); });
 document.querySelectorAll('.dpad-btn').forEach(b => {
@@ -1483,6 +1758,12 @@ async function loadState() {
         looping: saved.looping ?? false,
         midiOutputId: saved.midiOutputId ?? '',
         midiChannel: saved.midiChannel ?? 0,
+        arpOn: saved.arpOn ?? false,
+        arpPattern: saved.arpPattern ?? 'pendulum',
+        arpRate: saved.arpRate ?? 4,
+        arpOctaves: saved.arpOctaves ?? 1,
+        doubleTime: saved.doubleTime ?? false,
+        fastHop: saved.fastHop ?? false,
       });
       document.getElementById('velocitySlider').value = state.velocity;
       document.getElementById('velocityVal').textContent = state.velocity;
@@ -1500,6 +1781,23 @@ async function loadState() {
       const loopBtn = document.getElementById('loopChip');
       loopBtn.classList.toggle('active', state.looping);
       loopBtn.textContent = state.looping ? 'ON' : 'OFF';
+      const dtBtn = document.getElementById('doubleTimeChip');
+      if (dtBtn) { dtBtn.classList.toggle('active', state.doubleTime); dtBtn.textContent = state.doubleTime ? 'BEAT' : 'BAR'; }
+      const fhBtn = document.getElementById('fastHopChip');
+      if (fhBtn) { fhBtn.classList.toggle('active', state.fastHop); fhBtn.textContent = state.fastHop ? 'FAST' : 'SLOW'; }
+      // Arp restore
+      const arpBtn = document.getElementById('arpToggle');
+      if (arpBtn) {
+        arpBtn.classList.toggle('on', state.arpOn);
+        arpBtn.setAttribute('aria-pressed', state.arpOn ? 'true' : 'false');
+        document.getElementById('arpLabel').textContent = state.arpOn ? 'ON' : 'OFF';
+      }
+      document.querySelectorAll('#arpRateChips .arp-chip').forEach(x => x.classList.toggle('active', +x.dataset.rate === state.arpRate));
+      const arpRateVal = document.getElementById('arpRateVal');
+      if (arpRateVal) arpRateVal.textContent = ARP_RATE_LABELS[state.arpRate] || state.arpRate;
+      document.querySelectorAll('#arpOctChips .arp-chip').forEach(x => x.classList.toggle('active', +x.dataset.oct === state.arpOctaves));
+      const arpOctVal = document.getElementById('arpOctVal');
+      if (arpOctVal) arpOctVal.textContent = state.arpOctaves;
     }
   } catch (e) {}
 }
@@ -1510,6 +1808,9 @@ async function saveState() {
       spread: state.spread, velocity: state.velocity,
       tempo: state.tempo, barsLen: state.barsLen, looping: state.looping,
       midiOutputId: state.midiOutputId, midiChannel: state.midiChannel,
+      arpOn: state.arpOn, arpPattern: state.arpPattern,
+      arpRate: state.arpRate, arpOctaves: state.arpOctaves,
+      doubleTime: state.doubleTime, fastHop: state.fastHop,
     }));
   } catch (e) {}
 }
@@ -1551,6 +1852,8 @@ async function init() {
   state.player.cubeIdx = 0;
   renderPyramid();
   renderHistoryStrip();
+  renderArpPatternChips();
+  document.getElementById('arpPatternVal').textContent = (ARP_PATTERNS[state.arpPattern] || ARP_PATTERNS.up).label;
   await initMIDI();
 }
 init();
