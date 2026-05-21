@@ -3,6 +3,7 @@ import { Footer } from "../_components/shared/Footer";
 import { getVideos } from "../_lib/sanity-queries";
 import { FOOTER_LINKS } from "../_lib/social-links";
 import { WatchClient } from "./WatchClient";
+import { FeaturedVideo } from "./FeaturedVideo";
 
 export const revalidate = 600;
 
@@ -39,6 +40,11 @@ const TAG_ORDER: { value: string; label: string }[] = [
 export default async function WatchPage() {
   const videos = await getVideos(500);
 
+  // Pull out the single featured video for the hero block. getVideos
+  // already sorts featured-first, so the first one is what we want.
+  // Falls back to undefined if nothing is pinned.
+  const featured = videos.find((v) => v.featured);
+
   // Build tag counts so chips can show "(N)" only for tags that actually have videos.
   const counts: Record<string, number> = {};
   for (const v of videos) for (const t of v.tags ?? []) counts[t] = (counts[t] ?? 0) + 1;
@@ -65,6 +71,7 @@ export default async function WatchPage() {
             the channel. all of it. tag-filtered, search-able, click any tile to play it inline. {videos.length} videos and counting.
           </p>
         </header>
+        {featured && <FeaturedVideo video={featured} />}
         <WatchClient videos={videos} tags={visibleTags} />
       </main>
       <Footer

@@ -15,6 +15,7 @@
  *   play({ id, title, artist, coverUrl, audioUrl, releaseSlug });
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import posthog from "posthog-js";
 
 export type ListeningTrack = {
   /** Stable id — typically a release-slug + track-index combo. */
@@ -114,6 +115,12 @@ export function ListeningProvider({ children }: { children: React.ReactNode }) {
       setProgress(0);
     }
     a.play().catch(() => setIsPlaying(false));
+    posthog.capture?.("track_played", {
+      track_id: current.id,
+      track_title: current.title,
+      track_artist: current.artist,
+      release_slug: current.releaseSlug,
+    });
   }, [current]);
 
   const play = useCallback((t: ListeningTrack) => {

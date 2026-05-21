@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ListeningProvider } from "./_components/listening/ListeningProvider";
 import { MiniPlayer } from "./_components/listening/MiniPlayer";
+import { PostHogInit } from "./_components/PostHogInit";
 
 // Site-wide metadata defaults. Individual pages override via their own
 // `export const metadata = {...}` — those wins, this fills the rest.
@@ -58,6 +59,7 @@ export default function RootLayout({
           when something's loaded — sticky bottom bar, persists across
           navigation. */}
       <body className="min-h-full flex flex-col bg-paper text-ink">
+        <PostHogInit />
         <ListeningProvider>
           {children}
           <MiniPlayer />

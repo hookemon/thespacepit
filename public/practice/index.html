@@ -930,6 +930,21 @@
       <path d="M 200,108 Q 222,82 262,88 Q 305,90 332,115 Q 355,135 350,168 Q 348,205 326,228 Q 298,250 260,245 Q 222,240 204,220 Q 188,200 190,165 Q 192,132 200,108 Z"
         fill="var(--sand)" stroke="#15110d" stroke-width="2.5" stroke-linejoin="round"/>
 
+      <!-- AFRICA — teardrop continent. Wide across the Maghreb (top), Horn
+           of Africa juts east near Ethiopia city node, tapers to a point at
+           the Cape of Good Hope. -->
+      <path d="M 245,295 Q 295,285 340,300 Q 358,318 360,348 Q 357,366 340,362 Q 322,370 305,415 Q 290,455 285,488 Q 280,500 270,495 Q 258,482 252,452 Q 245,412 244,372 Q 242,332 245,295 Z"
+        fill="var(--sand)" stroke="#15110d" stroke-width="2.5" stroke-linejoin="round"/>
+
+      <!-- Madagascar — narrow island east of Africa, off Mozambique. -->
+      <ellipse cx="350" cy="445" rx="6" ry="16" fill="var(--sand)" stroke="#15110d" stroke-width="2"/>
+
+      <!-- ASIA MAINLAND — the China / Korea / Mongolia mass bridging
+           Eurasia and the Japan island. Shares its west border with
+           Eurasia and its south with the top of India. -->
+      <path d="M 332,118 Q 380,108 412,128 Q 422,150 420,180 Q 416,205 408,212 L 332,212 Q 326,170 332,118 Z"
+        fill="var(--sand)" stroke="#15110d" stroke-width="2.5" stroke-linejoin="round"/>
+
       <!-- INDIA subcontinent — wider at the north (Pakistan-Bangladesh
            border), tapering to a point at the south tip (Kanyakumari).
            Sized to sit under Rishikesh / Varanasi / Bombay (cities at
@@ -1066,6 +1081,18 @@
         <path d="M 373,283 Q 360,300 350,313"/>  <!-- Varanasi → Bombay -->
         <path d="M 350,318 Q 400,275 432,222"/>  <!-- Bombay → Tokyo -->
         <path d="M 310,140 Q 365,150 432,205"/>  <!-- Berlin → Tokyo direct -->
+        <!-- West Africa cluster -->
+        <path d="M 285,365 Q 270,362 263,360"/>  <!-- Addis → Lagos -->
+        <path d="M 252,360 Q 240,355 234,350"/>  <!-- Lagos → Accra -->
+        <path d="M 248,200 Q 240,275 232,344"/>  <!-- Madrid → Accra (transatlantic colonial route) -->
+        <!-- Caribbean + South America cluster -->
+        <path d="M 135,290 Q 130,300 128,307"/>  <!-- Tulum → Kingston -->
+        <path d="M 128,318 Q 130,360 132,395"/>  <!-- Kingston → Medellín -->
+        <path d="M 130,405 Q 122,425 118,438"/>  <!-- Medellín → Cusco -->
+        <path d="M 137,400 Q 160,420 182,428"/>  <!-- Medellín → Salvador -->
+        <path d="M 186,438 Q 184,453 181,465"/>  <!-- Salvador → Rio -->
+        <path d="M 178,475 Q 170,490 162,498"/>  <!-- Rio → Buenos Aires -->
+        <path d="M 120,448 Q 138,475 156,500"/>  <!-- Cusco → Buenos Aires (Andean line) -->
       </g>
 
       <!-- CITIES -->
@@ -1181,6 +1208,62 @@
         <text class="city-label" x="0" y="22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">ADDIS ABABA</text>
       </g>
 
+      <!-- 15. Lagos -->
+      <g class="city-node" data-city="lagos" transform="translate(258, 358)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#5a8a47" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#5a8a47" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#f3ecd8">15</text>
+        <text class="city-label" x="0" y="-22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">LAGOS</text>
+      </g>
+
+      <!-- 16. Accra -->
+      <g class="city-node" data-city="accra" transform="translate(228, 348)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#d4a32d" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#d4a32d" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#15110d">16</text>
+        <text class="city-label" x="0" y="-22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">ACCRA</text>
+      </g>
+
+      <!-- 17. Kingston -->
+      <g class="city-node" data-city="kingston" transform="translate(128, 312)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#c44438" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#c44438" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#f3ecd8">17</text>
+        <text class="city-label" x="0" y="22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">KINGSTON</text>
+      </g>
+
+      <!-- 18. Cusco -->
+      <g class="city-node" data-city="cusco" transform="translate(115, 442)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#c8743e" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#c8743e" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#f3ecd8">18</text>
+        <text class="city-label" x="0" y="-22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">CUSCO</text>
+      </g>
+
+      <!-- 19. Salvador -->
+      <g class="city-node" data-city="salvador" transform="translate(185, 432)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#2a5556" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#2a5556" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#f3ecd8">19</text>
+        <text class="city-label" x="0" y="-22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">SALVADOR</text>
+      </g>
+
+      <!-- 20. Rio -->
+      <g class="city-node" data-city="rio" transform="translate(180, 470)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#ffd400" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#ffd400" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#15110d">20</text>
+        <text class="city-label" x="0" y="22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="10" fill="#15110d" letter-spacing="0.5">RIO</text>
+      </g>
+
+      <!-- 21. Buenos Aires -->
+      <g class="city-node" data-city="buenosaires" transform="translate(160, 502)">
+        <circle class="city-aura" cx="0" cy="0" r="22" fill="#5c2858" opacity="0"/>
+        <circle class="city-circle" cx="0" cy="0" r="14" fill="#5c2858" stroke="#15110d" stroke-width="2.5"/>
+        <text class="city-number" x="0" y="5" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="900" font-size="12" fill="#f3ecd8">21</text>
+        <text class="city-label" x="0" y="22" text-anchor="middle" font-family="Bricolage Grotesque" font-weight="800" font-size="9.5" fill="#15110d" letter-spacing="0.4">BUENOS AIRES</text>
+      </g>
+
       <!-- Compass rose -->
       <g transform="translate(38, 500)" stroke="#15110d" stroke-width="1.5" fill="#15110d">
         <circle cx="0" cy="0" r="14" fill="#f3ecd8"/>
@@ -1246,8 +1329,8 @@
         <div class="module-card-name">FINGER <em>DRUM</em></div>
         <div class="module-card-tag">RHYTHM</div>
       </div>
-      <div class="module-card-desc">Five city patterns. Boom bap to dembow to techno to dilla. MIDI controller welcome. Build music skill the hard way.</div>
-      <div class="module-card-features">— 5 PATTERNS BY CITY<br>— BPM 60—160<br>— RECORDING + PLAYBACK<br>— MIDI SUPPORT</div>
+      <div class="module-card-desc">A dozen city patterns. Boom bap to cumbia to one-drop to baile funk to highlife. MIDI controller welcome. Build music skill the hard way.</div>
+      <div class="module-card-features">— 12 PATTERNS BY CITY<br>— BPM 60—160<br>— RECORDING + PLAYBACK<br>— MIDI SUPPORT</div>
       <a class="module-launch" href="finger_drum_practice.html">★ OPEN FINGER DRUM</a>
     </div>
 
@@ -1256,8 +1339,8 @@
         <div class="module-card-name">HOP<em>.</em></div>
         <div class="module-card-tag">MELODY</div>
       </div>
-      <div class="module-card-desc">Q*bert-style pyramid. Each cube plays a pentatonic note. 6 city worlds, 6 scales. Phrygian to hirajoshi.</div>
-      <div class="module-card-features">— 6 WORLDS // 6 SCALES<br>— UNIQUE PALETTE PER CITY<br>— HOP / SCORE / LIFE SYSTEM<br>— PERSISTENT EAR SKILL</div>
+      <div class="module-card-desc">Q*bert-style pyramid. Each cube plays a pentatonic note. 21 city worlds, 21 scales. Phrygian to hirajoshi to Andean pentatonic.</div>
+      <div class="module-card-features">— 21 WORLDS // 21 SCALES<br>— UNIQUE PALETTE PER CITY<br>— HOP / SCORE / LIFE SYSTEM<br>— PERSISTENT EAR SKILL</div>
       <a class="module-launch" href="hop_pyramid.html">★ OPEN HOP</a>
     </div>
 
@@ -1266,8 +1349,8 @@
         <div class="module-card-name">HOP <em>CHORDS</em></div>
         <div class="module-card-tag">HARMONY</div>
       </div>
-      <div class="module-card-desc">Every hop pulls a fresh random chord from the city's beautiful pool. 13 city palettes — flamenco to Bhairavi. Generate writes you a new song every time. MIDI out to Live.</div>
-      <div class="module-card-features">— 13 WORLDS // 13 PALETTES<br>— GENERATE / PLAY / LOOP<br>— PER-CITY SYNTH VOICES<br>— WEBMIDI TO LIVE OR M4L</div>
+      <div class="module-card-desc">Every hop pulls a fresh random chord from the city's beautiful pool. 21 city palettes — flamenco to Bhairavi to afrobeat to dub. Generate writes you a new song every time. MIDI out to Live.</div>
+      <div class="module-card-features">— 21 WORLDS // 21 PALETTES<br>— GENERATE / PLAY / LOOP<br>— PER-CITY SYNTH VOICES<br>— WEBMIDI TO LIVE OR M4L</div>
       <a class="module-launch" href="hop_chords.html">★ OPEN CHORDS</a>
     </div>
 
@@ -1276,8 +1359,8 @@
         <div class="module-card-name">GARDEN<em>.</em></div>
         <div class="module-card-tag green">GROWTH</div>
       </div>
-      <div class="module-card-desc">Plants tied to every city. Marigolds in Mexico City, cacao in Tulum, tulsi in Rishikesh, sandalwood in Bombay. They grow over real time — even when you're not looking.</div>
-      <div class="module-card-features">— 12 PLANTS BY REGION<br>— SACRED / CULINARY / HEALING<br>— REAL-TIME GROWTH<br>— CULTURAL CONTEXT</div>
+      <div class="module-card-desc">Plants tied to every city. Marigolds in Mexico City, cacao in Tulum, tulsi in Rishikesh, hibiscus in Lagos, coca leaf in Cusco, ackee in Kingston. They grow over real time — even when you're not looking.</div>
+      <div class="module-card-features">— 21 PLANTS BY REGION<br>— SACRED / CULINARY / HEALING<br>— REAL-TIME GROWTH<br>— CULTURAL CONTEXT</div>
       <a class="module-launch green" href="garden.html">★ OPEN GARDEN</a>
     </div>
 
@@ -1286,8 +1369,8 @@
         <div class="module-card-name">LANGUAGE<em>.</em></div>
         <div class="module-card-tag">SPEAK</div>
       </div>
-      <div class="module-card-desc">Flashcards for what the city actually says. Spanish in Madrid + Latin America, French in Paris, German in Berlin, Japanese in Tokyo, Hindi in India. Music vocab + street slang + the phrase that defuses any situation.</div>
-      <div class="module-card-features">— 5 LANGUAGES<br>— CITY-TAGGED PHRASES<br>— NATIVE TTS PRONUNCIATION<br>— MUSIC + STREET CATEGORIES</div>
+      <div class="module-card-desc">Flashcards for what the city actually says. Spanish, French, German, Japanese, Hindi, Amharic, Yoruba, Twi, Patwa, Quechua, Portuguese. Music vocab + street slang + the phrase that defuses any situation.</div>
+      <div class="module-card-features">— 11 LANGUAGES<br>— CITY-TAGGED PHRASES<br>— NATIVE TTS PRONUNCIATION<br>— MUSIC + STREET CATEGORIES</div>
       <a class="module-launch" href="language.html">★ OPEN LANGUAGE</a>
     </div>
   </div>
@@ -1394,7 +1477,7 @@ if (!window.storage) {
 }
 
 
-// ============ CITY DATA (14 cities) ============
+// ============ CITY DATA (21 cities) ============
 const CITIES = {
   brooklyn: { name: 'BROOKLYN', mood: 'WAREHOUSE BRICK', scale: 'MINOR PENTATONIC', tagline: 'TheSpacePit lives here' },
   stlouis: { name: 'ST. LOUIS', mood: 'ARCH OF RETURN', scale: 'BLUES MIXOLYDIAN', tagline: 'where it begins' },
@@ -1410,6 +1493,13 @@ const CITIES = {
   bombay: { name: 'BOMBAY', mood: 'RICKSHAW THUNDER', scale: 'RAGA BILAWAL', tagline: 'horn ok please' },
   tokyo: { name: 'TOKYO', mood: 'LANTERN HIRAJOSHI', scale: 'HIRAJOSHI', tagline: 'paper rain, neon temple' },
   ethiopia: { name: 'ADDIS ABABA', mood: 'ETHIO-JAZZ + COFFEE', scale: 'TEZETA PENTATONIC', tagline: 'mulatu warmth, ቡና slow' },
+  lagos: { name: 'LAGOS', mood: 'AFROBEAT SHRINE', scale: 'G DORIAN', tagline: 'fela teaches the church on monday' },
+  accra: { name: 'ACCRA', mood: 'PALM-WINE HIGHLIFE', scale: 'D MIXOLYDIAN', tagline: 'ebo at sunset, every sunset' },
+  kingston: { name: 'KINGSTON', mood: 'SOUND SYSTEM SUNDOWN', scale: 'A AEOLIAN', tagline: 'kick on three, echo on the bass' },
+  cusco: { name: 'CUSCO', mood: 'ALTITUDE AND ANDES', scale: 'ANDEAN PENTATONIC', tagline: 'the breath at altitude, the charango chord' },
+  salvador: { name: 'SALVADOR', mood: 'BAHIA HEAT', scale: 'D DORIAN', tagline: 'pelourinho cobblestones, axé and atabaque' },
+  rio: { name: 'RIO', mood: 'BOSSA + BAILE', scale: 'D MIXOLYDIAN', tagline: 'tom jobim wrote the chord, dj marlboro broke it' },
+  buenosaires: { name: 'BUENOS AIRES', mood: 'BANDONEÓN MELANCHOLY', scale: 'A HARMONIC MINOR', tagline: 'piazzolla in one ear, ZZK in the other' },
 };
 
 // City → primary language for the LANG deep-link
@@ -1428,6 +1518,13 @@ const CITY_LANGUAGE = {
   bombay: 'hi',
   tokyo: 'jp',
   ethiopia: 'am',
+  lagos: 'yo',          // Yoruba
+  accra: 'tw',          // Twi
+  kingston: 'jam',      // Jamaican Patois
+  cusco: 'qu',          // Quechua
+  salvador: 'pt',       // Brazilian Portuguese
+  rio: 'pt',
+  buenosaires: 'es',    // Spanish — Argentine variant
 };
 
 // ============ CHARACTER AVATAR RENDERING ============
@@ -1452,6 +1549,7 @@ const OUTFIT_COLORS = [
 const LANG_NAMES = {
   es: 'Español', pt: 'Português', fr: 'Français', de: 'Deutsch',
   jp: 'Japanese (日本語)', hi: 'Hindi (हिन्दी)', zh: 'Mandarin (中文)', ar: 'Arabic (العربية)',
+  am: 'Amharic (አማርኛ)', yo: 'Yorùbá', tw: 'Twi', jam: 'Patwa', qu: 'Runa Simi (Quechua)',
 };
 const WHY_TEXT = {
   stuck: 'I need a way out of where I am.',

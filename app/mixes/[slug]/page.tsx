@@ -133,6 +133,16 @@ export default async function MixPage({ params }: { params: Promise<{ slug: stri
                       youtube →
                     </a>
                   )}
+                  {mix.boilerRoomUrl && (
+                    <a
+                      href={mix.boilerRoomUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-mono text-[11px] tracking-[.1em] uppercase px-3 py-1.5 border border-paper rounded-full hover:bg-paper hover:text-ink transition-colors no-underline"
+                    >
+                      boiler room →
+                    </a>
+                  )}
                 </div>
               </div>
             </div>

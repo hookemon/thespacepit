@@ -22,6 +22,13 @@ export const artist = defineType({
     }),
     defineField({ name: "portrait", title: "Portrait image", type: "image", options: { hotspot: true } }),
     defineField({
+      name: "wordmark",
+      title: "Wordmark / custom logo (transparent PNG preferred)",
+      type: "image",
+      options: { hotspot: false },
+      description: "If set, replaces the plain text headline on the artist page hero. For acts with a distinctive logotype (e.g. Cubic Zirconia's geometric wordmark).",
+    }),
+    defineField({
       name: "displayInitials",
       title: "Show initials instead of portrait",
       type: "boolean",

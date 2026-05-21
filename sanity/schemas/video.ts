@@ -73,6 +73,7 @@ export const video = defineType({
               { value: "interview",         title: "Interview / talk" },
               { value: "tutorial",          title: "Tutorial / walkthrough" },
               { value: "chakra",            title: "Chakra / meditation" },
+              { value: "rbma",              title: "Red Bull Music Academy" },
               { value: "rtj",               title: "Run The Jewels" },
               { value: "dam-funk",          title: "DāM-FunK" },
               { value: "mwc",               title: "Men Women & Children" },
@@ -107,10 +108,18 @@ export const video = defineType({
     }),
     defineField({
       name: "relatedArtist",
-      title: "Related artist",
+      title: "Related artist (primary)",
       type: "reference",
       to: [{ type: "artist" }],
-      description: "Surfaces on the artist's page.",
+      description: "Primary artist for the video — when set, the video surfaces under their page as a main credit.",
+    }),
+    defineField({
+      name: "relatedArtists",
+      title: "Other artists in the video",
+      type: "array",
+      of: [{ type: "reference", to: [{ type: "artist" }] }],
+      description:
+        "Additional people in the room. Surfaces on each of their artist pages too. Use for crew / collaborators / featured guests beyond the primary artist.",
     }),
     defineField({
       name: "relatedBrand",

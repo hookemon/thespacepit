@@ -1,3 +1,5 @@
+import { NewsletterForm } from "./NewsletterForm";
+
 type Theme = "dark" | "paper";
 type HeptagonVariant = "fill-white" | "fill-black" | "paper" | "transparent";
 
@@ -8,6 +10,9 @@ type Props = {
   links: { href: string; label: string }[];
   id?: string;
   heptagon?: HeptagonVariant;
+  // Compact newsletter band rendered above the signoff row. Default true.
+  // Pass false on pages that already render a NewsletterSection just above.
+  newsletter?: boolean;
 };
 
 const HEPTAGON_SRC: Record<HeptagonVariant, string> = {
@@ -17,7 +22,7 @@ const HEPTAGON_SRC: Record<HeptagonVariant, string> = {
   transparent: "/heptagon-transparent.png",
 };
 
-export function Footer({ theme, signoff, meta, links, id, heptagon }: Props) {
+export function Footer({ theme, signoff, meta, links, id, heptagon, newsletter = true }: Props) {
   const wrap = theme === "dark"
     ? "px-5 sm:px-8 py-12 bg-ink text-paper border-t border-paper flex flex-wrap items-center justify-between gap-6"
     : "px-5 sm:px-8 py-12 bg-paper text-ink border-t border-ink flex flex-wrap items-center justify-between gap-6";
@@ -25,7 +30,34 @@ export function Footer({ theme, signoff, meta, links, id, heptagon }: Props) {
   const heptagonSrc = HEPTAGON_SRC[heptagon ?? (theme === "dark" ? "paper" : "transparent")];
 
   return (
-    <footer id={id} className={wrap}>
+    <>
+      {newsletter && (
+        <section className="px-5 sm:px-8 py-12 bg-ink text-paper">
+          <div className="max-w-[1180px] mx-auto flex flex-col md:flex-row md:items-end md:justify-between gap-8">
+            <div className="md:flex-1 md:max-w-[520px]">
+              <div className="font-mono text-[10px] tracking-[.14em] uppercase text-lamp">
+                stay in the loop · newsletter
+              </div>
+              <h3
+                className="font-display font-bold uppercase m-0 mt-2"
+                style={{ fontSize: "clamp(22px, 3.2vw, 36px)", lineHeight: 0.95, letterSpacing: "-0.01em" }}
+              >
+                first dibs on drops
+              </h3>
+              <p
+                className="font-serif italic mt-2 max-w-[440px] text-on-dark"
+                style={{ fontSize: 14, lineHeight: 1.45 }}
+              >
+                one email when something lands. no spam.
+              </p>
+            </div>
+            <div className="w-full md:w-auto md:max-w-[440px]">
+              <NewsletterForm source="footer" />
+            </div>
+          </div>
+        </section>
+      )}
+      <footer id={id} className={wrap}>
       <div className="flex items-center gap-4">
         <img src={heptagonSrc} alt="" className="w-11 h-11 heptagon-spin" />
         <div>
@@ -49,6 +81,7 @@ export function Footer({ theme, signoff, meta, links, id, heptagon }: Props) {
           );
         })}
       </div>
-    </footer>
+      </footer>
+    </>
   );
 }

@@ -135,6 +135,8 @@ export default function SessionsPage() {
               </div>
               <a
                 href="#book"
+                data-track="session_cta_clicked"
+                data-track-props={JSON.stringify({ location: "hero" })}
                 className="inline-flex items-center font-display font-semibold tracking-[.04em] uppercase px-7 border border-ink bg-ink text-paper hover:bg-paper hover:text-ink transition-colors no-underline"
                 style={{ fontSize: "clamp(20px, 2.4vw, 28px)" }}
               >
@@ -282,6 +284,7 @@ export default function SessionsPage() {
         signoff="see u in the pit 🪐"
         meta={`sessions · ${SOCIALS.spacepitEmail}`}
         links={[...FOOTER_LINKS.spacepit]}
+        newsletter={false}
       />
     </div>
   );

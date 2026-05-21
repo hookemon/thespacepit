@@ -153,6 +153,7 @@ export default function PopUpPage() {
         signoff="see u in the pit 🪐"
         meta="brooklyn · medellín · since 2011"
         links={[...FOOTER_LINKS.spacepit]}
+        newsletter={false}
       />
     </div>
   );

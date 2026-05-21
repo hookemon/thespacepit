@@ -138,6 +138,14 @@ export const release = defineType({
       description: 'Like "drone", "co-exec", "💿 gold". Shown on the card.',
     }),
     defineField({
+      name: "hideTypesetTitle",
+      title: "Hide typeset title (cover IS the title)",
+      type: "boolean",
+      description:
+        "When the cover image already includes the release's wordmark / title artwork (e.g. Rap Monument), turn this on so the page doesn't double-print it in Antonio. The H1 stays in the DOM as sr-only for accessibility + SEO.",
+      initialValue: false,
+    }),
+    defineField({
       name: "bandcampUrl",
       title: "Bandcamp URL",
       type: "url",
@@ -488,6 +496,21 @@ export const release = defineType({
               title: "Track scope (optional)",
               description: 'When this credit only applies to specific tracks, list the track titles (or "track 1", "track 2"). Empty = album-wide. Used for things like "Mike Mogis produced tracks 2, 6, 8, 9, 10, 11" on the MWC self-titled.',
               options: { layout: "tags" },
+            },
+            {
+              name: "annotation",
+              type: "text",
+              rows: 3,
+              title: "Wall text (museum card)",
+              description:
+                "Optional. A short Nick-voice note about this person on this credit — what happened in the room, the era, the context. Renders as a pop-up when the visitor clicks the credit. NOT lyrics — just commentary. Keep it 1–3 sentences.",
+            },
+            {
+              name: "geniusUrl",
+              type: "url",
+              title: "Genius link (optional)",
+              description:
+                "Optional. Link to this verse on Genius. Surfaces as a 'read on Genius' button inside the credit pop-up. Use the song page URL — Genius hosts the lyrics, we just link out.",
             },
           ],
           preview: {

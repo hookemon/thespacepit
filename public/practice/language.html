@@ -940,6 +940,19 @@ const DECKS = {
       { cat: 'feelings', phrase: 'Estoy cansado', pronounce: 'es-TOY kahn-SAH-doh', en: "I'm tired", ctx: '"Cansada" if you\'re female-gendered. Studio life requires this often.', cities: ['madrid','medellin','mexico'] },
       { cat: 'feelings', phrase: 'Tranqui', pronounce: 'TRAHN-kee', en: 'Chill / no worries', ctx: 'Short for "tranquilo." Defuse any situation. Foundational.', cities: ['madrid','medellin','mexico','oaxaca'] },
       { cat: 'feelings', phrase: 'Me encanta', pronounce: 'meh en-KAHN-tah', en: 'I love it', ctx: 'Stronger than "me gusta." For when a beat or a meal really lands.', cities: ['madrid','medellin','mexico'] },
+      // BUENOS AIRES — Lunfardo + Argentine register
+      { cat: 'greetings', phrase: 'Che',                  pronounce: 'CHEH',                en: 'Hey',                          ctx: 'The Argentine signature. "Che, ¿qué hacés?" = "hey, what\'s up?" Earned Ernesto "Che" Guevara his nickname.', cities: ['buenosaires'] },
+      { cat: 'greetings', phrase: '¿Cómo andás?',         pronounce: 'KOH-moh ahn-DAHS',    en: 'How you doing? (voseo)',       ctx: 'Argentine "vos" form (not "tú"). "¿Cómo estás?" works too but feels foreign.', cities: ['buenosaires'] },
+      { cat: 'food',      phrase: 'Un mate',              pronounce: 'oon MAH-teh',         en: 'A mate (yerba ritual)',        ctx: 'You\'ll be offered one. Drink from the bombilla, pass it back. Don\'t move the straw.', cities: ['buenosaires'] },
+      { cat: 'food',      phrase: 'Una birra',            pronounce: 'OO-nah BEE-rah',      en: 'A beer',                       ctx: 'BA slang for cerveza (Italian-loan: "birra"). Foundational.', cities: ['buenosaires'] },
+      { cat: 'music',     phrase: 'Bandoneón',            pronounce: 'bahn-doh-neh-OHN',    en: 'The tango accordion',          ctx: 'The soul of tango. German invention, Argentine adoption. Piazzolla\'s instrument.', cities: ['buenosaires'] },
+      { cat: 'music',     phrase: 'Milonga',              pronounce: 'mee-LOHN-gah',        en: 'Tango dance hall / pre-tango', ctx: 'Both a place (where tango is danced) and a rhythm (faster than tango, 3-3-2).', cities: ['buenosaires'] },
+      { cat: 'street',    phrase: 'Boludo',               pronounce: 'boh-LOO-doh',         en: 'Dude (or idiot — context)',    ctx: 'Among friends: "dude." With strangers: insult. Reads tone above all.', cities: ['buenosaires'] },
+      { cat: 'street',    phrase: 'Re bueno',             pronounce: 'reh BWEH-noh',        en: 'Really good',                  ctx: '"Re" is the BA intensifier. "Re cansado" = really tired. "Re zarpado" = wildly over-the-top.', cities: ['buenosaires'] },
+      { cat: 'street',    phrase: 'Quilombo',             pronounce: 'kee-LOHM-boh',        en: 'A mess / chaos',               ctx: 'Lit. an Afro-Brazilian runaway settlement; BA slang = total disaster. "Qué quilombo" = "what a mess."', cities: ['buenosaires'] },
+      { cat: 'street',    phrase: 'Posta',                pronounce: 'POHS-tah',            en: 'For real / no joke',           ctx: 'Used to confirm seriousness. "Posta?" = "really?" "Posta" = "for real."', cities: ['buenosaires'] },
+      { cat: 'directions', phrase: '¿Cuánto sale?',       pronounce: 'KWAHN-toh SAH-leh',   en: 'How much?',                    ctx: 'Argentine variant of "cuánto cuesta." Lit. "how much does it come out."', cities: ['buenosaires'] },
+      { cat: 'feelings',  phrase: 'Estoy fundido',        pronounce: 'es-TOY foon-DEE-doh', en: "I'm wrecked / dead tired",     ctx: 'Lit. "I\'m melted/fused." After an asado that ran till 4am.', cities: ['buenosaires'] },
     ],
   },
 
@@ -1061,6 +1074,140 @@ const DECKS = {
       { cat: 'directions', phrase: 'ስንት ነው?', pronounce: 'sint new', en: 'How much?', ctx: 'For markets and taxis. Numbers help.', cities: ['ethiopia'] },
       // FEELINGS
       { cat: 'feelings', phrase: 'ደክሞኛል', pronounce: 'dehk-MOH-nyahl', en: "I'm tired", ctx: 'After a 6am Lalibela hike or a long studio session.', cities: ['ethiopia'] },
+    ],
+  },
+
+  yo: {
+    name: 'YORÙBÁ',
+    nativeName: 'Yoruba',
+    voiceLocale: 'yo-NG',
+    accent: '#5a8a47',
+    dj: 'fẹlà ní ọjọ́ aṣẹ.',
+    cards: [
+      // GREETINGS
+      { cat: 'greetings', phrase: 'Bawo ni?',         pronounce: 'BAH-woh nee',          en: 'How are you?',                ctx: 'Standard greeting. Reply: "dáadáa" (I\'m fine).', cities: ['lagos'] },
+      { cat: 'greetings', phrase: 'E kú àárọ̀',        pronounce: 'eh-KOO ah-ah-RAW',     en: 'Good morning',                ctx: 'Formal/respectful morning greeting. "E" is the plural-you (respect).', cities: ['lagos'] },
+      { cat: 'greetings', phrase: 'E ṣé',              pronounce: 'eh-SHAY',              en: 'Thank you',                   ctx: 'The everyday thank you. Pair with a small bow of the head.', cities: ['lagos'] },
+      { cat: 'greetings', phrase: 'Ó dàbọ̀',           pronounce: 'oh DAH-baw',           en: 'Goodbye',                     ctx: 'Lit. "until it returns" — used like ciao.', cities: ['lagos'] },
+      // FOOD + DRINK
+      { cat: 'food',      phrase: 'Jollof',            pronounce: 'JOL-lof',              en: 'Jollof rice',                 ctx: 'The national pride. Don\'t debate with Ghanaians about whose is better.', cities: ['lagos'] },
+      { cat: 'food',      phrase: 'Zobo',              pronounce: 'ZO-bo',                en: 'Hibiscus drink',              ctx: 'Cold hibiscus tea. Red, tart, served at every party.', cities: ['lagos'] },
+      { cat: 'food',      phrase: 'Suya',              pronounce: 'SOO-yah',              en: 'Spiced grilled meat',         ctx: 'Street food classic. Peanut + chili rub, smoky.', cities: ['lagos'] },
+      // MUSIC
+      { cat: 'music',     phrase: 'Afrobeat',          pronounce: 'AH-fro-beat',          en: 'Afrobeat',                    ctx: 'Fela\'s invention. NOT to be confused with Afrobeats (plural) — that\'s the modern pop genre.', cities: ['lagos'] },
+      { cat: 'music',     phrase: 'Sákárà',            pronounce: 'SAH-kah-RAH',          en: 'Sakara drum',                 ctx: 'Frame drum with goat-skin head. Yoruba praise-music staple.', cities: ['lagos'] },
+      { cat: 'music',     phrase: 'Bàtá',              pronounce: 'BAH-tah',              en: 'Bata drums',                  ctx: 'Sacred drum set for Yoruba orisha rituals. The talking drum family.', cities: ['lagos'] },
+      // STREET
+      { cat: 'street',    phrase: 'No wahala',         pronounce: 'no wah-HAH-lah',       en: 'No problem',                  ctx: 'Pidgin-Yoruba mix. The universal "all good." Foundational.', cities: ['lagos'] },
+      { cat: 'street',    phrase: 'How far?',          pronounce: 'how FAR',              en: "What's up? (Pidgin)",         ctx: 'Nigerian Pidgin "how far?" = "how\'s it going?" Reply: "I dey."', cities: ['lagos'] },
+      { cat: 'street',    phrase: 'Omo!',              pronounce: 'OH-moh',               en: 'Wow / damn',                  ctx: 'Lit. "child" but used as an expletive of surprise. Versatile.', cities: ['lagos'] },
+      // DIRECTIONS
+      { cat: 'directions', phrase: 'Èló ni?',          pronounce: 'EH-loh nee',           en: 'How much?',                   ctx: 'For markets, danfo buses, anything you need a price for.', cities: ['lagos'] },
+      // FEELINGS
+      { cat: 'feelings',  phrase: 'Mo ti rẹ̀ mí',      pronounce: 'moh tee REH mee',      en: "I'm tired",                   ctx: 'After a long studio session. Lagos traffic alone earns this.', cities: ['lagos'] },
+      { cat: 'feelings',  phrase: 'Ó dára gan',        pronounce: 'oh DAH-rah GAHN',      en: "It's really good",            ctx: 'Praise for food, music, anything. Strong approval.', cities: ['lagos'] },
+    ],
+  },
+
+  tw: {
+    name: 'TWI',
+    nativeName: 'Twi (Akan)',
+    voiceLocale: 'tw-GH',
+    accent: '#d4a32d',
+    dj: 'ebo at sunset.',
+    cards: [
+      { cat: 'greetings', phrase: 'Akwaaba',           pronounce: 'ah-KWAH-bah',          en: 'Welcome',                     ctx: 'The first word you hear at the airport. Universal welcome.', cities: ['accra'] },
+      { cat: 'greetings', phrase: 'Ɛte sɛn?',          pronounce: 'EH-teh sehn',          en: 'How are you?',                ctx: 'Standard greeting. Reply: "Eyɛ" (it\'s good).', cities: ['accra'] },
+      { cat: 'greetings', phrase: 'Medaase',           pronounce: 'meh-DAH-seh',          en: 'Thank you',                   ctx: 'Universal thank you. Often paired with "paa" for emphasis (medaase paa).', cities: ['accra'] },
+      { cat: 'greetings', phrase: 'Nante yiye',        pronounce: 'NAHN-teh YEE-eh',      en: 'Travel well',                 ctx: 'Goodbye to someone leaving. Lit. "walk well."', cities: ['accra'] },
+      { cat: 'food',      phrase: 'Jollof',            pronounce: 'JOL-lof',              en: 'Jollof rice',                 ctx: 'Ghanaian jollof uses long-grain rice, lighter tomato. Don\'t @ the Nigerians.', cities: ['accra'] },
+      { cat: 'food',      phrase: 'Banku',             pronounce: 'BAHN-koo',             en: 'Fermented corn dough ball',   ctx: 'Eaten with okro stew or pepper sauce. Tear with your hand, scoop.', cities: ['accra'] },
+      { cat: 'food',      phrase: 'Kelewele',          pronounce: 'keh-leh-WEH-leh',      en: 'Spiced fried plantain',       ctx: 'Street food. Ginger + chili + plantain. Eat hot, walk slow.', cities: ['accra'] },
+      { cat: 'music',     phrase: 'Highlife',          pronounce: 'HIGH-life',            en: 'Highlife',                    ctx: 'The genre. Started Ghanaian, spread across West Africa. Ebo Taylor is the patron saint.', cities: ['accra'] },
+      { cat: 'music',     phrase: 'Atumpan',           pronounce: 'ah-TOOM-pahn',         en: 'Talking drums',               ctx: 'Pair of tonal drums. Speech rhythms encoded in pitch. Court instrument.', cities: ['accra'] },
+      { cat: 'music',     phrase: 'Gome',              pronounce: 'GOH-meh',              en: 'Box drum',                    ctx: 'Bass-frequency drum from Ga people. Sits on, plays with feet + hands.', cities: ['accra'] },
+      { cat: 'street',    phrase: 'Chale',             pronounce: 'CHAH-leh',             en: 'Friend / bro',                ctx: 'Foundational Ghanaian English slang. "Eh chale, how be?"', cities: ['accra'] },
+      { cat: 'street',    phrase: 'Eyɛ',               pronounce: 'EH-yeh',               en: "It's good",                   ctx: 'All-purpose approval. Food good, weather good, mix good.', cities: ['accra'] },
+      { cat: 'directions', phrase: 'Sɛn?',             pronounce: 'sehn',                 en: 'How much?',                   ctx: 'Markets, taxis, trotro fares. Negotiate from there.', cities: ['accra'] },
+      { cat: 'feelings',  phrase: 'Mabrɛ',             pronounce: 'mah-BREH',             en: "I'm tired",                   ctx: 'After a long Accra traffic day. Or session.', cities: ['accra'] },
+    ],
+  },
+
+  jam: {
+    name: 'PATWA',
+    nativeName: 'Jamaican Patois',
+    voiceLocale: 'en-JM',
+    accent: '#c44438',
+    dj: 'scratch perry is mixing god into the tape.',
+    cards: [
+      { cat: 'greetings', phrase: 'Wah gwaan?',        pronounce: 'wah GWAHN',            en: "What's going on?",            ctx: 'Foundational. Reply: "everyting cris" or "mi deh yah."', cities: ['kingston'] },
+      { cat: 'greetings', phrase: 'Bless up',          pronounce: 'BLESS up',             en: 'Greetings / blessings',       ctx: 'Spoken on arrival or parting. Reggae-inflected respect.', cities: ['kingston'] },
+      { cat: 'greetings', phrase: 'Big up',            pronounce: 'BIG UP',               en: 'Respect / shoutout',          ctx: 'How you honor someone. "Big up to my selector."', cities: ['kingston'] },
+      { cat: 'greetings', phrase: 'Likkle more',       pronounce: 'LIK-kul moh',          en: 'See you later',               ctx: 'Lit. "little more." Casual goodbye.', cities: ['kingston'] },
+      { cat: 'food',      phrase: 'Ackee an saltfish', pronounce: 'AH-kee an SOLT-fish',  en: 'National dish',               ctx: 'Ackee fruit + salted cod. Eaten for breakfast. Bizarre on paper, perfect in mouth.', cities: ['kingston'] },
+      { cat: 'food',      phrase: 'Ital',              pronounce: 'EYE-tal',              en: 'Rastafari vegan food',        ctx: 'Pure, plant-based, no salt, no chemicals. Spiritually clean cooking.', cities: ['kingston'] },
+      { cat: 'food',      phrase: 'Rum punch',         pronounce: 'RUM POONCH',           en: 'Rum punch',                   ctx: 'One of sour, two of sweet, three of strong, four of weak. The recipe is a riddle.', cities: ['kingston'] },
+      { cat: 'music',     phrase: 'Riddim',            pronounce: 'RID-dim',              en: 'The instrumental beat',       ctx: 'Foundational. A riddim is reused by many vocalists — version after version.', cities: ['kingston'] },
+      { cat: 'music',     phrase: 'Dubplate',          pronounce: 'DUB-plate',            en: 'Exclusive sound cut',         ctx: 'A custom version of a song cut to acetate for one sound system. Currency in the dub world.', cities: ['kingston'] },
+      { cat: 'music',     phrase: 'One drop',          pronounce: 'ONE drop',             en: 'The reggae beat',             ctx: 'Kick only on the 3, rim on the 3 with it. Carlton Barrett invented it.', cities: ['kingston'] },
+      { cat: 'street',    phrase: 'Irie',              pronounce: 'EYE-ree',              en: 'Cool / all good',             ctx: 'Vibration is right. The state of being aligned.', cities: ['kingston'] },
+      { cat: 'street',    phrase: 'Nyam',              pronounce: 'NYAHM',                en: 'To eat',                      ctx: '"Mi a go nyam" = "I\'m going to eat." West African root, came with the trade.', cities: ['kingston'] },
+      { cat: 'street',    phrase: 'Yeah man',          pronounce: 'YEAH man',             en: 'Yes / agreement',             ctx: 'Universal affirmation. "Man" is filler, gendered or not.', cities: ['kingston'] },
+      { cat: 'directions', phrase: 'How much?',        pronounce: 'how MUCH',             en: 'How much?',                   ctx: 'Markets, taxis, route taxis. Negotiate hard.', cities: ['kingston'] },
+      { cat: 'feelings',  phrase: 'Mi tyad',           pronounce: 'mee TYAD',             en: "I'm tired",                   ctx: 'After a sound clash that ran to 6am. Earned.', cities: ['kingston'] },
+      { cat: 'feelings',  phrase: 'One love',          pronounce: 'ONE LOVE',             en: 'Goodbye / unity',             ctx: 'Bob Marley\'s sign-off. Now everyone\'s.', cities: ['kingston'] },
+    ],
+  },
+
+  qu: {
+    name: 'RUNA SIMI',
+    nativeName: 'Quechua',
+    voiceLocale: 'qu-PE',
+    accent: '#c8743e',
+    dj: 'pawkar plays the chacra at first light.',
+    cards: [
+      { cat: 'greetings', phrase: 'Allinllanchu?',     pronounce: 'ah-yeen-YAHN-choo',    en: 'How are you?',                ctx: 'Standard greeting. Reply: "Allinllanmi" (I am well).', cities: ['cusco'] },
+      { cat: 'greetings', phrase: 'Rimaykullayki',     pronounce: 'ree-mai-koo-YAI-kee',  en: 'Hello (formal)',              ctx: 'Lit. "I speak to you with respect." Used at first meeting.', cities: ['cusco'] },
+      { cat: 'greetings', phrase: 'Sulpayki',          pronounce: 'sool-PAI-kee',         en: 'Thank you',                   ctx: 'Universal thanks. Sometimes "agradesiki" (Spanish loan).', cities: ['cusco'] },
+      { cat: 'greetings', phrase: 'Tupananchiskama',   pronounce: 'too-pah-nahn-CHEES-kah-mah', en: 'Until we meet again', ctx: 'Goodbye. Andean farewells are not casual — they assume return.', cities: ['cusco'] },
+      { cat: 'food',      phrase: 'Mut\'i',            pronounce: 'MOO-tee',              en: 'Boiled corn (mote)',          ctx: 'Andean staple. Big kernels. Eaten with cheese.', cities: ['cusco'] },
+      { cat: 'food',      phrase: 'Coca',              pronounce: 'KO-kah',               en: 'Coca leaf',                   ctx: 'Sacred. Chew for altitude (mal de altura), tea for everything else.', cities: ['cusco'] },
+      { cat: 'food',      phrase: 'Chicha',            pronounce: 'CHEE-chah',            en: 'Fermented corn drink',        ctx: 'Old, sacred, present at every Andean festival. Red flag on a stick outside the door = chicha is open.', cities: ['cusco'] },
+      { cat: 'music',     phrase: 'Charango',          pronounce: 'cha-RAHN-goh',         en: 'Andean small string',         ctx: 'Armadillo or wood-shell tiny guitar. The high jangle of the Andes.', cities: ['cusco'] },
+      { cat: 'music',     phrase: 'Quena',             pronounce: 'KEH-nah',              en: 'Notched flute',               ctx: 'Single-piece notched flute. The breath at altitude.', cities: ['cusco'] },
+      { cat: 'music',     phrase: 'Zampoña',           pronounce: 'sahm-POHN-yah',        en: 'Pan flute',                   ctx: 'Bound bamboo pipes, two interlocking halves. Communal instrument.', cities: ['cusco'] },
+      { cat: 'music',     phrase: 'Huayno',            pronounce: 'WAI-noh',              en: 'Andean folk genre',           ctx: 'The 1-2-3 stomp + pentatonic melody. Foundational dance music of the Andes.', cities: ['cusco'] },
+      { cat: 'street',    phrase: 'Apu',               pronounce: 'AH-poo',               en: 'Mountain spirit',             ctx: 'Every mountain has one. You greet them when you pass.', cities: ['cusco'] },
+      { cat: 'street',    phrase: 'Pachamama',         pronounce: 'pah-cha-MAH-mah',      en: 'Mother Earth',                ctx: 'Spill a drop before drinking — for Pachamama. Always.', cities: ['cusco'] },
+      { cat: 'street',    phrase: 'Munay',             pronounce: 'MOO-nai',              en: 'Love / will / desire',        ctx: 'One of the three Andean principles (munay/llank\'ay/yachay = love/work/wisdom).', cities: ['cusco'] },
+      { cat: 'directions', phrase: 'Hayk\'an?',        pronounce: 'HAI-kahn',             en: 'How much?',                   ctx: 'Markets in San Pedro. Negotiate softly — Andean culture isn\'t adversarial.', cities: ['cusco'] },
+      { cat: 'feelings',  phrase: 'Sayk\'usqa kani',   pronounce: 'sai-KOOS-kah KAH-nee', en: "I'm tired",                   ctx: 'Altitude exhaustion is real. So is studio exhaustion.', cities: ['cusco'] },
+    ],
+  },
+
+  pt: {
+    name: 'PORTUGUÊS',
+    nativeName: 'Brazilian Portuguese',
+    voiceLocale: 'pt-BR',
+    accent: '#5a8a47',
+    dj: 'tudo na paz.',
+    cards: [
+      { cat: 'greetings', phrase: 'Oi, tudo bem?',     pronounce: 'oy TOO-doh bay',       en: 'Hi, all good?',               ctx: 'Universal Brazilian greeting. Reply: "tudo bem" or "tudo joia."', cities: ['salvador','rio'] },
+      { cat: 'greetings', phrase: 'Beleza?',           pronounce: 'beh-LEH-zah',          en: 'All cool?',                   ctx: 'Lit. "beauty?" Used as "all good?" Very Carioca but everywhere now.', cities: ['rio','salvador'] },
+      { cat: 'greetings', phrase: 'Obrigado / Obrigada', pronounce: 'oh-bree-GAH-doh',   en: 'Thank you',                   ctx: '"-do" if you\'re male-gendered, "-da" if female. The thanks agrees with the speaker.', cities: ['salvador','rio'] },
+      { cat: 'greetings', phrase: 'Até logo',          pronounce: 'ah-TEH LOH-goh',       en: 'See you soon',                ctx: 'Standard goodbye. "Tchau" works too — borrowed from Italian.', cities: ['salvador','rio'] },
+      { cat: 'food',      phrase: 'A conta, por favor',pronounce: 'ah KOHN-tah por fah-VOR', en: 'The check, please',       ctx: 'Universal. You may also need to flag the waiter with a small wave.', cities: ['salvador','rio'] },
+      { cat: 'food',      phrase: 'Caipirinha',        pronounce: 'kai-pee-REE-nyah',     en: 'Cachaça cocktail',            ctx: 'Lime + sugar + cachaça. Brazil\'s national drink. Order it everywhere.', cities: ['rio','salvador'] },
+      { cat: 'food',      phrase: 'Açaí',              pronounce: 'ah-sah-EE',            en: 'Açaí berry bowl',             ctx: 'Frozen pulp with banana and granola. Energy fuel. Beach lunch staple.', cities: ['rio','salvador'] },
+      { cat: 'food',      phrase: 'Moqueca',           pronounce: 'mo-KEH-kah',           en: 'Bahian fish stew',            ctx: 'Coconut milk + dendê (palm oil) + fish. The Salvador signature.', cities: ['salvador'] },
+      { cat: 'music',     phrase: 'Saudade',           pronounce: 'sow-DAH-jee',          en: 'Untranslatable longing',      ctx: 'The chord behind half of Brazilian music. Bittersweet ache for what\'s gone.', cities: ['salvador','rio'] },
+      { cat: 'music',     phrase: 'Axé',               pronounce: 'ah-SHEH',              en: 'Spiritual energy / Bahian genre', ctx: 'Yoruba root: "force/power." In Bahia: a music genre AND a blessing. Foundational.', cities: ['salvador'] },
+      { cat: 'music',     phrase: 'Baile funk',        pronounce: 'BAI-lee FOON-key',     en: 'Favela dance music',          ctx: 'Rio favela genre. Tamborzão pattern, 130 BPM, raw. DJ Marlboro lineage.', cities: ['rio'] },
+      { cat: 'music',     phrase: 'Bossa nova',        pronounce: 'BAH-sah NOH-vah',      en: 'Bossa nova',                  ctx: 'Tom Jobim, João Gilberto. The whispered samba. Carioca invention, 1958.', cities: ['rio'] },
+      { cat: 'street',    phrase: 'Que massa',         pronounce: 'kee MAH-sah',          en: 'How cool',                    ctx: 'Brazilian "that\'s sick." Lit. "what mass" but used like "what a feeling."', cities: ['salvador','rio'] },
+      { cat: 'street',    phrase: 'Valeu',             pronounce: 'vah-LEH-oo',           en: 'Thanks / cool',               ctx: 'Casual thanks, also "cool, sounds good." Versatile.', cities: ['salvador','rio'] },
+      { cat: 'directions', phrase: 'Quanto custa?',    pronounce: 'KWAHN-toh KOOS-tah',   en: 'How much?',                   ctx: 'Markets, taxis, anywhere.', cities: ['salvador','rio'] },
+      { cat: 'feelings',  phrase: 'Estou cansado',     pronounce: 'es-TOH kahn-SAH-doh',  en: "I'm tired",                   ctx: '"Cansada" if female. After Carnaval week, this is the only phrase you need.', cities: ['salvador','rio'] },
     ],
   },
 };
@@ -1332,9 +1479,23 @@ const CITY_MUSIC = {
   // Ethiopia: Tezeta pentatonic in E — warm brass-ish pad with slow filter
   // wow. Mulatu/Ethio-jazz territory: lazy nostalgic drone.
   ethiopia:  { root: 82.41, fifth: 123.47, padWave: 'sawtooth', detune: 5,  filterType: 'lowpass',  filterFreq: 1100, filterQ: 1.8, lfoRate: 0.10, lfoDepth: 260, label: 'tezeta drone' },
+  // Lagos: G Dorian — Rhodes + sax pad, Fela / Tony Allen warm pocket
+  lagos:     { root: 98.00, fifth: 146.83, padWave: 'sawtooth', detune: 7,  filterType: 'lowpass',  filterFreq: 1300, filterQ: 1.5, lfoRate: 0.18, lfoDepth: 280, label: 'afrobeat drone' },
+  // Accra: D Mixolydian — clean guitar shimmer, palm-wine warmth
+  accra:     { root: 73.42, fifth: 110.00, padWave: 'triangle', detune: 6,  filterType: 'lowpass',  filterFreq: 1500, filterQ: 1.2, lfoRate: 0.20, lfoDepth: 240, label: 'highlife drift' },
+  // Kingston: A natural minor — Rhodes with spring-reverb haze
+  kingston:  { root: 110.00,fifth: 164.81, padWave: 'sine',     detune: 4,  filterType: 'lowpass',  filterFreq: 1200, filterQ: 1.6, lfoRate: 0.14, lfoDepth: 300, label: 'one-drop bed' },
+  // Cusco: A Andean pentatonic — charango + quena breath, high air
+  cusco:     { root: 110.00,fifth: 164.81, padWave: 'triangle', detune: 5,  filterType: 'bandpass', filterFreq: 1800, filterQ: 3.0, lfoRate: 0.18, lfoDepth: 360, label: 'andean breath' },
+  // Salvador: D Dorian — nylon + berimbau pulse, oceanic
+  salvador:  { root: 73.42, fifth: 110.00, padWave: 'sawtooth', detune: 8,  filterType: 'lowpass',  filterFreq: 1000, filterQ: 2.4, lfoRate: 0.15, lfoDepth: 280, label: 'axé drone' },
+  // Rio: D Mixolydian — Rhodes + soft, beach
+  rio:       { root: 73.42, fifth: 110.00, padWave: 'triangle', detune: 6,  filterType: 'lowpass',  filterFreq: 1700, filterQ: 1.3, lfoRate: 0.22, lfoDepth: 260, label: 'bossa drift' },
+  // Buenos Aires: A Harmonic Minor — bandoneón breathing pad, dark
+  buenosaires: { root: 110.00, fifth: 164.81, padWave: 'sawtooth', detune: 10, filterType: 'lowpass', filterFreq: 900, filterQ: 2.8, lfoRate: 0.12, lfoDepth: 320, label: 'tango drone' },
 };
 
-const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'bombay', am: 'ethiopia' };
+const LANG_CITY_FOR_BED = { es: 'madrid', fr: 'paris', de: 'berlin', jp: 'tokyo', hi: 'bombay', am: 'ethiopia', yo: 'lagos', tw: 'accra', jam: 'kingston', qu: 'cusco', pt: 'rio' };
 
 let audioCtx = null;
 let masterGain = null;

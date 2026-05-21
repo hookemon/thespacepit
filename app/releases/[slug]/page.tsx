@@ -291,12 +291,19 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
         )}
         <article className="relative px-6 sm:px-8 py-12">
           <div className="max-w-[1180px] mx-auto">
-            <Link
-              href="/calm-collect#releases"
-              className="font-mono text-[11px] tracking-[.14em] uppercase text-collect hover:opacity-70 no-underline"
-            >
-              ← back to catalogue
-            </Link>
+            {(() => {
+              const isUpcoming = release.status === "dropping" || release.status === "upcoming";
+              const backHref = isUpcoming ? "/calm-collect/upcoming" : "/calm-collect#releases";
+              const backLabel = isUpcoming ? "← back to upcoming" : "← back to catalogue";
+              return (
+                <Link
+                  href={backHref}
+                  className="font-mono text-[11px] tracking-[.14em] uppercase text-collect hover:opacity-70 no-underline"
+                >
+                  {backLabel}
+                </Link>
+              );
+            })()}
 
             <div className={`grid gap-10 mt-6 items-start ${LIVE_COVERS[release.slug] ? "md:grid-cols-[minmax(320px,560px)_1fr]" : "md:grid-cols-[minmax(280px,420px)_1fr]"}`}>
               {/* LEFT COLUMN: cover + (if MP3 uploaded) the player stacked
@@ -387,12 +394,22 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                   )}
                   {release.format && (<><span>·</span><span>{release.format}</span></>)}
                 </div>
-                <h1
-                  className="font-display font-bold uppercase m-0"
-                  style={{ fontSize: "clamp(40px, 6vw, 80px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}
-                >
-                  {release.title}
-                </h1>
+                {/* When the cover image already carries the title artwork
+                    (e.g. Rap Monument's Noisey wordmark baked in), the page
+                    H1 would double-print the title in Antonio next to its
+                    own original brand mark. The `hideTypesetTitle` flag
+                    collapses the H1 to sr-only — still in the DOM for
+                    accessibility / SEO, just not visible. */}
+                {release.hideTypesetTitle ? (
+                  <h1 className="sr-only">{release.title}</h1>
+                ) : (
+                  <h1
+                    className="font-display font-bold uppercase m-0"
+                    style={{ fontSize: "clamp(40px, 6vw, 80px)", lineHeight: 0.92, letterSpacing: "-0.015em" }}
+                  >
+                    {release.title}
+                  </h1>
+                )}
                 {release.artists.length > 0 && (
                   <div className="font-sans text-[18px] mt-2">
                     {release.artists.map((a, i) => (
@@ -483,6 +500,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                               href={url}
                               target="_blank"
                               rel="noopener noreferrer"
+                              data-track="dsp_clicked"
+                              data-track-props={JSON.stringify({ release_slug: release.slug, dsp: link.label, paid: link.paid, position: "top" })}
                               className="stream-chip group inline-flex items-center gap-2 font-mono text-[11px] tracking-[.12em] uppercase px-3.5 py-2 border border-ink rounded-full no-underline text-ink transition-all hover:-translate-x-[1px] hover:-translate-y-[1px]"
                               style={{ ["--c" as string]: link.color }}
                             >
@@ -667,6 +686,56 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
             {/* (RelatedVideos moved DOWN — Nick's locked order puts videos
                 after the credits room, not before the tracklist. New home is
                 just after THE CREDITS below.) */}
+
+            {/* === THE ROSTER === Big-cast releases (posse cuts, writing-camp
+                records, RTJ-scale collabs) deserve a section where every
+                credited person lands as a prominent clickable button — not
+                buried in tiny hero chips or hidden behind the per-track ▾
+                note toggle. Threshold: 6+ credited persons. Groups by role
+                using the same canonical rank as THE CREDITS room. */}
+            {(() => {
+              const credPersons = (release.credits ?? []).filter((c) => c.person);
+              if (credPersons.length < 6) return null;
+              const byRole = new Map<string, typeof credPersons>();
+              for (const c of credPersons) {
+                const k = c.role ?? "—";
+                if (!byRole.has(k)) byRole.set(k, []);
+                byRole.get(k)!.push(c);
+              }
+              const roles = [...byRole.keys()].sort((a, b) => rankRole(a) - rankRole(b));
+              return (
+                <Room
+                  number="02c"
+                  title="the roster"
+                  kicker={`${credPersons.length} contributors · click any name`}
+                >
+                  <div className="max-w-[920px]">
+                    {roles.map((role) => {
+                      const cs = byRole.get(role)!;
+                      return (
+                        <div key={role} className="mb-8 last:mb-0">
+                          <div className="font-mono text-[10px] tracking-[.2em] uppercase text-ink-3 mb-3">
+                            {role.toLowerCase()} · {cs.length}
+                          </div>
+                          <div className="flex flex-wrap gap-2">
+                            {cs.map((c, i) => (
+                              <Link
+                                key={i}
+                                href={`/artists/${c.person!.slug}`}
+                                className="inline-flex font-display font-semibold uppercase tracking-[-0.005em] px-3.5 py-1.5 border border-ink hover:bg-ink hover:text-paper transition-colors no-underline text-ink"
+                                style={{ fontSize: 17, lineHeight: 1.2 }}
+                              >
+                                {c.person!.name}
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </Room>
+              );
+            })()}
 
             {/* === THE TRACKS === tracklist */}
             {release.tracklist && release.tracklist.length > 0 && (
@@ -932,6 +1001,8 @@ export default async function ReleasePage({ params }: { params: Promise<{ slug: 
                         href={url}
                         target="_blank"
                         rel="noopener noreferrer"
+                        data-track="dsp_clicked"
+                        data-track-props={JSON.stringify({ release_slug: release.slug, dsp: link.label, paid: link.paid, position: "bottom" })}
                         className="font-display font-semibold text-[14px] tracking-[.04em] uppercase px-5 py-3 border border-ink bg-paper text-ink hover:bg-ink hover:text-paper transition-colors no-underline"
                       >
                         {link.label} →

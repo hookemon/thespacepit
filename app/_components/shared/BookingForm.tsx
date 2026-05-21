@@ -65,7 +65,7 @@ export function BookingForm({ toEmail, subjectPrefix, submitLabel, fields, forms
   if (done) {
     return (
       <div className="border border-paper p-6 font-mono text-[13px] tracking-[.05em] text-paper-2">
-        ✓ {formspreeEndpoint ? "got it. coleman will reply soon." : "your email client should be open. send and we'll be in touch."}
+        ✓ {formspreeEndpoint ? "got it. we'll be in touch soon." : "your email client should be open. send and we'll be in touch."}
         <button
           type="button"
           onClick={() => setDone(false)}

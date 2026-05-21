@@ -40,6 +40,7 @@ export default async function ThePitHome() {
         meta="brooklyn · medellín · since 2011"
         links={[...FOOTER_LINKS.spacepit]}
         id="visit"
+        newsletter={false}
       />
     </>
   );

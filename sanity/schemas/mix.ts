@@ -28,6 +28,13 @@ export const mix = defineType({
     defineField({ name: "soundcloudUrl", title: "SoundCloud URL", type: "url" }),
     defineField({ name: "youtubeUrl", title: "YouTube URL", type: "url" }),
     defineField({
+      name: "boilerRoomUrl",
+      title: "Boiler Room URL",
+      type: "url",
+      description:
+        "Link to the original Boiler Room session page. Surfaces as a 'boiler room ↗' button next to the other platform links.",
+    }),
+    defineField({
       name: "audio",
       title: "Audio file (direct upload)",
       type: "file",

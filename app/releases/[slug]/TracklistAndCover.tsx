@@ -47,6 +47,10 @@ export function TracklistAndCover({
   // Separate state for lyrics expansion — opening lyrics shouldn't open
   // the credits panel on the same row (and vice versa).
   const [openLyrics, setOpenLyrics] = useState<Set<number>>(new Set());
+  /** Which individual credit pop-outs ("museum cards") are open inside the
+   *  per-track credits panel. Key format: `<trackIdx>-<creditIdx>`. Allows
+   *  multiple to be open at once. */
+  const [openCards, setOpenCards] = useState<Set<string>>(new Set());
 
   // Index album credits by lowercased + normalized track title so each row
   // can do a quick `creditsByTrack.get(normalize(title)) ?? []` lookup.
@@ -200,6 +204,13 @@ export function TracklistAndCover({
                     type="button"
                     onClick={() => smartPlay(i, t)}
                     disabled={isSearching}
+                    data-track="track_row_clicked"
+                    data-track-props={JSON.stringify({
+                      release_slug: releaseSlug,
+                      track_title: t.title,
+                      track_number: i + 1,
+                      source: hasPreview ? "audio" : hasVideo ? "video" : "search",
+                    })}
                     className={`group/play w-8 h-8 shrink-0 rounded-full border border-ink flex items-center justify-center text-[12px] tabular-nums font-mono transition-colors ${
                       isPlaying
                         ? "bg-collect text-paper"
@@ -363,25 +374,74 @@ export function TracklistAndCover({
                     on this song
                   </div>
                   <ul className="grid gap-1.5">
-                    {sortByRoleOrder(trackCredits).map((cr, idx) => (
-                      <li key={idx} className="flex items-baseline gap-3">
-                        <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 shrink-0 w-[140px]">
-                          {cr.role}{cr.instrument ? ` · ${cr.instrument}` : ""}
-                        </span>
-                        <span className="flex-1 font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight">
-                          {cr.person ? (
-                            <Link
-                              href={`/artists/${cr.person.slug}`}
-                              className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
-                            >
-                              {cr.person.name}
-                            </Link>
-                          ) : (
-                            cr.name ?? "—"
+                    {sortByRoleOrder(trackCredits).map((cr, idx) => {
+                      // A credit has a museum card to pop if it carries
+                      // commentary (annotation) and/or an external Genius
+                      // link. Without either, just the role · name row.
+                      const hasCard = Boolean(cr.annotation || cr.geniusUrl);
+                      const cardKey = `${i}-${idx}`;
+                      const cardOpen = openCards.has(cardKey);
+                      const toggleCard = () => {
+                        setOpenCards((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(cardKey)) next.delete(cardKey);
+                          else next.add(cardKey);
+                          return next;
+                        });
+                      };
+                      return (
+                        <li key={idx} className="grid gap-1">
+                          <div className="flex items-baseline gap-3">
+                            <span className="font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 shrink-0 w-[140px]">
+                              {cr.role}{cr.instrument ? ` · ${cr.instrument}` : ""}
+                            </span>
+                            <span className="flex-1 font-display font-semibold text-[15px] uppercase tracking-[-0.005em] leading-tight">
+                              {cr.person ? (
+                                <Link
+                                  href={`/artists/${cr.person.slug}`}
+                                  className="text-ink hover:text-collect underline-offset-4 decoration-1 hover:underline transition-colors no-underline"
+                                >
+                                  {cr.person.name}
+                                </Link>
+                              ) : (
+                                cr.name ?? "—"
+                              )}
+                              {hasCard && (
+                                <button
+                                  type="button"
+                                  onClick={toggleCard}
+                                  aria-expanded={cardOpen}
+                                  aria-label={cardOpen ? "Hide museum card" : "Show museum card"}
+                                  title={cardOpen ? "Hide notes" : "Show notes"}
+                                  className="ml-2 font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 hover:text-collect transition-colors"
+                                >
+                                  {cardOpen ? "▴ hide" : "▾ note"}
+                                </button>
+                              )}
+                            </span>
+                          </div>
+                          {hasCard && cardOpen && (
+                            <div className="ml-[140px] mr-2 mt-1 pl-3 border-l border-ink/20">
+                              {cr.annotation && (
+                                <p className="font-serif italic text-[14px] leading-snug text-ink-2 m-0">
+                                  {cr.annotation}
+                                </p>
+                              )}
+                              {cr.geniusUrl && (
+                                <a
+                                  href={cr.geniusUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-block mt-2 font-mono text-[10px] tracking-[.14em] uppercase text-ink-3 hover:text-collect border-b border-ink/30 hover:border-collect transition-colors no-underline"
+                                >
+                                  read the verse on genius ↗
+                                </a>
+                              )}
+                            </div>
                           )}
-                        </span>
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               </div>

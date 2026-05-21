@@ -154,6 +154,12 @@ export function ListeningClient({ records, total }: { records: DiscogsRelease[];
                             alt={`${artist} — ${r.title}`}
                             loading="lazy"
                             className="absolute inset-0 w-full h-full object-cover"
+                            // Discogs's i.discogs.com CDN can 403 / return blank
+                            // when it sees a cross-origin Referer it doesn't
+                            // expect. PressGrid hits the same pattern and uses
+                            // the same fix. Without this, covers occasionally
+                            // render as empty boxes on first paint.
+                            referrerPolicy="no-referrer"
                           />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center p-2 text-center font-display text-[13px] uppercase text-paper-2 leading-tight">

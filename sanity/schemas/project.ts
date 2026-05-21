@@ -45,6 +45,13 @@ export const project = defineType({
       of: [{ type: "block" }],
     }),
     defineField({ name: "cover", title: "Hero image", type: "image", options: { hotspot: true } }),
+    defineField({
+      name: "wordmark",
+      title: "Wordmark / custom logo (transparent PNG preferred)",
+      type: "image",
+      options: { hotspot: false },
+      description: "If set, replaces the plain text headline on the era page hero. Use this for bands/projects with a distinctive logotype — e.g. Cubic Zirconia's geometric wordmark from the Josephine cover.",
+    }),
     defineField({ name: "gallery", title: "Photos", type: "array", of: [{ type: "image", options: { hotspot: true } }] }),
     defineField({
       name: "members",

@@ -59,8 +59,8 @@ export default async function CubicZirconiaWorldPage() {
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
       <CollectionJsonLd
-        path="/collabs/cubic-zirconia"
-        name="Cubic Zirconia — Tiombe Lockhart × Nick Hook"
+        path="/bands/cubic-zirconia"
+        name="Cubic Zirconia"
         description="Brooklyn 2009–2012. 9 releases (FUCK WORK → Darko), 34 documented shows, the Lockhart Dynasty × Calm + Collect sub-imprint."
         items={releases.map((r) => ({ slug: r.slug, title: r.title }))}
       />
@@ -72,11 +72,11 @@ export default async function CubicZirconiaWorldPage() {
           <div className="absolute inset-0 bg-ink/40" aria-hidden />
           <div className="relative px-5 sm:px-8 pt-16 pb-20 sm:pt-24 sm:pb-28 max-w-[1180px] mx-auto">
             <Link
-              href="/nick-hook"
+              href="/bands"
               className="font-mono text-[11px] tracking-[.14em] uppercase no-underline"
               style={{ color: CZ_GOLD }}
             >
-              ← nick hook
+              ← back
             </Link>
 
             <div className="mt-16 sm:mt-24">

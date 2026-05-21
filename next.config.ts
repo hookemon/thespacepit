@@ -14,6 +14,17 @@ const nextConfig: NextConfig = {
       { source: "/lab/:path*", destination: "https://spacepit-lab.vercel.app/lab/:path*" },
     ];
   },
+  // MWC + Cubic Zirconia were real bands, not Nick's collabs — moved out
+  // of /collabs into the band-perspective /bands/* tree. Permanent so
+  // any inbound links still land.
+  async redirects() {
+    return [
+      { source: "/collabs/men-women-children", destination: "/bands/men-women-children", permanent: true },
+      { source: "/collabs/cubic-zirconia",     destination: "/bands/cubic-zirconia",     permanent: true },
+      // Skully's artist-slug rename.
+      { source: "/artists/scully-sullivan-kaplan", destination: "/artists/skully-sullivan-kaplan", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;

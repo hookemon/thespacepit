@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { VideoListItem } from "../../_lib/sanity-queries";
 
 /**
@@ -8,7 +8,14 @@ import type { VideoListItem } from "../../_lib/sanity-queries";
  * era pages, brand/partner pages, gear pages, artist pages — anywhere a
  * video doc has linked back to this entity via the related* refs.
  *
- * Click any tile → inline modal player (no leaving the page).
+ * Two interaction tiers:
+ *   - HOVER any tile → muted preview autoplays inline (no leaving the page,
+ *     no full modal — just see what the video is)
+ *   - CLICK any tile → full modal player with audio
+ *
+ * The hover preview only loads the YouTube iframe on hover (not at mount), so
+ * the page isn't pre-loading 20 YouTube embeds. When the hover ends, the
+ * iframe gets unmounted to free memory.
  *
  * If the parent has zero linked videos, render nothing.
  */
@@ -27,6 +34,7 @@ export function RelatedVideos({
   theme?: "dark" | "light" | "auto";
 }) {
   const [open, setOpen] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
 
   if (videos.length === 0) return null;
 
@@ -52,9 +60,16 @@ export function RelatedVideos({
           <button
             key={v._id}
             onClick={() => setOpen(v.youtubeId)}
+            onMouseEnter={() => setHovered(v.youtubeId)}
+            onMouseLeave={() => setHovered((h) => (h === v.youtubeId ? null : h))}
+            onFocus={() => setHovered(v.youtubeId)}
+            onBlur={() => setHovered((h) => (h === v.youtubeId ? null : h))}
             className={`group text-left border ${borderC} flex flex-col cursor-pointer transition-transform duration-150 hover:-translate-x-[2px] hover:-translate-y-[2px] hover:shadow-[3px_3px_0_#E83A1C]`}
           >
             <div className="relative overflow-hidden bg-ink" style={{ aspectRatio: "16 / 9" }}>
+              {/* Thumbnail — always rendered. The hover preview iframe sits
+                  on top when hovered; if we ever fail to load, this stays
+                  visible as the fallback. */}
               {v.thumbnailUrl && (
                 <img
                   src={v.thumbnailUrl}
@@ -63,11 +78,37 @@ export function RelatedVideos({
                   loading="lazy"
                 />
               )}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-12 h-12 border border-paper rounded-full bg-ink/55 text-paper flex items-center justify-center text-[20px] group-hover:bg-redline transition-colors">▶</div>
+
+              {/* Hover preview — silent autoplay YouTube embed. Only mounted
+                  when hovered (frees memory + avoids 20-iframe page load).
+                  `mute=1&autoplay=1&controls=0&playsinline=1` for a clean
+                  preview; `start=2` to skip past any title-card padding;
+                  modestbranding for less YouTube chrome. We pull the
+                  preview at z-[1] so the play badge can still float above
+                  it at z-[2]. */}
+              {hovered === v.youtubeId && (
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${v.youtubeId}?autoplay=1&mute=1&controls=0&modestbranding=1&playsinline=1&rel=0&start=2&loop=1&playlist=${v.youtubeId}`}
+                  title=""
+                  aria-hidden
+                  tabIndex={-1}
+                  allow="autoplay; encrypted-media"
+                  className="absolute inset-0 w-full h-full pointer-events-none z-[1]"
+                />
+              )}
+
+              {/* Play badge — sits above the preview iframe so the
+                  click affordance is always obvious. Slightly dims when a
+                  hover preview is actively playing so it doesn't fight the
+                  motion. */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-[2]">
+                <div
+                  className={`w-12 h-12 border border-paper rounded-full bg-ink/55 text-paper flex items-center justify-center text-[20px] group-hover:bg-redline transition-all ${hovered === v.youtubeId ? "opacity-70 scale-95" : "opacity-100"}`}
+                >▶</div>
               </div>
+
               {v.duration && (
-                <div className="absolute bottom-1.5 right-1.5 bg-ink text-paper font-mono text-[10px] px-1.5 py-0.5 tracking-[.04em]">{v.duration}</div>
+                <div className="absolute bottom-1.5 right-1.5 bg-ink text-paper font-mono text-[10px] px-1.5 py-0.5 tracking-[.04em] z-[3]">{v.duration}</div>
               )}
             </div>
             <div className="p-3">

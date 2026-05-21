@@ -139,7 +139,11 @@ export default async function PartnerPage({ params }: { params: Promise<{ slug: 
                   <img
                     src={logo}
                     alt={brand.name}
-                    className="max-w-[440px] w-[70%] max-h-[280px] object-contain drop-shadow-[0_4px_24px_rgba(0,0,0,0.55)]"
+                    // Hero logo: let it command the page. Caps at 720px wide /
+                    // 460px tall so very wide wordmarks (Moog, RBMA, Lot Radio)
+                    // and tall marks (Splice triangle) both land big but never
+                    // overflow. object-contain keeps aspect, no cropping.
+                    className="max-w-[720px] w-[90%] max-h-[460px] object-contain drop-shadow-[0_4px_20px_rgba(0,0,0,0.45)]"
                   />
                 ) : (
                   <h1

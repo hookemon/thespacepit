@@ -1,7 +1,8 @@
 /**
- * /collabs — the index. A door per collab world. Each subworld (RTJ, MWC,
- * Cubic Zirconia, Gangsta Boo) already has its own deep page; this index
- * exists so /collabs isn't a 404. It also surfaces the network at a glance.
+ * /collabs — the index. A door per collab world. MWC + Cubic Zirconia
+ * (Nick's actual bands) live at /bands/* instead — this index is just
+ * the projects where Nick is engineer / producer / collaborator, not
+ * a band member.
  *
  * Auto-extends: drop a new folder in app/collabs/<slug>/ with a page.tsx and
  * add it to the COLLABS array below. No Sanity coupling — these are
@@ -20,7 +21,7 @@ import { buildCollectionJsonLd, jsonLdScript } from "../_lib/schema-jsonld";
 export const metadata = {
   title: "collabs — nick hook",
   description:
-    "the deep collab worlds. RTJ. Men Women + Children. Cubic Zirconia. Gangsta Boo. Each one's a full chapter.",
+    "the deep collab worlds. Run The Jewels. Gangsta Boo. Each one's a full chapter. (For Nick's own bands see /bands.)",
 };
 
 type CollabChapter = {
@@ -39,6 +40,9 @@ type CollabChapter = {
   artistMatch: string;
 };
 
+// MWC + Cubic Zirconia were ACTUAL BANDS — moved out to /bands/*. Run The
+// Jewels (Nick engineered) and Gangsta Boo (Nick produced for) belong here
+// because they're collaborations, not Nick's bands.
 const COLLABS: CollabChapter[] = [
   {
     slug: "run-the-jewels",
@@ -50,28 +54,6 @@ const COLLABS: CollabChapter[] = [
     blockColor: "#F4EFE6",
     featuredCovers: ["run-the-jewels-2013", "run-the-jewels-4-2020", "rtj-cu4tro-2023"],
     artistMatch: "Run The Jewels",
-  },
-  {
-    slug: "men-women-children",
-    title: "Men Women & Children",
-    subtitle: "Reprise / Warner — Nick's first band",
-    years: "2004 → 2008",
-    blurb: "20-year anniversary in 2026. The whole press archive, the videos, the tour history — already documented.",
-    accent: "#F2B705",
-    blockColor: "#0B0B0B",
-    featuredCovers: ["men-women-children-self-titled", "dance-in-my-blood-us-dmd-maxi"],
-    artistMatch: "Men Women",
-  },
-  {
-    slug: "cubic-zirconia",
-    title: "Cubic Zirconia",
-    subtitle: "Tiombe Lockhart × Nick Hook · Brooklyn",
-    years: "2009 → 2012",
-    blurb: "9 releases (FUCK WORK → Darko), 34 documented shows, club circuit. Sub-imprint with Lockhart Dynasty.",
-    accent: "#4B2E83",
-    blockColor: "#F2C84B",
-    featuredCovers: ["fuck-work", "ldcc001-josephine", "ldcc006-darko"],
-    artistMatch: "Cubic Zirconia",
   },
   {
     slug: "gangsta-boo",

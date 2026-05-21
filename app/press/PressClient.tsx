@@ -272,6 +272,20 @@ function PressTile({ p, large = false }: { p: PressCard; large?: boolean }) {
   const showBadge = p.imageKind === "cover";
   const content = (
     <div className="relative border border-paper bg-ink-2 flex flex-col h-full overflow-hidden">
+      {/* Stretched-link pattern: the article URL covers the whole card via
+          an absolutely-positioned anchor at z-[1]. Any internal links (the
+          release/era chips below) sit at z-[2] so they capture their own
+          clicks. This avoids nesting <a> inside <a> — React's hydration
+          checker rightfully hates that, and browsers render it unreliably. */}
+      {p.url && (
+        <a
+          href={p.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={p.headline ?? p.outletDisplay ?? "open press piece"}
+          className="absolute inset-0 z-[1]"
+        />
+      )}
       {/* Accent stripe top */}
       <div className="absolute top-0 left-0 right-0 h-[3px] z-[1]" style={{ background: color }} aria-hidden />
       {/* Image (article og:image, falling back to album cover) */}
@@ -332,7 +346,7 @@ function PressTile({ p, large = false }: { p: PressCard; large?: boolean }) {
             {p.releaseSlug && (
               <Link
                 href={`/releases/${p.releaseSlug}`}
-                className="px-2 py-0.5 border border-collect text-collect hover:bg-collect hover:text-paper transition-colors rounded-full no-underline"
+                className="relative z-[2] px-2 py-0.5 border border-collect text-collect hover:bg-collect hover:text-paper transition-colors rounded-full no-underline"
               >
                 {p.releaseTitle}
               </Link>
@@ -340,7 +354,7 @@ function PressTile({ p, large = false }: { p: PressCard; large?: boolean }) {
             {p.eraSlug && (
               <Link
                 href={`/eras/${p.eraSlug}`}
-                className="px-2 py-0.5 border border-redline text-redline hover:bg-redline hover:text-paper transition-colors rounded-full no-underline"
+                className="relative z-[2] px-2 py-0.5 border border-redline text-redline hover:bg-redline hover:text-paper transition-colors rounded-full no-underline"
               >
                 {p.eraName?.toLowerCase()}
               </Link>
@@ -355,19 +369,20 @@ function PressTile({ p, large = false }: { p: PressCard; large?: boolean }) {
       </div>
     </div>
   );
-  return p.url ? (
-    <a
-      href={p.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group block no-underline text-paper transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px]"
+  // Outer wrapper is ALWAYS a <div> (never an anchor) — the article URL is
+  // now the stretched <a> inside `content`. The div carries hover transform
+  // + offset-shadow; the inner chip Links sit above the stretched anchor at
+  // z-[2] so each link captures its own click.
+  return (
+    <div
+      className="group block text-paper transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px]"
       style={{ ["--hover" as string]: color }}
-      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `4px 4px 0 ${color}`; }}
+      onMouseEnter={(e) => {
+        if (p.url) e.currentTarget.style.boxShadow = `4px 4px 0 ${color}`;
+      }}
       onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "none"; }}
     >
       {content}
-    </a>
-  ) : (
-    <div>{content}</div>
+    </div>
   );
 }

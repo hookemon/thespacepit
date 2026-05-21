@@ -3,12 +3,33 @@ import Link from "next/link";
 import { TopNav } from "../../_components/shared/TopNav";
 import { Footer } from "../../_components/shared/Footer";
 import { PortableText } from "../../_components/shared/PortableText";
-import { getProjectBySlug, getProjectSlugs, getVideosForEra } from "../../_lib/sanity-queries";
+import { getProjectBySlug, getProjectSlugs, getVideosForEra, getPressForEra } from "../../_lib/sanity-queries";
 import { RelatedVideos } from "../../_components/shared/RelatedVideos";
+import { PressGrid } from "../../_components/shared/PressGrid";
 import { urlFor } from "../../_lib/sanity";
 import { FOOTER_LINKS } from "../../_lib/social-links";
+import { SHOWS } from "../../_lib/shows";
+import { getVideosFromPlaylist } from "../../_lib/youtube";
+import { VideoPlaylist } from "../../_components/shared/VideoPlaylist";
 import { HorizontalJourney } from "./HorizontalJourney";
 import { CollageEra } from "./CollageEra";
+
+// Era slug → curated YouTube playlist on @thespacepit. Renders an embedded
+// playlist + thumbnail rail in the era page. Add an entry once Nick
+// curates a per-era playlist.
+const ERA_SLUG_TO_YT_PLAYLIST: Record<string, string> = {
+  "men-women-children": "PLMXEKDUSbulNyFibYJR2I2I0EnPpLp_ts",
+};
+
+// Era slug → SHOWS.era pattern (the xlsx-master era label is upper-case
+// and doesn't always match the project slug 1:1). Only listed eras get a
+// shows section; others fall back to the era's tour-highlights array.
+const ERA_SLUG_TO_SHOWS_PATTERN: Record<string, RegExp> = {
+  "men-women-children": /MEN WOMEN/i,
+  "cubic-zirconia":     /CUBIC ZIRCONIA/i,
+  "gangsta-boo-live-studio": /GANGSTA BOO/i,
+  "run-the-jewels-tour-2017": /RUN THE JEWELS TOUR/i,
+};
 
 export const revalidate = 3600;
 
@@ -44,6 +65,25 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
   const p = await getProjectBySlug(slug);
   if (!p) notFound();
   const videos = await getVideosForEra(slug);
+  // Era-tagged press (richer + more complete than the project's inline
+  // pressQuotes array). Renders below the inline-quote highlights when
+  // there are items.
+  const eraPress = await getPressForEra(slug);
+  // Curated YouTube playlist for the era (when Nick has one). Pulled live
+  // from YT, cached for an hour by the helper.
+  const eraPlaylistId = ERA_SLUG_TO_YT_PLAYLIST[slug];
+  const eraVideos = eraPlaylistId ? await getVideosFromPlaylist(eraPlaylistId, 50) : [];
+  // Full xlsx-sourced show history for eras that have one (MWC, CZ, etc.)
+  const showPattern = ERA_SLUG_TO_SHOWS_PATTERN[slug];
+  const eraShows = showPattern ? SHOWS.filter((sh) => showPattern.test(sh.era ?? "")) : [];
+  const showsByYear = new Map<number, typeof eraShows>();
+  for (const sh of eraShows) {
+    const y = sh.year ?? 0;
+    const arr = showsByYear.get(y) ?? [];
+    arr.push(sh);
+    showsByYear.set(y, arr);
+  }
+  const showYears = [...showsByYear.keys()].sort((a, b) => a - b);
 
   // Branch on layoutVariant — most eras render with the default vertical
   // page below; CZ + Boo (set in their project doc) get bespoke layouts.
@@ -77,7 +117,7 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
   }
 
   const cover = p.cover ? urlFor(p.cover).width(1200).height(800).fit("crop").url() : null;
-  const years = p.yearStart ? (p.yearEnd ? `${p.yearStart}–${p.yearEnd}` : `${p.yearStart} → today`) : "";
+  const years = p.yearStart ? (p.yearEnd ? `${p.yearStart}–${p.yearEnd}` : `${p.yearStart} → ∞`) : "";
 
   return (
     <div className="bg-ink text-paper min-h-screen flex flex-col flex-1">
@@ -170,12 +210,28 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
               <div className="font-mono text-[11px] tracking-[.14em] uppercase text-paper mt-6 mb-2">
                 {years}{p.kind && years ? " · " : ""}{p.kind}
               </div>
-              <h1
-                className="font-display font-bold uppercase m-0 text-paper"
-                style={{ fontSize: "clamp(48px, 10vw, 160px)", lineHeight: 0.88, letterSpacing: "-0.02em" }}
-              >
-                {p.name}
-              </h1>
+              {p.wordmark ? (
+                // Wordmark image takes precedence over the text headline.
+                // Used for projects with a distinctive logotype (Cubic Zirconia's
+                // geometric wordmark from the Josephine cover). Sized by
+                // viewport width so it scales like the H1 would. Alt is the
+                // project name so screen readers still get the semantic title.
+                <h1 className="m-0 mt-2">
+                  <img
+                    src={urlFor(p.wordmark).width(1600).fit("max").url()}
+                    alt={p.name}
+                    className="block max-w-full h-auto"
+                    style={{ width: "min(900px, 88vw)" }}
+                  />
+                </h1>
+              ) : (
+                <h1
+                  className="font-display font-bold uppercase m-0 text-paper"
+                  style={{ fontSize: "clamp(48px, 10vw, 160px)", lineHeight: 0.88, letterSpacing: "-0.02em" }}
+                >
+                  {p.name}
+                </h1>
+              )}
               {p.tagline && <p className="font-serif italic text-[22px] mt-4 max-w-[720px] text-paper-2">{p.tagline}</p>}
 
               <div className="flex flex-wrap gap-2 mt-6">
@@ -220,11 +276,37 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
                 >
                   videos →
                 </Link>
+                {eraShows.length > 0 && (
+                  <a
+                    href="#shows"
+                    className="font-mono text-[11px] tracking-[.14em] uppercase px-4 py-2 bg-ink text-paper border border-paper hover:bg-paper hover:text-ink transition-colors no-underline"
+                  >
+                    shows ↓
+                  </a>
+                )}
               </div>
             </div>
           </header>
 
           <div className="px-6 sm:px-8 py-12 max-w-[1180px] mx-auto">
+            {/* === CURRENT STATUS BANNER === MWC-specific for now: announce
+                that the band is active again after a 20-year break. Hardcoded
+                because no other era has this need yet — extract to a Sanity
+                field if a second era needs it. */}
+            {slug === "men-women-children" && (
+              <section className="mb-12 border-2 border-redline px-5 sm:px-7 py-5 sm:py-6">
+                <div className="font-mono text-[10px] sm:text-[11px] tracking-[.18em] uppercase text-redline mb-2">
+                  NEW MUSIC · INCOMING
+                </div>
+                <p
+                  className="font-display font-bold uppercase leading-[0.95] m-0"
+                  style={{ fontSize: "clamp(22px, 3.4vw, 36px)", letterSpacing: "-0.01em" }}
+                >
+                  currently working on new music for the first time in 20 years. we will be current again soon.
+                </p>
+              </section>
+            )}
+
             {p.story && Array.isArray(p.story) && p.story.length > 0 && (
               <section className="max-w-[720px]">
                 <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">THE STORY</div>
@@ -418,6 +500,116 @@ export default async function EraPage({ params }: { params: Promise<{ slug: stri
                   ))}
                 </ol>
               </section>
+            )}
+
+            {/* === EVERY DOCUMENTED SHOW === xlsx-sourced. Only renders for
+                eras with show data mapped at the top of the file. Each year
+                is a <details> — folded by default so 183 shows don't infinite-
+                scroll. Visitors see year totals + can expand whichever year
+                interests them. */}
+            {eraShows.length > 0 && (
+              <section id="shows" className="mt-16 scroll-mt-12">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                  EVERY DOCUMENTED SHOW · {eraShows.length}
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-3"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+                >
+                  {eraShows.length} dates · {showYears[showYears.length - 1] - showYears[0] + 1} years
+                </h2>
+                <p className="font-serif italic text-[14px] text-paper-2 mb-8 max-w-[640px]">
+                  click any year to expand the full date list.
+                </p>
+                <div className="space-y-2">
+                  {showYears.map((y) => {
+                    const list = showsByYear.get(y)!;
+                    return (
+                      <details key={y} className="group border-b border-paper/15 last:border-b-0">
+                        <summary
+                          className="list-none cursor-pointer flex items-baseline justify-between gap-4 py-3 hover:bg-paper/5 transition-colors px-1"
+                        >
+                          <span
+                            className="font-display font-bold uppercase"
+                            style={{ fontSize: "clamp(22px, 2.6vw, 30px)", letterSpacing: "-0.02em" }}
+                          >
+                            {y > 0 ? y : "—"}
+                          </span>
+                          <span className="font-mono text-[11px] tracking-[.16em] uppercase text-paper-2 tabular-nums">
+                            {list.length} shows
+                            <span aria-hidden className="inline-block ml-3 text-redline transition-transform group-open:rotate-90">▸</span>
+                          </span>
+                        </summary>
+                        <ol className="list-none p-0 m-0 pb-6 pt-2">
+                          {list.map((sh, i) => (
+                            <li key={`${sh.date}-${sh.venue}-${i}`}>
+                              <div className="grid grid-cols-[90px_1fr] sm:grid-cols-[120px_1fr] items-baseline gap-3 sm:gap-5 py-2 border-b border-paper/10 last:border-b-0">
+                                <div className="font-mono text-[10px] sm:text-[11px] tracking-[.06em] text-paper-2 tabular-nums shrink-0">
+                                  {sh.date ?? "—"}
+                                </div>
+                                <div className="min-w-0">
+                                  <div className="font-display font-semibold text-[15px] sm:text-[17px] uppercase tracking-[-0.005em] leading-tight">
+                                    {sh.city}{sh.country ? `, ${sh.country.replace(/, USA$/, "")}` : ""}
+                                  </div>
+                                  <div className="font-mono text-[10px] sm:text-[11px] tracking-[.04em] text-paper-2 mt-0.5 line-clamp-1">
+                                    {sh.venue ?? "—"}
+                                    {sh.support && <span className="text-paper-2/70"> · {sh.support}</span>}
+                                  </div>
+                                  {sh.notes && (
+                                    <div className="font-serif italic text-[12px] text-paper-2 mt-1 leading-snug max-w-[560px] opacity-80 line-clamp-2">
+                                      {sh.notes}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </li>
+                          ))}
+                        </ol>
+                      </details>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
+
+            {/* === THE VIDEOS === curated YouTube playlist for the era, pulled
+                live. Only renders when ERA_SLUG_TO_YT_PLAYLIST has an entry. */}
+            {eraVideos.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-redline mb-3">
+                  ON THE SCREEN · {eraVideos.length} VIDEOS
+                </div>
+                <h2
+                  className="font-display font-bold uppercase m-0 mb-6"
+                  style={{ fontSize: "clamp(28px, 4vw, 44px)", lineHeight: 0.92, letterSpacing: "-0.02em" }}
+                >
+                  the videos
+                </h2>
+                <VideoPlaylist
+                  items={eraVideos.map((v) => ({
+                    url: `https://www.youtube.com/watch?v=${v.id}`,
+                    title: v.title,
+                  }))}
+                  accent={p.color ?? "#E83A1C"}
+                  eyebrow={`PLAYLIST · ${eraVideos.length} VIDEOS`}
+                />
+              </section>
+            )}
+
+            {/* === PRESS ARCHIVE === every press piece tagged to this era.
+                The inline pressQuotes block above is a curated quote-pulls
+                view; this is the full archive of articles you can click
+                through. Falls silent when no era-tagged press exists. */}
+            {eraPress.length > 0 && (
+              <div className="mt-16">
+                <PressGrid
+                  items={eraPress}
+                  accent="#E83A1C"
+                  eyebrow={`PRESS ARCHIVE · ${eraPress.length}`}
+                  heading="press archive"
+                  subhead="every outlet that covered this era. click any card to read."
+                />
+              </div>
             )}
 
             {p.gallery && p.gallery.length > 0 && (

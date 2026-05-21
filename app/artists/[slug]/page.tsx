@@ -106,12 +106,27 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
                 {artist.city && (
                   <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-3">{artist.city}</div>
                 )}
-                <h1
-                  className="font-display font-bold uppercase m-0"
-                  style={{ fontSize: "clamp(48px, 8vw, 120px)", lineHeight: 0.9, letterSpacing: "-0.02em" }}
-                >
-                  {artist.name}
-                </h1>
+                {artist.wordmark ? (
+                  // Custom wordmark image takes precedence over the text headline.
+                  // Used for acts with a distinctive logotype — e.g. Cubic
+                  // Zirconia's geometric wordmark. Alt = artist.name so screen
+                  // readers still get the semantic title.
+                  <h1 className="m-0">
+                    <img
+                      src={urlFor(artist.wordmark).width(1400).fit("max").url()}
+                      alt={artist.name}
+                      className="block max-w-full h-auto"
+                      style={{ width: "min(720px, 88vw)" }}
+                    />
+                  </h1>
+                ) : (
+                  <h1
+                    className="font-display font-bold uppercase m-0"
+                    style={{ fontSize: "clamp(48px, 8vw, 120px)", lineHeight: 0.9, letterSpacing: "-0.02em" }}
+                  >
+                    {artist.name}
+                  </h1>
+                )}
                 {artist.tagline && (
                   <p className="font-serif italic text-[20px] mt-4 max-w-[600px]">{artist.tagline}</p>
                 )}
@@ -156,20 +171,20 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
                   )}
                   {(artist.slug === "cubic-zirconia" || artist.slug === "tiombe-lockhart") && (
                     <Link
-                      href="/collabs/cubic-zirconia"
+                      href="/bands/cubic-zirconia"
                       className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
                       style={{ borderColor: "#4B2E83", color: "#fff", background: "#4B2E83" }}
                     >
-                      cubic zirconia world →
+                      cubic zirconia →
                     </Link>
                   )}
                   {artist.slug === "men-women-children-band" && (
                     <Link
-                      href="/collabs/men-women-children"
+                      href="/bands/men-women-children"
                       className="font-mono text-[11px] tracking-[.14em] uppercase px-3 py-1.5 border-2 rounded-full no-underline transition-colors"
                       style={{ borderColor: "#E2651A", color: "#fff", background: "#E2651A" }}
                     >
-                      mwc world →
+                      men women & children →
                     </Link>
                   )}
                 </div>
@@ -318,13 +333,57 @@ export default async function ArtistPage({ params }: { params: Promise<{ slug: s
               </section>
             )}
 
-            {/* (The APPEARS ON section used to live here — a grid of all
-                releases this artist contributed to via credits[]. Removed
-                per Nick's call to strip "also on..." surfaces site-wide.
-                The data still resolves in the artist query, so the
-                section can come back as a different treatment later if
-                we want it. For now: primary releases only on artist
-                pages.) */}
+            {/* APPEARS ON — every release where this artist is in credits[]
+                but isn't the primary artist. Brought back per Nick's later
+                ask: "all the versions or albums or whatever tags should start
+                cross referencing there". The query returns roles per release,
+                rendered as small mono chips under the cover so it's clear
+                whether they sang, wrote, produced, remixed, etc. */}
+            {artist.appearsOn && artist.appearsOn.length > 0 && (
+              <section className="mt-16">
+                <div className="font-mono text-[11px] tracking-[.14em] uppercase text-collect mb-4">
+                  APPEARS ON · {artist.appearsOn.length}
+                </div>
+                <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+                  {artist.appearsOn.map((entry) => {
+                    const r = entry.release;
+                    const cover = r.cover ? urlFor(r.cover).width(440).height(440).fit("crop").url() : null;
+                    const roles = (entry.roles ?? []).filter(Boolean);
+                    return (
+                      <Link
+                        key={r._id}
+                        href={`/releases/${r.slug}`}
+                        className="group border border-ink p-3.5 transition-transform duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] hover:shadow-[4px_4px_0_#0E4B3A] no-underline text-ink"
+                      >
+                        <div
+                          className="aspect-square border border-ink mb-3 flex items-center justify-center relative overflow-hidden"
+                          style={{ background: r.coverColor ?? "#1C1A17" }}
+                        >
+                          {cover ? (
+                            <img src={cover} alt={r.title} className="absolute inset-0 w-full h-full object-cover" />
+                          ) : (
+                            <span
+                              className="font-display font-bold uppercase text-center px-3 text-paper"
+                              style={{ fontSize: 22, transform: "rotate(-4deg)", letterSpacing: "-0.02em", color: r.coverColor ? "#0B0B0B" : "#F4EFE6" }}
+                            >
+                              {r.title}
+                            </span>
+                          )}
+                        </div>
+                        <div className="font-display font-bold text-[18px] uppercase leading-tight line-clamp-2">{r.title}</div>
+                        <div className="font-mono text-[10px] tracking-[.1em] uppercase text-ink-3 mt-2 flex flex-wrap items-center gap-x-1.5">
+                          {r.year && <span>{r.year}</span>}
+                          {r.year && roles.length > 0 && <span>·</span>}
+                          {roles.length > 0 && (
+                            <span className="text-collect">{roles.join(" · ")}</span>
+                          )}
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </section>
+            )}
 
             {artist.gallery && artist.gallery.length > 0 && (
               <section className="mt-16">

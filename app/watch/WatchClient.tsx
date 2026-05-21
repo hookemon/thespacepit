@@ -5,8 +5,16 @@ import type { VideoListItem } from "../_lib/sanity-queries";
 
 type TagChip = { value: string; label: string; count: number };
 
+// Default landing filter for /watch. Music videos are the front door — the
+// thing most visitors actually came to see — with ALL + GEAR sitting right
+// next to it as obvious alt-toggles.
+const DEFAULT_FILTER = "music-video";
+
 export function WatchClient({ videos, tags }: { videos: VideoListItem[]; tags: TagChip[] }) {
-  const [filter, setFilter] = useState<string>("all");
+  // If music-video happens to have zero entries on this dataset (shouldn't,
+  // but defensive), fall back to "all" so the page isn't empty on load.
+  const hasMusicVideo = tags.some((t) => t.value === DEFAULT_FILTER);
+  const [filter, setFilter] = useState<string>(hasMusicVideo ? DEFAULT_FILTER : "all");
   const [open, setOpen] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
@@ -29,7 +37,9 @@ export function WatchClient({ videos, tags }: { videos: VideoListItem[]; tags: T
   useEffect(() => {
     if (typeof window === "undefined") return;
     const url = new URL(window.location.href);
-    if (filter === "all") url.searchParams.delete("filter");
+    // The URL only stores filter when it diverges from the default — so the
+    // canonical landing URL stays clean.
+    if (filter === DEFAULT_FILTER) url.searchParams.delete("filter");
     else url.searchParams.set("filter", filter);
     window.history.replaceState(null, "", url.toString());
   }, [filter]);
@@ -57,21 +67,38 @@ export function WatchClient({ videos, tags }: { videos: VideoListItem[]; tags: T
             onChange={(e) => setSearch(e.target.value)}
             className="bg-transparent border border-ink text-ink px-3 py-1.5 font-mono text-[12px] tracking-[.05em] placeholder:text-mute focus:outline-none focus:border-lamp-deep min-w-[200px]"
           />
-          <button
-            onClick={() => setFilter("all")}
-            className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === "all" ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
-          >
-            all · {totalCount}
-          </button>
-          {tags.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setFilter(t.value)}
-              className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === t.value ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
-            >
-              {t.label} · {t.count}
-            </button>
-          ))}
+          {/* Chip order: MUSIC VIDEO first (the default — what people came
+              for), ALL right next to it (escape hatch), then the rest. We
+              render music-video and gear-demo as named pins so the order is
+              stable regardless of the TAG_ORDER config in page.tsx. */}
+          {(() => {
+            const musicVideo = tags.find((t) => t.value === "music-video");
+            const gear = tags.find((t) => t.value === "gear-demo");
+            const pinned = new Set(["music-video", "gear-demo"]);
+            const rest = tags.filter((t) => !pinned.has(t.value));
+            const chip = (t: TagChip) => (
+              <button
+                key={t.value}
+                onClick={() => setFilter(t.value)}
+                className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === t.value ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
+              >
+                {t.label} · {t.count}
+              </button>
+            );
+            return (
+              <>
+                {musicVideo && chip(musicVideo)}
+                <button
+                  onClick={() => setFilter("all")}
+                  className={`font-mono text-[10px] tracking-[.12em] uppercase px-3 py-1.5 border border-ink rounded-full transition-colors whitespace-nowrap ${filter === "all" ? "bg-ink text-paper" : "hover:bg-ink hover:text-paper"}`}
+                >
+                  all · {totalCount}
+                </button>
+                {gear && chip(gear)}
+                {rest.map(chip)}
+              </>
+            );
+          })()}
         </div>
         {filter !== "all" && (
           <div className="font-mono text-[10px] tracking-[.12em] uppercase text-ink-3 mt-2.5">

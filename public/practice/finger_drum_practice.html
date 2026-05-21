@@ -1207,6 +1207,118 @@ const PATTERNS = [
     ],
     unlockedBy: { pattern: 3, accuracy: 80 },
   },
+  {
+    id: 5,
+    num: '06',
+    name: 'ETHIO SHUFFLE',
+    city: 'ADDIS ABABA',
+    bpm: 80,
+    beats: 8,
+    // Slow swung feel — Mulatu / Mahmoud Ahmed pocket
+    notes: [
+      [0,0],[0.66,2],[1,2],[1.66,2],[2,1],[2.66,2],[3,0],[3.66,2],
+      [4,0],[4.66,2],[5,2],[5.66,2],[6,1],[6.66,2],[7,3],[7.66,2],
+    ],
+    unlockedBy: { pattern: 4, accuracy: 75 },
+  },
+  {
+    id: 6,
+    num: '07',
+    name: 'AFROBEAT',
+    city: 'LAGOS',
+    bpm: 105,
+    beats: 8,
+    // Tony Allen pocket — kick on 1, ride bell on hat, snare 2+4 with ghosts
+    notes: [
+      [0,0],[0.5,2],[1,2],[1.5,2],[2,1],[2.5,2],[2.75,2],[3,2],[3.5,2],
+      [4,0],[4.5,2],[5,2],[5.5,2],[6,1],[6.5,2],[7,3],[7.5,2],
+    ],
+    unlockedBy: { pattern: 5, accuracy: 75 },
+  },
+  {
+    id: 7,
+    num: '08',
+    name: 'HIGHLIFE',
+    city: 'ACCRA',
+    bpm: 100,
+    beats: 8,
+    // Highlife I-IV-V feel — syncopated kick, snare on 2/4, hat steady
+    notes: [
+      [0,0],[0.5,2],[1,0],[1,3],[1.5,2],[2,1],[2.5,2],[3,0],[3.5,0],[3.5,2],
+      [4,0],[4.5,2],[5,0],[5,3],[5.5,2],[6,1],[6.5,2],[7,0],[7.5,0],[7.5,2],
+    ],
+    unlockedBy: { pattern: 6, accuracy: 75 },
+  },
+  {
+    id: 8,
+    num: '09',
+    name: 'ONE DROP',
+    city: 'KINGSTON',
+    bpm: 70,
+    beats: 8,
+    // The dub one-drop — kick + rim ONLY on the 3, hat steady
+    notes: [
+      [0.5,2],[1,2],[1.5,2],[2,0],[2,1],[2.5,2],[3,2],[3.5,2],
+      [4.5,2],[5,2],[5.5,2],[6,0],[6,1],[6.5,2],[7,2],[7.5,2],
+    ],
+    unlockedBy: { pattern: 7, accuracy: 70 },
+  },
+  {
+    id: 9,
+    num: '10',
+    name: 'HUAYNO',
+    city: 'CUSCO',
+    bpm: 95,
+    beats: 8,
+    // Andean huayno stomp — kick 1+3, snare on the 2.5, charango-bell hat
+    notes: [
+      [0,0],[0.5,2],[1,2],[1.5,2],[2,1],[2.5,2],[3,0],[3.5,2],
+      [4,0],[4.5,2],[5,2],[5.5,2],[6,1],[6.5,2],[6.75,3],[7,0],[7.5,2],
+    ],
+    unlockedBy: { pattern: 8, accuracy: 75 },
+  },
+  {
+    id: 10,
+    num: '11',
+    name: 'SAMBA',
+    city: 'SALVADOR',
+    bpm: 100,
+    beats: 8,
+    // Samba surdo on 2 and 4, agogô as hat, clap on offbeats
+    notes: [
+      [0.5,2],[1,2],[2,0],[2.5,2],[3,2],[3.5,2],
+      [4.5,2],[5,2],[6,0],[6,1],[6.5,2],[7,2],[7.5,3],
+    ],
+    unlockedBy: { pattern: 9, accuracy: 75 },
+  },
+  {
+    id: 11,
+    num: '12',
+    name: 'BAILE FUNK',
+    city: 'RIO',
+    bpm: 130,
+    beats: 8,
+    // Tamborzão — the iconic baile funk pattern
+    notes: [
+      [0,0],[0.75,0],[0.75,1],[1.5,3],[2,0],[2.5,3],[3,0],[3.5,3],
+      [4,0],[4.75,0],[4.75,1],[5.5,3],[6,0],[6.5,3],[7,0],[7.5,3],
+    ],
+    unlockedBy: { pattern: 10, accuracy: 80 },
+  },
+  {
+    id: 12,
+    num: '13',
+    name: 'TANGO / MILONGA',
+    city: 'BUENOS AIRES',
+    bpm: 110,
+    beats: 8,
+    // Milonga 3-3-2 + tango heartbeat
+    notes: [
+      [0,0],[0.75,0],[1.5,1],[2,2],[2.5,2],[3,2],[3.5,2],
+      [4,0],[4.75,0],[5.5,1],[6,2],[6.5,2],[7,3],[7.5,2],
+    ],
+    unlockedBy: { pattern: 11, accuracy: 80 },
+  },
 ];
 
 // ============ STATE ============
@@ -1827,7 +1939,7 @@ function selectPattern(id) {
   }
   renderPatternSelector();
   updateStats();
-  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo' };
+  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo', 'ADDIS ABABA': 'ethiopia', 'LAGOS': 'lagos', 'ACCRA': 'accra', 'KINGSTON': 'kingston', 'CUSCO': 'cusco', 'SALVADOR': 'salvador', 'RIO': 'rio', 'BUENOS AIRES': 'buenosaires' };
   if (typeof applyCityBackground === 'function') applyCityBackground(DRUM_CITY_TO_ID[PATTERNS[id].city]);
   saveState();
 }
@@ -1977,7 +2089,7 @@ window.addEventListener('keydown', (e) => {
   updateStats();
   // pattern.city is uppercase (BROOKLYN, MEDELLÍN, CDMX, BERLIN, TOKYO);
   // map back to the lowercase atlas id so the mural lookup matches.
-  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo' };
+  const DRUM_CITY_TO_ID = { 'BROOKLYN': 'brooklyn', 'MEDELLÍN': 'medellin', 'CDMX': 'mexico', 'BERLIN': 'berlin', 'TOKYO': 'tokyo', 'ADDIS ABABA': 'ethiopia', 'LAGOS': 'lagos', 'ACCRA': 'accra', 'KINGSTON': 'kingston', 'CUSCO': 'cusco', 'SALVADOR': 'salvador', 'RIO': 'rio', 'BUENOS AIRES': 'buenosaires' };
   if (typeof applyCityBackground === 'function') applyCityBackground(DRUM_CITY_TO_ID[currentPattern().city]);
   initMIDI();
   requestAnimationFrame(gameLoop);

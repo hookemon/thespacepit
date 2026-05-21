@@ -138,6 +138,13 @@ export function PressGrid({
               href={q.url}
               target="_blank"
               rel="noopener noreferrer"
+              data-track="press_clicked"
+              data-track-props={JSON.stringify({
+                outlet: q.outlet ?? q.source,
+                headline: q.headline,
+                url: q.url,
+                press_id: q._id,
+              })}
               className={`block border ${borderClass} p-5 sm:p-6 transition-all duration-150 hover:-translate-x-[3px] hover:-translate-y-[3px] no-underline`}
               style={{ boxShadow: "none" }}
               onMouseEnter={(e) => { e.currentTarget.style.boxShadow = `4px 4px 0 ${accent}`; }}
