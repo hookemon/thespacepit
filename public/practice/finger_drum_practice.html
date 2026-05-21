@@ -737,6 +737,73 @@
     margin-top: 2px;
   }
 
+  /* ====== Guide / Click / Backing toggles ====== */
+  .guide-row {
+    padding: 10px 20px 8px;
+    background: var(--paper);
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .guide-help-row {
+    padding: 0 20px 12px;
+    background: var(--paper);
+    border-bottom: 2px solid var(--ink);
+  }
+  .guide-btn {
+    background: var(--paper-2);
+    border: 2px solid var(--ink);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    padding: 7px 12px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0 var(--ink);
+    transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+  }
+  .guide-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--ink);
+  }
+  .guide-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0 var(--ink);
+  }
+  .guide-btn.on {
+    background: var(--yellow);
+  }
+  .guide-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--ink-3);
+    border: 1.5px solid var(--ink);
+    flex: 0 0 auto;
+  }
+  .guide-btn.on .guide-dot {
+    background: var(--ink);
+    animation: guide-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes guide-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.35; }
+  }
+  .guide-help {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 11px;
+    color: var(--ink-3);
+    line-height: 1.2;
+    flex: 1 1 auto;
+  }
+
   /* ====== Recording controls ====== */
   .record-row {
     padding: 12px 20px;
@@ -990,7 +1057,7 @@
 <div class="pattern-section">
   <div class="pattern-section-head">
     <span class="pattern-section-label">— SELECT PATTERN</span>
-    <span class="pattern-current-name" id="currentPatternName">PATTERN 01 — <em>BOOM BAP</em></span>
+    <span class="pattern-current-name" id="currentPatternName">PATTERN 01 — <em>JUST KICKS</em></span>
   </div>
   <div class="pattern-scroll" id="patternScroll"></div>
 </div>
@@ -1025,7 +1092,7 @@
 
 <!-- BPM slider -->
 <div class="bpm-slider-row">
-  <input type="range" class="bpm-slider" id="bpmSlider" min="60" max="160" step="1" value="90">
+  <input type="range" class="bpm-slider" id="bpmSlider" min="60" max="160" step="1" value="70">
   <div class="bpm-range-labels"><span>60</span><span>90</span><span>120</span><span>160 BPM</span></div>
 </div>
 
@@ -1083,10 +1150,29 @@
 <div class="controls">
   <button class="control-btn primary" id="playBtn">PLAY</button>
   <div class="bpm-control">
-    <div class="bpm-display"><span id="bpmVal">90</span></div>
+    <div class="bpm-display"><span id="bpmVal">70</span></div>
     <div class="bpm-label">BPM</div>
   </div>
   <button class="control-btn secondary" id="resetBtn">RESET</button>
+</div>
+
+<!-- Guide track / Click / Backing toggles -->
+<div class="guide-row">
+  <button class="guide-btn on" id="guideBtn">
+    <span class="guide-dot"></span>
+    <span class="guide-text">GUIDE: ON</span>
+  </button>
+  <button class="guide-btn on" id="clickBtn">
+    <span class="guide-dot"></span>
+    <span class="guide-text">CLICK: ON</span>
+  </button>
+  <button class="guide-btn on" id="backingBtn">
+    <span class="guide-dot"></span>
+    <span class="guide-text">BACKING: ON</span>
+  </button>
+</div>
+<div class="guide-help-row">
+  <span class="guide-help">— <strong>guide</strong>: hear the pads as they fall.&nbsp;&nbsp;<strong>click</strong>: metronome flavored to the style.&nbsp;&nbsp;<strong>backing</strong>: bass + chord bed for each level.</span>
 </div>
 
 <!-- Recording -->
@@ -1144,6 +1230,67 @@ const PATTERNS = [
   {
     id: 0,
     num: '01',
+    name: 'JUST KICKS',
+    city: 'BROOKLYN',
+    bpm: 70,
+    beats: 8,
+    // The pulse — one finger, four hits, slow. KEY: A
+    notes: [
+      [0,0],[2,0],[4,0],[6,0],
+    ],
+    backing: {
+      key: 'A1', click: 'click', crush: 0.3,
+      // No bass yet — just the click. Let them feel the pulse.
+      bass: [], pad: [],
+    },
+    unlockedBy: null, // always unlocked
+  },
+  {
+    id: 1,
+    num: '02',
+    name: 'BOOM CLAP',
+    city: 'BROOKLYN',
+    bpm: 80,
+    beats: 8,
+    // Backbone — kick on 1+3, snare on 2+4. The 808 / drum machine starter.
+    notes: [
+      [0,0],[1,1],[2,0],[3,1],[4,0],[5,1],[6,0],[7,1],
+    ],
+    backing: {
+      key: 'A1', click: 'click', crush: 0.5,
+      bassVoice: 'upright',
+      // Root on every kick — locks the kick to the bass
+      bass: [[0,0,1.6],[2,0,1.6],[4,0,1.6],[6,0,1.6]],
+      pad: [],
+    },
+    unlockedBy: { pattern: 0, accuracy: 50 },
+  },
+  {
+    id: 2,
+    num: '03',
+    name: 'ADD HATS',
+    city: 'BROOKLYN',
+    bpm: 85,
+    beats: 8,
+    // Boom bap skeleton — backbeat + hats on every "and"
+    notes: [
+      [0,0],[0.5,2],[1,1],[1.5,2],[2,0],[2.5,2],[3,1],[3.5,2],
+      [4,0],[4.5,2],[5,1],[5.5,2],[6,0],[6.5,2],[7,1],[7.5,2],
+    ],
+    backing: {
+      key: 'A1', click: 'click', crush: 0.55,
+      bassVoice: 'upright',
+      // Root + 5th walking — still simple but starts moving
+      bass: [[0,0,1.2],[1.5,7,0.5],[2,0,1.2],[3.5,-5,0.5],[4,0,1.2],[5.5,7,0.5],[6,0,1.2],[7.5,-5,0.5]],
+      padVoice: 'rhodes',
+      // Am triad pad — sustains over each bar
+      pad: [[0,[0,3,7,12],4],[4,[0,3,7,12],4]],
+    },
+    unlockedBy: { pattern: 1, accuracy: 60 },
+  },
+  {
+    id: 3,
+    num: '04',
     name: 'BOOM BAP',
     city: 'BROOKLYN',
     bpm: 90,
@@ -1153,11 +1300,20 @@ const PATTERNS = [
       [0,0],[0.5,2],[1,1],[1.5,2],[2,0],[2.5,2],[3,1],[3.5,2],
       [4,0],[4.5,2],[5,1],[5.5,2],[6,0],[6.25,0],[6.5,2],[7,3],[7.5,2],
     ],
-    unlockedBy: null, // always unlocked
+    backing: {
+      key: 'A1', click: 'click', crush: 0.7, // full SP-1200 grit
+      bassVoice: 'upright',
+      // Dorian walk — root, b3, 4, 5, root, b7, 5, 4
+      bass: [[0,0,1],[1,3,0.5],[1.5,5,0.5],[2,7,1],[3,5,1],[4,0,1],[5,10,0.5],[5.5,7,0.5],[6,5,1],[7,3,1]],
+      padVoice: 'rhodes',
+      // Am9 — minor 9th, very Hi Tek / Pete Rock
+      pad: [[0,[0,3,7,10,14],4],[4,[0,3,7,10,14],4]],
+    },
+    unlockedBy: { pattern: 2, accuracy: 65 },
   },
   {
-    id: 1,
-    num: '02',
+    id: 4,
+    num: '05',
     name: 'CUMBIA',
     city: 'MEDELLÍN',
     bpm: 100,
@@ -1166,11 +1322,20 @@ const PATTERNS = [
       [0,0],[0.5,2],[1.5,2],[2,1],[2.5,2],[3,0],[3.5,2],[4,1],
       [4.5,2],[5.5,0],[6,2],[6.5,1],[7,2],[7.5,3],
     ],
-    unlockedBy: { pattern: 0, accuracy: 70 },
+    backing: {
+      key: 'D2', click: 'guacharaca', crush: 0.45,
+      bassVoice: 'electric',
+      // Tumbao — root on 1, 5th on 3.5, root on 5, 5th on 7.5
+      bass: [[0,0,1.5],[2.5,7,0.5],[4,0,1.5],[6.5,7,0.5]],
+      padVoice: 'accordion',
+      // D7 cumbia chord — root, 3rd, 5th, b7
+      pad: [[0,[0,4,7,10],3.5],[4,[0,4,7,10],3.5]],
+    },
+    unlockedBy: { pattern: 3, accuracy: 70 },
   },
   {
-    id: 2,
-    num: '03',
+    id: 5,
+    num: '06',
     name: 'DEMBOW REBAJADA',
     city: 'CDMX',
     bpm: 75,
@@ -1179,11 +1344,20 @@ const PATTERNS = [
       [0,0],[0.75,0],[1,1],[1.5,2],[2,0],[2.5,2],[3,1],[3,3],[3.5,2],
       [4,0],[4.5,2],[5,1],[5.5,2],[5.5,3],[6,0],[6.5,2],[7,1],[7.5,2],
     ],
-    unlockedBy: { pattern: 1, accuracy: 75 },
+    backing: {
+      key: 'D1', click: 'rim', crush: 0.6,
+      bassVoice: 'sub',
+      // Dembow sub — root on 1, octave up on 4, slid down. Classic chopped & screwed feel.
+      bass: [[0,0,1.8],[3,12,0.6],[4,0,1.8],[7,12,0.6]],
+      padVoice: 'wurli',
+      // Dm9 — dark and woozy
+      pad: [[0,[0,3,7,10,14],4],[4,[0,3,7,10,14],4]],
+    },
+    unlockedBy: { pattern: 4, accuracy: 75 },
   },
   {
-    id: 3,
-    num: '04',
+    id: 6,
+    num: '07',
     name: 'TECHNO 4/4',
     city: 'BERLIN',
     bpm: 128,
@@ -1192,11 +1366,19 @@ const PATTERNS = [
       [0,0],[0.5,2],[1,0],[1,3],[1.5,2],[2,0],[2.5,2],[3,0],[3,3],[3.5,2],
       [4,0],[4.5,2],[5,0],[5,3],[5.5,2],[6,0],[6.5,2],[7,0],[7,3],[7.5,2],[7.5,1],
     ],
-    unlockedBy: { pattern: 2, accuracy: 75 },
+    backing: {
+      key: 'E1', click: 'click', crush: 0.15, // techno stays clean
+      bassVoice: 'synth',
+      // Driving 16th sub on the root, modulating to 7/octave for tension
+      bass: [[0,0,0.5],[1,0,0.5],[2,0,0.5],[3,7,0.5],[4,0,0.5],[5,0,0.5],[6,0,0.5],[7,12,0.5]],
+      padVoice: 'sine',
+      pad: [],
+    },
+    unlockedBy: { pattern: 5, accuracy: 75 },
   },
   {
-    id: 4,
-    num: '05',
+    id: 7,
+    num: '08',
     name: 'LOOSE / DILLA',
     city: 'TOKYO',
     bpm: 85,
@@ -1205,11 +1387,20 @@ const PATTERNS = [
       [0,0],[0.75,2],[1,1],[1.5,2],[2,0],[2.25,0],[2.5,2],[3,1],[3.5,2],
       [4,0],[4.5,2],[5,1],[5.75,0],[6,2],[6.5,0],[7,1],[7.5,2],
     ],
-    unlockedBy: { pattern: 3, accuracy: 80 },
+    backing: {
+      key: 'D1', click: 'tape', crush: 0.75, // wonky tape-saturated
+      bassVoice: 'upright',
+      // Drunk walk — late, behind the kick. Suggests the Dilla swing.
+      bass: [[0.1,0,1.4],[1.6,3,0.4],[2.1,5,1],[3.6,-2,0.4],[4.1,0,1.4],[5.6,7,0.4],[6.1,5,1.4]],
+      padVoice: 'rhodes',
+      // Dm9 — wonky neo-soul
+      pad: [[0,[0,3,7,10,14],4],[4,[0,3,7,10,14],4]],
+    },
+    unlockedBy: { pattern: 6, accuracy: 80 },
   },
   {
-    id: 5,
-    num: '06',
+    id: 8,
+    num: '09',
     name: 'ETHIO SHUFFLE',
     city: 'ADDIS ABABA',
     bpm: 80,
@@ -1219,11 +1410,20 @@ const PATTERNS = [
       [0,0],[0.66,2],[1,2],[1.66,2],[2,1],[2.66,2],[3,0],[3.66,2],
       [4,0],[4.66,2],[5,2],[5.66,2],[6,1],[6.66,2],[7,3],[7.66,2],
     ],
-    unlockedBy: { pattern: 4, accuracy: 75 },
+    backing: {
+      key: 'A1', click: 'sidestick', crush: 0.6,
+      bassVoice: 'upright',
+      // Tezeta-style — root on 1, 5th on 3
+      bass: [[0,0,2],[3,7,1],[4,0,2],[7,5,1]],
+      padVoice: 'wurli',
+      // Tizita scale flavor — Am with passing b6 feel
+      pad: [[0,[0,3,7,12],4],[4,[0,3,7,12],4]],
+    },
+    unlockedBy: { pattern: 7, accuracy: 75 },
   },
   {
-    id: 6,
-    num: '07',
+    id: 9,
+    num: '10',
     name: 'AFROBEAT',
     city: 'LAGOS',
     bpm: 105,
@@ -1233,11 +1433,19 @@ const PATTERNS = [
       [0,0],[0.5,2],[1,2],[1.5,2],[2,1],[2.5,2],[2.75,2],[3,2],[3.5,2],
       [4,0],[4.5,2],[5,2],[5.5,2],[6,1],[6.5,2],[7,3],[7.5,2],
     ],
-    unlockedBy: { pattern: 5, accuracy: 75 },
+    backing: {
+      key: 'F#1', click: 'cowbell', crush: 0.4,
+      bassVoice: 'electric',
+      // Tony Allen / Fela bass — octave bounce on kick, walks up to 5
+      bass: [[0,0,0.8],[1.5,12,0.4],[2,7,0.8],[3.5,12,0.4],[4,0,0.8],[5.5,12,0.4],[6,7,0.8],[7.5,5,0.4]],
+      padVoice: 'organ',
+      pad: [[0,[0,3,7,10],3.5],[4,[0,3,7,10],3.5]],
+    },
+    unlockedBy: { pattern: 8, accuracy: 75 },
   },
   {
-    id: 7,
-    num: '08',
+    id: 10,
+    num: '11',
     name: 'HIGHLIFE',
     city: 'ACCRA',
     bpm: 100,
@@ -1247,11 +1455,20 @@ const PATTERNS = [
       [0,0],[0.5,2],[1,0],[1,3],[1.5,2],[2,1],[2.5,2],[3,0],[3.5,0],[3.5,2],
       [4,0],[4.5,2],[5,0],[5,3],[5.5,2],[6,1],[6.5,2],[7,0],[7.5,0],[7.5,2],
     ],
-    unlockedBy: { pattern: 6, accuracy: 75 },
+    backing: {
+      key: 'C2', click: 'woodblock', crush: 0.35,
+      bassVoice: 'electric',
+      // I-IV-V — root, 4, 5 walk. Bright.
+      bass: [[0,0,1],[1,0,0.5],[2,5,1],[3,7,1],[4,0,1],[5,0,0.5],[6,5,1],[7,7,1]],
+      padVoice: 'marimba',
+      // C major triad palm wine
+      pad: [[0,[0,4,7,12],1.5],[2,[0,5,9,12],1.5],[4,[0,7,11,14],1.5],[6,[0,4,7,12],1.5]],
+    },
+    unlockedBy: { pattern: 9, accuracy: 75 },
   },
   {
-    id: 8,
-    num: '09',
+    id: 11,
+    num: '12',
     name: 'ONE DROP',
     city: 'KINGSTON',
     bpm: 70,
@@ -1261,11 +1478,21 @@ const PATTERNS = [
       [0.5,2],[1,2],[1.5,2],[2,0],[2,1],[2.5,2],[3,2],[3.5,2],
       [4.5,2],[5,2],[5.5,2],[6,0],[6,1],[6.5,2],[7,2],[7.5,2],
     ],
-    unlockedBy: { pattern: 7, accuracy: 70 },
+    backing: {
+      key: 'A1', click: 'sidestick', crush: 0.55,
+      bassVoice: 'sub',
+      // Aston Barrett — root on 3, drop on 1
+      bass: [[0,0,1.8],[2,0,2],[4,0,1.8],[6,0,2]],
+      padVoice: 'organ',
+      // Bubble organ on the offbeats — quick stabs
+      pad: [[0.5,[0,3,7],0.4],[1.5,[0,3,7],0.4],[2.5,[0,3,7],0.4],[3.5,[0,3,7],0.4],
+            [4.5,[0,3,7],0.4],[5.5,[0,3,7],0.4],[6.5,[0,3,7],0.4],[7.5,[0,3,7],0.4]],
+    },
+    unlockedBy: { pattern: 10, accuracy: 70 },
   },
   {
-    id: 9,
-    num: '10',
+    id: 12,
+    num: '13',
     name: 'HUAYNO',
     city: 'CUSCO',
     bpm: 95,
@@ -1275,11 +1502,23 @@ const PATTERNS = [
       [0,0],[0.5,2],[1,2],[1.5,2],[2,1],[2.5,2],[3,0],[3.5,2],
       [4,0],[4.5,2],[5,2],[5.5,2],[6,1],[6.5,2],[6.75,3],[7,0],[7.5,2],
     ],
-    unlockedBy: { pattern: 8, accuracy: 75 },
+    backing: {
+      key: 'D2', click: 'woodblock', crush: 0.4,
+      bassVoice: 'upright',
+      // Andean root-5-root pulse
+      bass: [[0,0,1.5],[2,7,1],[4,0,1.5],[6,7,1]],
+      padVoice: 'marimba',
+      // Charango pluck — quick repeated stabs
+      pad: [[0,[0,7,12],0.4],[0.5,[0,7,12],0.4],[1,[0,7,12],0.4],[1.5,[0,7,12],0.4],
+            [2,[0,7,12],0.4],[2.5,[0,7,12],0.4],[3,[0,7,12],0.4],[3.5,[0,7,12],0.4],
+            [4,[0,7,12],0.4],[4.5,[0,7,12],0.4],[5,[0,7,12],0.4],[5.5,[0,7,12],0.4],
+            [6,[0,7,12],0.4],[6.5,[0,7,12],0.4],[7,[0,7,12],0.4],[7.5,[0,7,12],0.4]],
+    },
+    unlockedBy: { pattern: 11, accuracy: 75 },
   },
   {
-    id: 10,
-    num: '11',
+    id: 13,
+    num: '14',
     name: 'SAMBA',
     city: 'SALVADOR',
     bpm: 100,
@@ -1289,11 +1528,21 @@ const PATTERNS = [
       [0.5,2],[1,2],[2,0],[2.5,2],[3,2],[3.5,2],
       [4.5,2],[5,2],[6,0],[6,1],[6.5,2],[7,2],[7.5,3],
     ],
-    unlockedBy: { pattern: 9, accuracy: 75 },
+    backing: {
+      key: 'C2', click: 'agogo', crush: 0.3,
+      bassVoice: 'electric',
+      // Samba root walk
+      bass: [[0,0,1],[1.5,7,0.5],[2,5,1],[3,0,1],[4,0,1],[5.5,7,0.5],[6,5,1],[7,0,1]],
+      padVoice: 'marimba',
+      // Cavaquinho strum stabs on the offbeats
+      pad: [[0.5,[0,4,7],0.3],[1.5,[0,4,7],0.3],[2.5,[0,4,7],0.3],[3.5,[0,4,7],0.3],
+            [4.5,[0,4,7],0.3],[5.5,[0,4,7],0.3],[6.5,[0,4,7],0.3],[7.5,[0,4,7],0.3]],
+    },
+    unlockedBy: { pattern: 12, accuracy: 75 },
   },
   {
-    id: 11,
-    num: '12',
+    id: 14,
+    num: '15',
     name: 'BAILE FUNK',
     city: 'RIO',
     bpm: 130,
@@ -1303,11 +1552,19 @@ const PATTERNS = [
       [0,0],[0.75,0],[0.75,1],[1.5,3],[2,0],[2.5,3],[3,0],[3.5,3],
       [4,0],[4.75,0],[4.75,1],[5.5,3],[6,0],[6.5,3],[7,0],[7.5,3],
     ],
-    unlockedBy: { pattern: 10, accuracy: 80 },
+    backing: {
+      key: 'D1', click: 'cowbell', crush: 0.5,
+      bassVoice: 'sub',
+      // Aggressive sub on every kick + tamborzão drops
+      bass: [[0,0,0.6],[0.75,0,0.6],[2,0,0.6],[3,0,0.6],[4,0,0.6],[4.75,0,0.6],[6,0,0.6],[7,0,0.6]],
+      padVoice: 'sine',
+      pad: [],
+    },
+    unlockedBy: { pattern: 13, accuracy: 80 },
   },
   {
-    id: 12,
-    num: '13',
+    id: 15,
+    num: '16',
     name: 'TANGO / MILONGA',
     city: 'BUENOS AIRES',
     bpm: 110,
@@ -1317,7 +1574,16 @@ const PATTERNS = [
       [0,0],[0.75,0],[1.5,1],[2,2],[2.5,2],[3,2],[3.5,2],
       [4,0],[4.75,0],[5.5,1],[6,2],[6.5,2],[7,3],[7.5,2],
     ],
-    unlockedBy: { pattern: 11, accuracy: 80 },
+    backing: {
+      key: 'A1', click: 'sidestick', crush: 0.5,
+      bassVoice: 'upright',
+      // Tango walking bass — 3-3-2 milonga feel
+      bass: [[0,0,0.75],[0.75,7,0.75],[1.5,5,0.5],[2,0,1],[3,7,1],[4,0,0.75],[4.75,7,0.75],[5.5,5,0.5],[6,0,1],[7,7,1]],
+      padVoice: 'accordion',
+      // Am pad — bandoneón drone
+      pad: [[0,[0,3,7,12],4],[4,[0,3,7,12],4]],
+    },
+    unlockedBy: { pattern: 14, accuracy: 80 },
   },
 ];
 
@@ -1334,7 +1600,12 @@ const state = {
   hits: { perfect: 0, good: 0, ok: 0, miss: 0 },
   lastBeatShown: -1,
   currentPatternIdx: 0,
-  bpm: 90,
+  bpm: 70,
+  guideOn: true,
+  guideCursor: 0,
+  clickOn: true,
+  backingOn: true,
+  backingCursor: 0,
   // Persistent
   musicSkill: 0,
   patternBest: {}, // {patternId: bestAccuracy}
@@ -1378,6 +1649,9 @@ const midiText = document.getElementById('midiText');
 const unlockLabel = document.getElementById('unlockLabel');
 const unlockProgress = document.getElementById('unlockProgress');
 const unlockProgressFill = document.getElementById('unlockProgressFill');
+const guideBtn = document.getElementById('guideBtn');
+const clickBtn = document.getElementById('clickBtn');
+const backingBtn = document.getElementById('backingBtn');
 
 // Build beat pulse dots
 for (let i = 0; i < 4; i++) {
@@ -1396,8 +1670,11 @@ async function loadState() {
       state.musicSkill = saved.musicSkill || 0;
       state.patternBest = saved.patternBest || {};
       state.unlockedPatterns = saved.unlockedPatterns || [0];
-      state.bpm = saved.bpm || 90;
+      state.bpm = saved.bpm || 70;
       state.currentPatternIdx = saved.currentPatternIdx || 0;
+      if (typeof saved.guideOn === 'boolean') state.guideOn = saved.guideOn;
+      if (typeof saved.clickOn === 'boolean') state.clickOn = saved.clickOn;
+      if (typeof saved.backingOn === 'boolean') state.backingOn = saved.backingOn;
     }
   } catch (e) { /* no saved state yet */ }
   // Apply
@@ -1413,6 +1690,9 @@ async function saveState() {
       unlockedPatterns: state.unlockedPatterns,
       bpm: state.bpm,
       currentPatternIdx: state.currentPatternIdx,
+      guideOn: state.guideOn,
+      clickOn: state.clickOn,
+      backingOn: state.backingOn,
     }));
   } catch (e) { /* storage not available, that's fine */ }
 }
@@ -1422,10 +1702,367 @@ function initAudio() {
   if (state.audio) return;
   const AC = window.AudioContext || window.webkitAudioContext;
   state.audio = new AC();
+
+  // Backing bus → bit crusher → destination.
+  // Drums route straight to destination (they should stay clean & punchy).
+  // The crusher gives the bass+pad that 12-bit / SP-1200 dust.
+  const ac = state.audio;
+  state.backingBus = ac.createGain();
+  state.backingBus.gain.value = 0.85;
+  state.bitCrusher = ac.createWaveShaper();
+  state.bitCrusher.oversample = 'none';
+  state.crushLpf = ac.createBiquadFilter();
+  state.crushLpf.type = 'lowpass';
+  state.crushLpf.frequency.value = 6500; // SP-1200 vibe (true SR is ~26.04kHz, anti-alias around 6-8k)
+  state.crushLpf.Q.value = 0.4;
+  applyCrushCurve(0.5); // initial, will be set per-pattern
+  state.backingBus.connect(state.bitCrusher).connect(state.crushLpf).connect(ac.destination);
 }
 function now() { return state.audio ? state.audio.currentTime : 0; }
 
-function playKick(t = now()) {
+// Bit-crush curve — quantize signal to N levels. amount: 0 (clean) to 1 (heavy).
+function applyCrushCurve(amount) {
+  if (!state.bitCrusher) return;
+  const bits = 16 - Math.round(amount * 8); // 16-bit at 0, 8-bit at 1, 12-bit at 0.5
+  const levels = Math.pow(2, bits);
+  const curve = new Float32Array(2048);
+  for (let i = 0; i < 2048; i++) {
+    const x = (i / 2047) * 2 - 1;
+    curve[i] = Math.round(x * levels) / levels;
+  }
+  state.bitCrusher.curve = curve;
+  // Crush also dulls the top end — adjust the LPF
+  state.crushLpf.frequency.setTargetAtTime(8500 - amount * 4500, now(), 0.05);
+}
+
+// Convert a note like "A2" or a midi number to Hz.
+function noteFreq(note) {
+  if (typeof note === 'number') return 440 * Math.pow(2, (note - 69) / 12);
+  const m = note.match(/^([A-G])(b|#)?(-?\d+)$/);
+  if (!m) return 220;
+  const NAMES = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+  let n = NAMES[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0);
+  const midi = n + (parseInt(m[3], 10) + 1) * 12;
+  return 440 * Math.pow(2, (midi - 69) / 12);
+}
+
+// ============ BACKING VOICES ============
+// All route through state.backingBus → bit crusher → destination.
+
+function playBass(t, freq, dur, vol, voice) {
+  const ac = state.audio;
+  voice = voice || 'upright';
+  if (voice === 'sub') {
+    // Sub bass — pure sine, long
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol * 1.1, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g).connect(state.backingBus);
+    o.start(t); o.stop(t + dur + 0.05);
+  } else if (voice === 'upright') {
+    // Upright bass — sine + triangle harmonic + finger thud transient
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.value = freq;
+    const o2 = ac.createOscillator();
+    o2.type = 'triangle';
+    o2.frequency.value = freq * 2;
+    const f = ac.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(1400, t);
+    f.frequency.exponentialRampToValueAtTime(450, t + 0.18);
+    f.Q.value = 3;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    const g2 = ac.createGain();
+    g2.gain.setValueAtTime(0, t);
+    g2.gain.linearRampToValueAtTime(vol * 0.25, t + 0.008);
+    g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.6);
+    o.connect(f).connect(g).connect(state.backingBus);
+    o2.connect(g2).connect(state.backingBus);
+    o.start(t); o.stop(t + dur + 0.05);
+    o2.start(t); o2.stop(t + dur + 0.05);
+  } else if (voice === 'electric') {
+    // Electric bass — sawtooth + lp envelope, more bite
+    const o = ac.createOscillator();
+    o.type = 'sawtooth';
+    o.frequency.value = freq;
+    const f = ac.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(2200, t);
+    f.frequency.exponentialRampToValueAtTime(550, t + 0.22);
+    f.Q.value = 5;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol * 0.7, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(f).connect(g).connect(state.backingBus);
+    o.start(t); o.stop(t + dur + 0.05);
+  } else if (voice === 'synth') {
+    // Synth bass — square + sub
+    const o = ac.createOscillator();
+    o.type = 'square';
+    o.frequency.value = freq;
+    const sub = ac.createOscillator();
+    sub.type = 'sine';
+    sub.frequency.value = freq / 2;
+    const f = ac.createBiquadFilter();
+    f.type = 'lowpass';
+    f.frequency.setValueAtTime(3000, t);
+    f.frequency.exponentialRampToValueAtTime(400, t + 0.2);
+    f.Q.value = 6;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol * 0.5, t + 0.003);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    const gs = ac.createGain();
+    gs.gain.setValueAtTime(0, t);
+    gs.gain.linearRampToValueAtTime(vol * 0.6, t + 0.005);
+    gs.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(f).connect(g).connect(state.backingBus);
+    sub.connect(gs).connect(state.backingBus);
+    o.start(t); o.stop(t + dur + 0.05);
+    sub.start(t); sub.stop(t + dur + 0.05);
+  }
+}
+
+function playPad(t, freqs, dur, vol, voice) {
+  const ac = state.audio;
+  voice = voice || 'rhodes';
+  if (voice === 'rhodes') {
+    // Rhodes — sine + slight detuned sine 2 octaves up
+    for (const f of freqs) {
+      const o = ac.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const o2 = ac.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.value = f * 4.01;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * 0.5, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      const g2 = ac.createGain();
+      g2.gain.setValueAtTime(0, t);
+      g2.gain.linearRampToValueAtTime(vol * 0.2, t + 0.005);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + dur * 0.5);
+      o.connect(g).connect(state.backingBus);
+      o2.connect(g2).connect(state.backingBus);
+      o.start(t); o.stop(t + dur + 0.05);
+      o2.start(t); o2.stop(t + dur + 0.05);
+    }
+  } else if (voice === 'wurli') {
+    // Wurli — triangle + lp filter, vibrato
+    for (const f of freqs) {
+      const o = ac.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      const lfo = ac.createOscillator();
+      lfo.frequency.value = 5.5;
+      const lfoGain = ac.createGain();
+      lfoGain.gain.value = 3.0;
+      lfo.connect(lfoGain).connect(o.frequency);
+      const fl = ac.createBiquadFilter();
+      fl.type = 'lowpass';
+      fl.frequency.value = 1800;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * 0.5, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(fl).connect(g).connect(state.backingBus);
+      o.start(t); o.stop(t + dur + 0.05);
+      lfo.start(t); lfo.stop(t + dur + 0.05);
+    }
+  } else if (voice === 'accordion') {
+    // Accordion / bandoneón — sawtooth pair detuned, breathy attack
+    for (const f of freqs) {
+      const o = ac.createOscillator();
+      o.type = 'sawtooth';
+      o.frequency.value = f;
+      const o2 = ac.createOscillator();
+      o2.type = 'sawtooth';
+      o2.frequency.value = f * 1.005;
+      const fl = ac.createBiquadFilter();
+      fl.type = 'lowpass';
+      fl.frequency.value = 2200;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * 0.35, t + 0.05);
+      g.gain.setValueAtTime(vol * 0.35, t + dur - 0.08);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(fl);
+      o2.connect(fl);
+      fl.connect(g).connect(state.backingBus);
+      o.start(t); o.stop(t + dur + 0.05);
+      o2.start(t); o2.stop(t + dur + 0.05);
+    }
+  } else if (voice === 'organ') {
+    // Reggae bubble organ — sine + 3rd harmonic + 5th
+    for (const f of freqs) {
+      const harms = [1, 2, 3];
+      const gains = [0.4, 0.25, 0.18];
+      harms.forEach((h, i) => {
+        const o = ac.createOscillator();
+        o.type = 'sine';
+        o.frequency.value = f * h;
+        const g = ac.createGain();
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(vol * gains[i], t + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+        o.connect(g).connect(state.backingBus);
+        o.start(t); o.stop(t + dur + 0.05);
+      });
+    }
+  } else if (voice === 'marimba') {
+    // Marimba / charango — short triangle pluck with body resonance
+    for (const f of freqs) {
+      const o = ac.createOscillator();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      const o2 = ac.createOscillator();
+      o2.type = 'sine';
+      o2.frequency.value = f * 4;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * 0.55, t + 0.003);
+      g.gain.exponentialRampToValueAtTime(0.001, t + Math.min(dur, 0.6));
+      const g2 = ac.createGain();
+      g2.gain.setValueAtTime(0, t);
+      g2.gain.linearRampToValueAtTime(vol * 0.15, t + 0.002);
+      g2.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+      o.connect(g).connect(state.backingBus);
+      o2.connect(g2).connect(state.backingBus);
+      o.start(t); o.stop(t + dur + 0.05);
+      o2.start(t); o2.stop(t + 0.15);
+    }
+  } else if (voice === 'sine') {
+    for (const f of freqs) {
+      const o = ac.createOscillator();
+      o.type = 'sine';
+      o.frequency.value = f;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(vol * 0.45, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.connect(g).connect(state.backingBus);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+  }
+}
+
+// Click voices — the metronome, varied per style so each pattern feels like its own room.
+function playClickVoice(t, voice, downbeat) {
+  const ac = state.audio;
+  voice = voice || 'click';
+  const dvol = downbeat ? 1 : 0.55;
+  if (voice === 'click') {
+    const o = ac.createOscillator();
+    const g = ac.createGain();
+    o.type = 'sine';
+    o.frequency.value = downbeat ? 1600 : 1100;
+    g.gain.setValueAtTime(0.22 * dvol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + 0.05);
+  } else if (voice === 'cowbell') {
+    // 808-style cowbell — two squares, ringing
+    const freqs = [800, 540];
+    freqs.forEach(fr => {
+      const o = ac.createOscillator();
+      o.type = 'square';
+      o.frequency.value = fr;
+      const f = ac.createBiquadFilter();
+      f.type = 'bandpass';
+      f.frequency.value = 800;
+      f.Q.value = 4;
+      const g = ac.createGain();
+      g.gain.setValueAtTime(0.22 * dvol, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+      o.connect(f).connect(g).connect(ac.destination);
+      o.start(t); o.stop(t + 0.18);
+    });
+  } else if (voice === 'rim' || voice === 'sidestick') {
+    // Rim click — short noise burst + woodblock pitch
+    const o = ac.createOscillator();
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(1800, t);
+    o.frequency.exponentialRampToValueAtTime(700, t + 0.025);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.45 * dvol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + 0.05);
+    const n = ac.createBufferSource();
+    n.buffer = noiseBuffer();
+    const nf = ac.createBiquadFilter();
+    nf.type = 'highpass';
+    nf.frequency.value = 3500;
+    const ng = ac.createGain();
+    ng.gain.setValueAtTime(0.18 * dvol, t);
+    ng.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+    n.connect(nf).connect(ng).connect(ac.destination);
+    n.start(t); n.stop(t + 0.04);
+  } else if (voice === 'woodblock') {
+    const o = ac.createOscillator();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(downbeat ? 1400 : 1050, t);
+    o.frequency.exponentialRampToValueAtTime((downbeat ? 1400 : 1050) * 0.7, t + 0.03);
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.38 * dvol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    o.connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + 0.07);
+  } else if (voice === 'guacharaca') {
+    // Cumbia scraper — quick high-frequency noise burst
+    const n = ac.createBufferSource();
+    n.buffer = noiseBuffer();
+    const f = ac.createBiquadFilter();
+    f.type = 'highpass';
+    f.frequency.value = 5500;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.32 * dvol, t + 0.005);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    n.connect(f).connect(g).connect(ac.destination);
+    n.start(t); n.stop(t + 0.08);
+  } else if (voice === 'agogo') {
+    // Samba agogô — two bell pitches
+    const fr = downbeat ? 1100 : 1400;
+    const o = ac.createOscillator();
+    o.type = 'square';
+    o.frequency.value = fr;
+    const f = ac.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = fr;
+    f.Q.value = 8;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.22 * dvol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.12);
+    o.connect(f).connect(g).connect(ac.destination);
+    o.start(t); o.stop(t + 0.14);
+  } else if (voice === 'tape') {
+    // Soft tape thunk — felt rather than heard, good for ambient styles
+    const n = ac.createBufferSource();
+    n.buffer = noiseBuffer();
+    const f = ac.createBiquadFilter();
+    f.type = 'bandpass';
+    f.frequency.value = 350;
+    f.Q.value = 2;
+    const g = ac.createGain();
+    g.gain.setValueAtTime(0.5 * dvol, t);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+    n.connect(f).connect(g).connect(ac.destination);
+    n.start(t); n.stop(t + 0.07);
+  }
+}
+
+function playKick(t = now(), vol = 1) {
   const ac = state.audio;
   const o = ac.createOscillator();
   const g = ac.createGain();
@@ -1433,7 +2070,7 @@ function playKick(t = now()) {
   o.frequency.setValueAtTime(180, t);
   o.frequency.exponentialRampToValueAtTime(45, t + 0.12);
   g.gain.setValueAtTime(0, t);
-  g.gain.linearRampToValueAtTime(0.85, t + 0.005);
+  g.gain.linearRampToValueAtTime(0.85 * vol, t + 0.005);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.18);
   o.connect(g).connect(ac.destination);
   o.start(t); o.stop(t + 0.2);
@@ -1441,7 +2078,7 @@ function playKick(t = now()) {
   const cg = ac.createGain();
   click.type = 'triangle';
   click.frequency.value = 1800;
-  cg.gain.setValueAtTime(0.25, t);
+  cg.gain.setValueAtTime(0.25 * vol, t);
   cg.gain.exponentialRampToValueAtTime(0.001, t + 0.012);
   click.connect(cg).connect(ac.destination);
   click.start(t); click.stop(t + 0.02);
@@ -1456,7 +2093,7 @@ function noiseBuffer() {
   return buf;
 }
 
-function playSnare(t = now()) {
+function playSnare(t = now(), vol = 1) {
   const ac = state.audio;
   const n = ac.createBufferSource();
   n.buffer = noiseBuffer();
@@ -1464,7 +2101,7 @@ function playSnare(t = now()) {
   nf.type = 'highpass';
   nf.frequency.value = 1200;
   const ng = ac.createGain();
-  ng.gain.setValueAtTime(0.5, t);
+  ng.gain.setValueAtTime(0.5 * vol, t);
   ng.gain.exponentialRampToValueAtTime(0.001, t + 0.13);
   n.connect(nf).connect(ng).connect(ac.destination);
   n.start(t); n.stop(t + 0.15);
@@ -1473,13 +2110,13 @@ function playSnare(t = now()) {
   o.type = 'triangle';
   o.frequency.setValueAtTime(220, t);
   o.frequency.exponentialRampToValueAtTime(140, t + 0.08);
-  g.gain.setValueAtTime(0.3, t);
+  g.gain.setValueAtTime(0.3 * vol, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.1);
   o.connect(g).connect(ac.destination);
   o.start(t); o.stop(t + 0.12);
 }
 
-function playHat(t = now()) {
+function playHat(t = now(), vol = 1) {
   const ac = state.audio;
   const n = ac.createBufferSource();
   n.buffer = noiseBuffer();
@@ -1487,13 +2124,13 @@ function playHat(t = now()) {
   f.type = 'highpass';
   f.frequency.value = 7500;
   const g = ac.createGain();
-  g.gain.setValueAtTime(0.3, t);
+  g.gain.setValueAtTime(0.3 * vol, t);
   g.gain.exponentialRampToValueAtTime(0.001, t + 0.05);
   n.connect(f).connect(g).connect(ac.destination);
   n.start(t); n.stop(t + 0.06);
 }
 
-function playClap(t = now()) {
+function playClap(t = now(), vol = 1) {
   const ac = state.audio;
   for (let i = 0; i < 3; i++) {
     const tt = t + i * 0.011;
@@ -1505,33 +2142,26 @@ function playClap(t = now()) {
     f.Q.value = 1.2;
     const g = ac.createGain();
     g.gain.setValueAtTime(0, tt);
-    g.gain.linearRampToValueAtTime(0.4, tt + 0.002);
+    g.gain.linearRampToValueAtTime(0.4 * vol, tt + 0.002);
     g.gain.exponentialRampToValueAtTime(0.001, tt + 0.05);
     n.connect(f).connect(g).connect(ac.destination);
     n.start(tt); n.stop(tt + 0.06);
   }
 }
 
-function playPadSound(pad) {
+function playPadSound(pad, t, vol = 1) {
   if (!state.audio) return;
-  if (pad === 0) playKick();
-  else if (pad === 1) playSnare();
-  else if (pad === 2) playHat();
-  else if (pad === 3) playClap();
+  if (t == null) t = now();
+  if (pad === 0) playKick(t, vol);
+  else if (pad === 1) playSnare(t, vol);
+  else if (pad === 2) playHat(t, vol);
+  else if (pad === 3) playClap(t, vol);
 }
 
 function tickClick(downbeat = false) {
-  if (!state.audio) return;
-  const ac = state.audio;
-  const t = now();
-  const o = ac.createOscillator();
-  const g = ac.createGain();
-  o.type = 'sine';
-  o.frequency.value = downbeat ? 1400 : 1000;
-  g.gain.setValueAtTime(downbeat ? 0.06 : 0.03, t);
-  g.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-  o.connect(g).connect(ac.destination);
-  o.start(t); o.stop(t + 0.05);
+  if (!state.audio || !state.clickOn) return;
+  const voice = currentPattern().backing?.click || 'click';
+  playClickVoice(now(), voice, downbeat);
 }
 
 // ============ PATTERNS / NOTES ============
@@ -1565,6 +2195,71 @@ function ensureNotesSpawned() {
   while (state.spawnCursor < targetLoop) {
     spawnLoop(state.spawnCursor);
     state.spawnCursor++;
+  }
+}
+
+// Guide track: schedule a quiet version of each hit so the player hears
+// what they're trying to play. Scheduled separately from note spawning
+// and only one loop ahead so toggle-off takes effect within ~1 loop.
+function scheduleGuideForLoop(loopIdx) {
+  const pattern = currentPattern();
+  const baseTime = state.startedAt + loopIdx * patternDur();
+  for (const [beat, pad] of pattern.notes) {
+    const t = baseTime + beat * secPerBeat();
+    if (t < now() - 0.02) continue;
+    playPadSound(pad, t, 0.32);
+  }
+}
+
+function ensureGuideScheduled() {
+  if (!state.guideOn || !state.audio) return;
+  const targetLoop = Math.floor((now() - state.startedAt) / patternDur()) + 1;
+  while (state.guideCursor <= targetLoop) {
+    scheduleGuideForLoop(state.guideCursor);
+    state.guideCursor++;
+  }
+}
+
+// ============ BACKING TRACK ============
+// Each pattern has a `backing` config: bass line, pad/chord stabs, click voice,
+// and a 12-bit crush amount. Scheduled per loop like the guide.
+function scheduleBackingForLoop(loopIdx) {
+  const pattern = currentPattern();
+  const b = pattern.backing;
+  if (!b) return;
+  const baseTime = state.startedAt + loopIdx * patternDur();
+  const spb = secPerBeat();
+  const root = noteFreq(b.key || 'A2');
+
+  // Bass line
+  if (b.bass && b.bass.length) {
+    for (const [beat, semis, dur] of b.bass) {
+      const t = baseTime + beat * spb;
+      if (t < now() - 0.02) continue;
+      const f = root * Math.pow(2, semis / 12);
+      playBass(t, f, (dur || 1) * spb, b.bassVol ?? 0.42, b.bassVoice || 'upright');
+    }
+  }
+
+  // Pad / chord stabs
+  if (b.pad && b.pad.length) {
+    for (const [beat, intervals, dur] of b.pad) {
+      const t = baseTime + beat * spb;
+      if (t < now() - 0.02) continue;
+      // Chord pad sits an octave up from the bass root
+      const padRoot = root * 2;
+      const freqs = intervals.map(s => padRoot * Math.pow(2, s / 12));
+      playPad(t, freqs, (dur || 2) * spb, b.padVol ?? 0.22, b.padVoice || 'rhodes');
+    }
+  }
+}
+
+function ensureBackingScheduled() {
+  if (!state.backingOn || !state.audio) return;
+  const targetLoop = Math.floor((now() - state.startedAt) / patternDur()) + 1;
+  while (state.backingCursor <= targetLoop) {
+    scheduleBackingForLoop(state.backingCursor);
+    state.backingCursor++;
   }
 }
 
@@ -1783,6 +2478,8 @@ document.querySelectorAll('.pad').forEach(padEl => {
 function gameLoop() {
   if (state.isPlaying) {
     ensureNotesSpawned();
+    ensureGuideScheduled();
+    ensureBackingScheduled();
     const t = now();
     const elapsed = t - state.startedAt;
     const totalBeats = currentPattern().beats;
@@ -1828,8 +2525,11 @@ function startPlay() {
   if (state.isPlaying) return;
   initAudio();
   if (state.audio.state === 'suspended') state.audio.resume();
+  applyCrushCurve(currentPattern().backing?.crush ?? 0.4);
   state.startedAt = state.audio.currentTime + 0.5;
   state.spawnCursor = 0;
+  state.backingCursor = 0;
+  state.guideCursor = 0;
   state.notes = [];
   state.score = 0;
   state.combo = 0;
@@ -1860,6 +2560,8 @@ function resetAll() {
   pausePlay();
   state.notes = [];
   state.spawnCursor = 0;
+  state.guideCursor = 0;
+  state.backingCursor = 0;
   state.score = 0;
   state.combo = 0;
   state.hits = { perfect: 0, good: 0, ok: 0, miss: 0 };
@@ -1880,6 +2582,41 @@ playBtn.addEventListener('click', () => {
   else startPlay();
 });
 resetBtn.addEventListener('click', resetAll);
+
+// ============ GUIDE / CLICK / BACKING TOGGLES ============
+function renderGuideBtn() {
+  guideBtn.classList.toggle('on', state.guideOn);
+  guideBtn.querySelector('.guide-text').textContent = state.guideOn ? 'GUIDE: ON' : 'GUIDE: OFF';
+  clickBtn.classList.toggle('on', state.clickOn);
+  clickBtn.querySelector('.guide-text').textContent = state.clickOn ? 'CLICK: ON' : 'CLICK: OFF';
+  backingBtn.classList.toggle('on', state.backingOn);
+  backingBtn.querySelector('.guide-text').textContent = state.backingOn ? 'BACKING: ON' : 'BACKING: OFF';
+}
+guideBtn.addEventListener('click', () => {
+  state.guideOn = !state.guideOn;
+  renderGuideBtn();
+  saveState();
+  // Turning ON: fast-forward so toggle picks up the current loop; turning OFF
+  // lets the already-queued ~1 loop of audio play out (acceptable).
+  if (state.guideOn && state.isPlaying) {
+    const currentLoop = Math.floor((now() - state.startedAt) / patternDur());
+    state.guideCursor = Math.max(state.guideCursor, currentLoop);
+  }
+});
+clickBtn.addEventListener('click', () => {
+  state.clickOn = !state.clickOn;
+  renderGuideBtn();
+  saveState();
+});
+backingBtn.addEventListener('click', () => {
+  state.backingOn = !state.backingOn;
+  renderGuideBtn();
+  saveState();
+  if (state.backingOn && state.isPlaying) {
+    const currentLoop = Math.floor((now() - state.startedAt) / patternDur());
+    state.backingCursor = Math.max(state.backingCursor, currentLoop);
+  }
+});
 
 // ============ BPM SLIDER ============
 bpmSlider.addEventListener('input', (e) => {
@@ -1931,6 +2668,8 @@ function selectPattern(id) {
   state.bpm = PATTERNS[id].bpm;
   bpmSlider.value = state.bpm;
   bpmVal.textContent = state.bpm;
+  // Each style gets its own bit-crush amount on the backing bus
+  if (state.audio) applyCrushCurve(PATTERNS[id].backing?.crush ?? 0.4);
   if (state.isPlaying) {
     resetAll();
     setTimeout(startPlay, 100);
@@ -2074,6 +2813,9 @@ window.addEventListener('keydown', (e) => {
     const CITY_MAP = {
       brooklyn: 'BROOKLYN', medellin: 'MEDELLÍN', mexico: 'CDMX',
       berlin: 'BERLIN', tokyo: 'TOKYO',
+      addis: 'ADDIS ABABA', lagos: 'LAGOS', accra: 'ACCRA',
+      kingston: 'KINGSTON', cusco: 'CUSCO', salvador: 'SALVADOR',
+      rio: 'RIO', buenosaires: 'BUENOS AIRES',
     };
     const wantCity = CITY_MAP[cityParam];
     if (wantCity) {
@@ -2086,6 +2828,7 @@ window.addEventListener('keydown', (e) => {
   }
 
   renderPatternSelector();
+  renderGuideBtn();
   updateStats();
   // pattern.city is uppercase (BROOKLYN, MEDELLÍN, CDMX, BERLIN, TOKYO);
   // map back to the lowercase atlas id so the mural lookup matches.
