@@ -1,28 +1,43 @@
-// la despensa reminder — Mon + Fri 9pm Medellín-time email nudge to do the
-// stock check.
+// la despensa reminder — Mon + Fri 9pm Medellín-time email nudge to lrel
+// to do the stock check.
 //
-// Cron schedule: "0 2 * * 2,6" = Tuesday + Saturday at 02:00 UTC =
-// Monday + Friday at 21:00 in America/Bogota (UTC-5, no DST).
+// Cron schedule (declared in vercel.json): "0 2 * * 2,6"
+//   = Tuesday + Saturday at 02:00 UTC
+//   = Monday + Friday at 21:00 in America/Bogota (UTC-5, no DST)
 //
-// Setup steps (one-time):
-//   1. Sign up at resend.com and create an API key.
-//   2. In Netlify → Site settings → Environment variables, add:
-//        RESEND_API_KEY  = re_xxx
-//        PANTRY_TO       = lrel.code@gmail.com   (optional, this is the default)
-//        PANTRY_FROM     = la despensa <onboarding@resend.dev>   (optional)
-//        PANTRY_URL      = https://thespacepit.com/pantry        (optional)
-//   3. To send from a custom address you'll need to verify a domain in Resend
-//      (e.g. thespacepit.com → DNS records), then set PANTRY_FROM accordingly.
-//      Without verification, only onboarding@resend.dev → your Resend-account
-//      email works.
-//   4. Deploy: `npx netlify deploy --prod --build`
+// Vercel invokes this route on schedule with an Authorization: Bearer
+// ${CRON_SECRET} header. We verify that header so the endpoint isn't
+// publicly triggerable. If CRON_SECRET is unset (e.g. local dev), we
+// log a warning and accept — that way `curl localhost:3000/api/pantry/reminder`
+// still works while testing.
 //
-// Manual test (after deploy): hit /.netlify/functions/pantry-reminder
+// Setup steps (one-time, Vercel project settings → Environment Variables):
+//   RESEND_API_KEY  = re_xxx                    (required to send)
+//   CRON_SECRET     = <long random string>      (Vercel auto-fills for crons;
+//                                                 set to match for manual tests)
+//   PANTRY_TO       = lrel.code@gmail.com       (optional, this is default)
+//   PANTRY_FROM     = la despensa <onboarding@resend.dev>   (optional)
+//   PANTRY_URL      = https://thespacepit.com/pantry        (optional)
+//
+// Manual test (after deploy):
+//   curl -H "Authorization: Bearer $CRON_SECRET" https://thespacepit.com/api/pantry/reminder
 
-export default async () => {
+import type { NextRequest } from "next/server";
+
+// Force dynamic — never cache; the cron pings this for the side effect.
+export const dynamic = "force-dynamic";
+
+function unauthorized() {
+  return Response.json({ error: "unauthorized" }, { status: 401 });
+}
+
+async function sendReminder() {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    return new Response("RESEND_API_KEY not set", { status: 500 });
+    return Response.json(
+      { error: "RESEND_API_KEY not set" },
+      { status: 500 },
+    );
   }
 
   const to = process.env.PANTRY_TO ?? "lrel.code@gmail.com";
@@ -63,12 +78,27 @@ export default async () => {
   if (!res.ok) {
     const err = await res.text();
     console.error("resend send failed", res.status, err);
-    return new Response(`resend error: ${res.status} ${err}`, { status: 502 });
+    return Response.json(
+      { error: `resend ${res.status}`, detail: err },
+      { status: 502 },
+    );
   }
 
-  return new Response("ok");
-};
+  const body = (await res.json().catch(() => ({}))) as { id?: string };
+  return Response.json({ ok: true, id: body.id ?? null, to });
+}
 
-export const config = {
-  schedule: "0 2 * * 2,6",
-};
+export async function GET(request: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  const header = request.headers.get("authorization");
+  const expected = secret ? `Bearer ${secret}` : null;
+
+  if (expected) {
+    if (header !== expected) return unauthorized();
+  } else {
+    // No secret set — local dev / first deploy. Warn but allow.
+    console.warn("[pantry-reminder] CRON_SECRET not set; allowing unauthenticated request");
+  }
+
+  return sendReminder();
+}
